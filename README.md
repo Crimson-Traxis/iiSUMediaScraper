@@ -177,10 +177,6 @@ Define output settings:
 
 **Note**: IGN scraper does not require API keys and works without authentication.
 
-## License
-
-GPL
-
 ## Support
 
 For issues, questions, or suggestions, please open an issue on GitHub.
