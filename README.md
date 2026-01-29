@@ -122,7 +122,7 @@ Configure media scrapers:
 
 ### Image Upscaler Settings
 
-Configure [SpeedVR2](https://github.com/AbdullahBRashid/SpeedVR2) for image upscaling:
+Configure [SpeedVR2](https://github.com/IceClear/SeedVR2) for image upscaling:
 - **Python Requirement**: Python (non-Windows Store version) must be installed and accessible from PATH
 - **SpeedVR2**: Fast video/image upscaling tool used by this application
 - Arguments
