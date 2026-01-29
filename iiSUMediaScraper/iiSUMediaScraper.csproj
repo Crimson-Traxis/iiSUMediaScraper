@@ -18,7 +18,7 @@
 		<UserSecretsId>f56c6b21-052c-4a63-a873-0055657b4875</UserSecretsId>
 		<WindowsPackageType>None</WindowsPackageType>
 		<PackageIcon>icon.png</PackageIcon>
-		<Version>1.0.2</Version>
+		<Version>1.0.3</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\icon.ico" />
