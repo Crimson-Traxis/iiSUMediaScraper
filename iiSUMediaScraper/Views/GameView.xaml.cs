@@ -206,12 +206,17 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// Handles view model property changes.
     /// Updates the loading state on the UI thread.
     /// </summary>
-    private void _viewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         DispatcherQueue.TryEnqueue(() =>
         {
             IsLoading = ViewModel?.IsLoading ?? false;
         });
+    }
+
+    private void ViewModel_DemoMediaChanged(object? sender, GameViewModel e)
+    {
+        UpdateHeroAndSlide();
     }
 
     /// <summary>
@@ -369,24 +374,20 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
         {
             if (ViewModel != null)
             {
+                CurrentHero = null;
+
                 if (ViewModel.DemoModeHeros.Count > 0)
                 {
                     _currentHeroIndex = (_currentHeroIndex + 1) % ViewModel.DemoModeHeros.Count;
                     CurrentHero = ViewModel.DemoModeHeros[_currentHeroIndex];
                 }
-                else
-                {
-                    CurrentHero = null;
-                }
+
+                CurrentSlide = null;
 
                 if (ViewModel.DemoModeSlides.Count > 0)
                 {
                     _currentSlideIndex = (_currentSlideIndex + 1) % ViewModel.DemoModeSlides.Count;
                     CurrentSlide = ViewModel.DemoModeSlides[_currentSlideIndex];
-                }
-                else
-                {
-                    CurrentSlide = null;
                 }
 
                 HeroCount = ViewModel.DemoModeHeros.Count;
@@ -442,7 +443,8 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
                 {
                     _viewModel.DemoModeHeros.CollectionChanged -= DemoModeHeros_CollectionChanged;
                     _viewModel.DemoModeSlides.CollectionChanged -= DemoModeSlides_CollectionChanged;
-                    _viewModel.PropertyChanged -= _viewModel_PropertyChanged;
+                    _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
+                    _viewModel.DemoMediaChanged -= ViewModel_DemoMediaChanged;
                 }
 
                 _viewModel = value;
@@ -453,7 +455,8 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
                 {
                     _viewModel.DemoModeHeros.CollectionChanged += DemoModeHeros_CollectionChanged;
                     _viewModel.DemoModeSlides.CollectionChanged += DemoModeSlides_CollectionChanged;
-                    _viewModel.PropertyChanged += _viewModel_PropertyChanged;
+                    _viewModel.PropertyChanged += ViewModel_PropertyChanged;
+                    _viewModel.DemoMediaChanged += ViewModel_DemoMediaChanged;
 
                     _currentHeroIndex = -1; // Start at -1 so first update goes to index 0
                     _currentSlideIndex = -1;

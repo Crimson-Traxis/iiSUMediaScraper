@@ -137,13 +137,13 @@ public class IgdbScraper : Scraper
                 {
                     foreach (Game? game in json.Where(g => g.Platforms.Any(p => p.Id == platformId)))
                     {
-                        bool foundMatch = TitleMatches(Path.GetFileNameWithoutExtension(name), game.Name);
+                        bool foundMatch = TitleMatches(CleanName(name), game.Name);
 
                         if (!foundMatch)
                         {
                             foreach (AlternativeName alternate in await ScrapeAlternateNames(game.Id))
                             {
-                                foundMatch |= TitleMatches(Path.GetFileNameWithoutExtension(name), alternate.Name);
+                                foundMatch |= TitleMatches(CleanName(name), alternate.Name);
                             }
                         }
 

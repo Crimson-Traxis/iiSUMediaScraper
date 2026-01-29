@@ -100,6 +100,11 @@ public partial class GameViewModel : ObservableObject
     public event EventHandler<GameViewModel>? StageApplyGameRequested;
 
     /// <summary>
+    /// Raised when the demo media changes 
+    /// </summary>
+    public event EventHandler<GameViewModel>? DemoMediaChanged;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="GameViewModel"/> class.
     /// </summary>
     /// <param name="fileService">The file service.</param>
@@ -173,6 +178,8 @@ public partial class GameViewModel : ObservableObject
             {
                 DemoModeIcon = await ImageFormatterService.FormatIcon(icon.BaseModel, Platform);
             }
+
+            DemoMediaChanged?.Invoke(this, this);
         }
 
         OnPropertyChanged(nameof(IsFound));
@@ -191,6 +198,8 @@ public partial class GameViewModel : ObservableObject
             {
                 DemoModeTitle = await ImageFormatterService.FormatTitle(title.BaseModel);
             }
+
+            DemoMediaChanged?.Invoke(this, this);
         }
 
         OnPropertyChanged(nameof(IsFound));
@@ -211,6 +220,8 @@ public partial class GameViewModel : ObservableObject
                     DemoModeHeros.Add(image);
                 }
             }
+
+            DemoMediaChanged?.Invoke(this, this);
         }
 
         OnPropertyChanged(nameof(IsFound));
@@ -231,6 +242,8 @@ public partial class GameViewModel : ObservableObject
                     DemoModeSlides.Add(image);
                 }
             }
+
+            DemoMediaChanged?.Invoke(this, this);
         }
 
         OnPropertyChanged(nameof(IsFound));

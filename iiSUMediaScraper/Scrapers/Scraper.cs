@@ -208,7 +208,9 @@ public abstract class Scraper
             SanitizationLevel.None,
             SanitizationLevel.Region,
             SanitizationLevel.RegionAndSpecialCharacters,
-            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpaces,
+            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals,
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals
         ];
 
         foreach (SanitizationLevel level in levels)
@@ -246,11 +248,21 @@ public abstract class Scraper
     /// <returns>Cleaned game name.</returns>
     protected string CleanName(string name)
     {
-        name = Path.GetFileNameWithoutExtension(name);
+        // Remove only known file extensions
+        var extensions = GlobalConfiguration.ExtensionConfigurations.SelectMany(e => e.Extension);
 
-        string pattern = @"\s*\(.*?\)\s*";
+        foreach (string ext in extensions)
+        {
+            string extension = ext.StartsWith('.') ? ext : "." + ext;
+            if (name.EndsWith(extension, StringComparison.OrdinalIgnoreCase))
+            {
+                name = name[..^extension.Length];
+                break;
+            }
+        }
 
-        // Replace matches with an empty string
+        // Remove only trailing parenthetical groups (region info, version, etc.)
+        string pattern = @"(\s*\([^)]*\))+$";
         name = Regex.Replace(name, pattern, string.Empty).Trim();
 
         return name;
@@ -285,22 +297,33 @@ public abstract class Scraper
     protected string SanitizeName(string name, SanitizationLevel level)
     {
         if (level is SanitizationLevel.RegionAndSpecialCharacters or
-            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals)
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpaces or
+            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals or
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals)
         {
             name = Regex.Replace(name, @"[^a-zA-Z0-9\s]", "").Trim();
         }
 
         if (level is SanitizationLevel.Region or
             SanitizationLevel.RegionAndSpecialCharacters or
-            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals)
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpaces or
+            SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals or
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals)
         {
             name = Regex.Replace(Regex.Replace(name, @"\s*\([^)]*\)$", ""), @"\s+", " ");
         }
 
-        if (level == SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals)
+        if (level is SanitizationLevel.RegionAndSpecialCharactersAndRomanNumerals or
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals)
         {
             name = ConvertRomanToNumbers(name);
             name = ConvertNumbersToRoman(name);
+        }
+
+        if (level is SanitizationLevel.RegionAndSpecialCharactersAndNoSpaces or
+            SanitizationLevel.RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals)
+        {
+            name = Regex.Replace(name, @"\s+", "");
         }
 
         return name;
@@ -441,8 +464,12 @@ public abstract class Scraper
         Region,
         /// <summary>Remove region info and special characters.</summary>
         RegionAndSpecialCharacters,
+        /// <summary>Remove region info, special characters, and no spaces.</summary>
+        RegionAndSpecialCharactersAndNoSpaces,
         /// <summary>Remove region info, special chars, and convert between Roman/Arabic numerals.</summary>
         RegionAndSpecialCharactersAndRomanNumerals,
+        /// <summary>Remove region info, special chars, no spaces, and convert between Roman/Arabic numerals.</summary>
+        RegionAndSpecialCharactersAndNoSpacesAndRomanNumerals,
     }
 
     /// <summary>

@@ -65,13 +65,13 @@ public class IgnScraper : Scraper
             {
                 foreach (Game? game in json.Data.Result.Games.Where(g => g.Regions.Any(r => r.Releases.Any(r => r.PlatformAttributes.Any(p => p.Id == platformId)))))
                 {
-                    bool foundMatch = TitleMatches(Path.GetFileNameWithoutExtension(name), game.Metadata.Names.Name);
+                    bool foundMatch = TitleMatches(CleanName(name), game.Metadata.Names.Name);
 
                     if (!foundMatch)
                     {
                         foreach (var alternate in game.Metadata.Names.Alternates)
                         {
-                            foundMatch |= TitleMatches(Path.GetFileNameWithoutExtension(name), alternate);
+                            foundMatch |= TitleMatches(CleanName(name), alternate);
                         }
                     }
 

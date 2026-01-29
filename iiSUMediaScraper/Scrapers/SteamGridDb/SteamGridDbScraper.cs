@@ -92,7 +92,7 @@ public class SteamGridDbScraper : Scraper
                 {
                     foreach (var game in json.Data)
                     {
-                        if (TitleMatches(Path.GetFileNameWithoutExtension(name), game.Name))
+                        if (TitleMatches(CleanName(name), game.Name))
                         {
                             Logger.LogDebug("SteamGridDB: Found match for {Name}: {GameName}", name, game.Name);
 
@@ -179,7 +179,7 @@ public class SteamGridDbScraper : Scraper
             Logger.LogWarning(ex, "SteamGridDB: Failed to scrape heroes for game {GameId}", gameId);
         }
 
-        return null;
+        return [];
     }
 
     /// <summary>
@@ -226,7 +226,7 @@ public class SteamGridDbScraper : Scraper
             Logger.LogWarning(ex, "SteamGridDB: Failed to scrape grids for game {GameId}", gameId);
         }
 
-        return null;
+        return [];
     }
 
     /// <summary>
@@ -273,7 +273,7 @@ public class SteamGridDbScraper : Scraper
             Logger.LogWarning(ex, "SteamGridDB: Failed to scrape logos for game {GameId}", gameId);
         }
 
-        return null;
+        return [];
     }
 
     /// <summary>
