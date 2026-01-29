@@ -2,6 +2,22 @@
 
 A powerful WinUI 3 application for scraping, managing, and formatting game media assets from multiple sources. Designed to help organize and optimize game icons, titles, logos, hero images, and slide images for gaming platforms and frontends.
 
+<img width="1564" height="891" alt="Loaded Game" src="https://github.com/user-attachments/assets/dccfeb85-3e65-450b-8aa9-389c0e505681" />
+
+## Game folder location example
+
+<img width="927" height="624" alt="Folder" src="https://github.com/user-attachments/assets/6a79170c-9dc7-40c4-ac73-afc7847e36e7" />
+
+## Applied assets
+- Platform folders matching your games folder will be created 
+- Sanitized game names will be used to create a platform sub folder for assets
+  
+<img width="927" height="623" alt="Assets" src="https://github.com/user-attachments/assets/258da64d-96dc-489d-8bb5-5dbddcfa4984" />
+<img width="877" height="629" alt="Applied Assets" src="https://github.com/user-attachments/assets/198ad9e1-763a-494f-9d69-be0b4f9f959c" />
+
+## Screenshots
+![slideshow](https://github.com/user-attachments/assets/11969150-49ae-4faf-ae7c-18bebac3ee98)
+
 ## Features
 
 ### Multi-Source Media Scraping
