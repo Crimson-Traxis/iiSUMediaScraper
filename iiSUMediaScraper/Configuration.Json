@@ -1,0 +1,1164 @@
+﻿{
+  "GamesPath": "",
+  "ApplyAssetPath": "",
+  "UnfoundMediaMovePath": "",
+  "SteamGridDbKey": "",
+  "IgdbClientSecret": "",
+  "IgdbClientId": "",
+  "IsPrioritizeLogoAsTitle": true,
+  "IsUseLogoAsTitle": false,
+  "IsMoveToUnfoundGamesFolder": false,
+  "IsApplyIcon": true,
+  "IsApplyTitle": true,
+  "IsApplyHeros": true,
+  "IsApplySlides": true,
+  "IconNameFormat": "icon",
+  "TitleNameFormat": "title",
+  "HeroNameFormat": "hero_",
+  "SlideNameFormat": "slide_",
+  "IsApplyUnfoundGames": false,
+  "IsDeleteExistingHeroAssets": false,
+  "IsDeleteExistingSlideAssets": false,
+  "MaxNumberOfConcurrentGames": 10,
+  "DefaultUpscaleConfigurationName": null,
+  "DefaultReconstructorConfigurationName": null,
+  "IsScanGames": true,
+  "IsScanUnfoundGames": false,
+  "IsUnfoundMediaIfNoIcons": true,
+  "IsUnfoundMediaIfNoLogos": true,
+  "IsUnfoundMediaIfNoTitles": true,
+  "IsUnfoundMediaIfNoHeros": true,
+  "IsUnfoundMediaIfNoSlides": false,
+  "IconWidth": 1024,
+  "IconHeight": 1024,
+  "LogoWidth": 1024,
+  "LogoHeight": null,
+  "TitleWidth": 1024,
+  "TitleHeight": 1024,
+  "HeroWidth": 3840,
+  "HeroHeight": 2160,
+  "SlideWidth": null,
+  "SlideHeight": null,
+  "FolderConfigurations": [
+    {
+      "Platform": "NES",
+      "Name": "nes"
+    },
+    {
+      "Platform": "NES",
+      "Name": "famicom"
+    },
+    {
+      "Platform": "SNES",
+      "Name": "snes"
+    },
+    {
+      "Platform": "SNES",
+      "Name": "sfc"
+    },
+    {
+      "Platform": "SNES",
+      "Name": "super famicom"
+    },
+    {
+      "Platform": "N64",
+      "Name": "n64"
+    },
+    {
+      "Platform": "N64",
+      "Name": "nintendo 64"
+    },
+    {
+      "Platform": "GB",
+      "Name": "gb"
+    },
+    {
+      "Platform": "GB",
+      "Name": "gameboy"
+    },
+    {
+      "Platform": "GBC",
+      "Name": "gbc"
+    },
+    {
+      "Platform": "GBC",
+      "Name": "gameboy color"
+    },
+    {
+      "Platform": "GBA",
+      "Name": "gba"
+    },
+    {
+      "Platform": "GBA",
+      "Name": "gameboy advance"
+    },
+    {
+      "Platform": "GC",
+      "Name": "gc"
+    },
+    {
+      "Platform": "GC",
+      "Name": "gamecube"
+    },
+    {
+      "Platform": "GC",
+      "Name": "ngc"
+    },
+    {
+      "Platform": "NDS",
+      "Name": "nds"
+    },
+    {
+      "Platform": "NDS",
+      "Name": "ds"
+    },
+    {
+      "Platform": "NDS",
+      "Name": "nintendo ds"
+    },
+    {
+      "Platform": "3DS",
+      "Name": "3ds"
+    },
+    {
+      "Platform": "3DS",
+      "Name": "nintendo 3ds"
+    },
+    {
+      "Platform": "Wii",
+      "Name": "wii"
+    },
+    {
+      "Platform": "WiiU",
+      "Name": "wiiu"
+    },
+    {
+      "Platform": "WiiU",
+      "Name": "wii u"
+    },
+    {
+      "Platform": "Switch",
+      "Name": "switch"
+    },
+    {
+      "Platform": "Switch",
+      "Name": "nintendo switch"
+    },
+    {
+      "Platform": "PSX",
+      "Name": "psx"
+    },
+    {
+      "Platform": "PSX",
+      "Name": "ps1"
+    },
+    {
+      "Platform": "PSX",
+      "Name": "playstation"
+    },
+    {
+      "Platform": "PS2",
+      "Name": "ps2"
+    },
+    {
+      "Platform": "PS2",
+      "Name": "playstation 2"
+    },
+    {
+      "Platform": "PS3",
+      "Name": "ps3"
+    },
+    {
+      "Platform": "PS3",
+      "Name": "playstation 3"
+    },
+    {
+      "Platform": "PS4",
+      "Name": "ps4"
+    },
+    {
+      "Platform": "PS4",
+      "Name": "playstation 4"
+    },
+    {
+      "Platform": "PSP",
+      "Name": "psp"
+    },
+    {
+      "Platform": "PSP",
+      "Name": "playstation portable"
+    },
+    {
+      "Platform": "PSVita",
+      "Name": "psvita"
+    },
+    {
+      "Platform": "PSVita",
+      "Name": "vita"
+    },
+    {
+      "Platform": "PSVita",
+      "Name": "ps vita"
+    },
+    {
+      "Platform": "Xbox",
+      "Name": "xbox"
+    },
+    {
+      "Platform": "Xbox360",
+      "Name": "xbox360"
+    },
+    {
+      "Platform": "Xbox360",
+      "Name": "xbox 360"
+    },
+    {
+      "Platform": "DreamCast",
+      "Name": "dreamcast"
+    },
+    {
+      "Platform": "DreamCast",
+      "Name": "dc"
+    },
+    {
+      "Platform": "GameGear",
+      "Name": "gamegear"
+    },
+    {
+      "Platform": "GameGear",
+      "Name": "game gear"
+    },
+    {
+      "Platform": "GameGear",
+      "Name": "gg"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Name": "genesis"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Name": "megadrive"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Name": "mega drive"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Name": "md"
+    },
+    {
+      "Platform": "Saturn",
+      "Name": "saturn"
+    },
+    {
+      "Platform": "Saturn",
+      "Name": "sega saturn"
+    },
+    {
+      "Platform": "Atari2600",
+      "Name": "atari2600"
+    },
+    {
+      "Platform": "Atari2600",
+      "Name": "atari 2600"
+    },
+    {
+      "Platform": "Atari2600",
+      "Name": "a2600"
+    },
+    {
+      "Platform": "NeoGeoPocketColor",
+      "Name": "ngpc"
+    },
+    {
+      "Platform": "NeoGeoPocketColor",
+      "Name": "neo geo pocket color"
+    },
+    {
+      "Platform": "NeoGeoPocketColor",
+      "Name": "neogeo pocket color"
+    },
+    {
+      "Platform": "Android",
+      "Name": "android"
+    },
+    {
+      "Platform": "PC",
+      "Name": "pc"
+    },
+    {
+      "Platform": "PC",
+      "Name": "windows"
+    },
+    {
+      "Platform": "Steam",
+      "Name": "steam"
+    },
+    {
+      "Platform": "GOG",
+      "Name": "gog"
+    }
+  ],
+  "GameIconOverlayConfigurations": [
+    {
+      "Platform": "Xbox",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Microsoft\\Xbox.png"
+    },
+    {
+      "Platform": "Xbox360",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Microsoft\\Xbox360.png"
+    },
+    {
+      "Platform": "3DS",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\3DS.png"
+    },
+    {
+      "Platform": "NDS",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\DS.png"
+    },
+    {
+      "Platform": "GC",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Gamecube.png"
+    },
+    {
+      "Platform": "GB",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Game_Boy.png"
+    },
+    {
+      "Platform": "GBA",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Game_Boy_Advance.png"
+    },
+    {
+      "Platform": "GBC",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Game_Boy_Color.png"
+    },
+    {
+      "Platform": "N64",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\N64.png"
+    },
+    {
+      "Platform": "NES",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\NES.png"
+    },
+    {
+      "Platform": "SNES",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\SNES.png"
+    },
+    {
+      "Platform": "Switch",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Switch.png"
+    },
+    {
+      "Platform": "Wii",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Wii.png"
+    },
+    {
+      "Platform": "WiiU",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Nintendo\\Wii_U.png"
+    },
+    {
+      "Platform": "Android",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\Android.png"
+    },
+    {
+      "Platform": "Atari2600",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\Atari2600.png"
+    },
+    {
+      "Platform": "GOG",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\GOG.png"
+    },
+    {
+      "Platform": "NeoGeoPocketColor",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\Neo_Geo_Pocket_Color.png"
+    },
+    {
+      "Platform": "PC",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\PC.png"
+    },
+    {
+      "Platform": "Steam",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Other\\Steam.png"
+    },
+    {
+      "Platform": "DreamCast",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sega\\Dreamcast.png"
+    },
+    {
+      "Platform": "GameGear",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sega\\Game_Gear.png"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sega\\Megadrive-Genesis.png"
+    },
+    {
+      "Platform": "Saturn",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sega\\Saturn.png"
+    },
+    {
+      "Platform": "PS2",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PS2.png"
+    },
+    {
+      "Platform": "PS3",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PS3.png"
+    },
+    {
+      "Platform": "PS4",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PS4.png"
+    },
+    {
+      "Platform": "PSP",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PSP.png"
+    },
+    {
+      "Platform": "PSX",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PSX.png"
+    },
+    {
+      "Platform": "PSVita",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Overlays\\Sony\\PS_Vita.png"
+    }
+  ],
+  "PlatformIconConfigurations": [
+    {
+      "Platform": "Android",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Android.png"
+    },
+    {
+      "Platform": "NES",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Famicom.png"
+    },
+    {
+      "Platform": "GBA",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Gameboy Advance.png"
+    },
+    {
+      "Platform": "GBC",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Gameboy Color.png"
+    },
+    {
+      "Platform": "GB",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Gameboy.png"
+    },
+    {
+      "Platform": "3DS",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo 3DS.png"
+    },
+    {
+      "Platform": "N64",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo 64.png"
+    },
+    {
+      "Platform": "NDS",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo DS.png"
+    },
+    {
+      "Platform": "EShop",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo eShop.png"
+    },
+    {
+      "Platform": "GC",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo GameCube.png"
+    },
+    {
+      "Platform": "Switch",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo Switch.png"
+    },
+    {
+      "Platform": "WiiU",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo Wii U.png"
+    },
+    {
+      "Platform": "Wii",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Nintendo Wii.png"
+    },
+    {
+      "Platform": "PS2",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\PlayStation 2.png"
+    },
+    {
+      "Platform": "PSP",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\PlayStation Portable.png"
+    },
+    {
+      "Platform": "PSVita",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\PlayStation VITA.png"
+    },
+    {
+      "Platform": "PSX",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\PlayStation.png"
+    },
+    {
+      "Platform": "DreamCast",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Sega Dreamcast.png"
+    },
+    {
+      "Platform": "GameGear",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Sega Game Gear.png"
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Sega Mega Drive.png"
+    },
+    {
+      "Platform": "Saturn",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Sega Saturn.png"
+    },
+    {
+      "Platform": "SNES",
+      "Path": "C:\\Users\\trent\\OneDrive\\Documents\\iiSUMediaScraper\\Icons\\Super Famicom.png"
+    }
+  ],
+  "ExtensionConfigurations": [
+    {
+      "Platform": "NES",
+      "Extension": [
+        ".nes",
+        ".nez",
+        ".unf",
+        ".unif"
+      ]
+    },
+    {
+      "Platform": "SNES",
+      "Extension": [
+        ".sfc",
+        ".smc",
+        ".swc",
+        ".fig",
+        ".bs"
+      ]
+    },
+    {
+      "Platform": "N64",
+      "Extension": [
+        ".z64",
+        ".n64",
+        ".v64"
+      ]
+    },
+    {
+      "Platform": "GB",
+      "Extension": [
+        ".gb"
+      ]
+    },
+    {
+      "Platform": "GBC",
+      "Extension": [
+        ".gbc"
+      ]
+    },
+    {
+      "Platform": "GBA",
+      "Extension": [
+        ".gba"
+      ]
+    },
+    {
+      "Platform": "GC",
+      "Extension": [
+        ".iso",
+        ".gcm",
+        ".gcz",
+        ".rvz",
+        ".wbfs",
+        ".ciso"
+      ]
+    },
+    {
+      "Platform": "NDS",
+      "Extension": [
+        ".nds"
+      ]
+    },
+    {
+      "Platform": "3DS",
+      "Extension": [
+        ".3ds",
+        ".cci",
+        ".cxi",
+        ".app",
+        ".cia"
+      ]
+    },
+    {
+      "Platform": "Wii",
+      "Extension": [
+        ".iso",
+        ".wbfs",
+        ".rvz",
+        ".gcz",
+        ".wad"
+      ]
+    },
+    {
+      "Platform": "WiiU",
+      "Extension": [
+        ".rpx",
+        ".wux",
+        ".wud"
+      ]
+    },
+    {
+      "Platform": "Switch",
+      "Extension": [
+        ".nsp",
+        ".nsz",
+        ".xci",
+        ".xcz"
+      ]
+    },
+    {
+      "Platform": "PSX",
+      "Extension": [
+        ".cue",
+        ".bin",
+        ".chd",
+        ".pbp",
+        ".m3u",
+        ".iso"
+      ]
+    },
+    {
+      "Platform": "PS2",
+      "Extension": [
+        ".iso",
+        ".bin",
+        ".chd",
+        ".cso"
+      ]
+    },
+    {
+      "Platform": "PS3",
+      "Extension": [
+        ".iso",
+        ".pkg"
+      ]
+    },
+    {
+      "Platform": "PS4",
+      "Extension": [
+        ".pkg"
+      ]
+    },
+    {
+      "Platform": "PSP",
+      "Extension": [
+        ".iso",
+        ".cso",
+        ".pbp"
+      ]
+    },
+    {
+      "Platform": "PSVita",
+      "Extension": [
+        ".vpk"
+      ]
+    },
+    {
+      "Platform": "Xbox",
+      "Extension": [
+        ".iso",
+        ".xbe"
+      ]
+    },
+    {
+      "Platform": "Xbox360",
+      "Extension": [
+        ".iso",
+        ".xex"
+      ]
+    },
+    {
+      "Platform": "DreamCast",
+      "Extension": [
+        ".cdi",
+        ".gdi",
+        ".chd"
+      ]
+    },
+    {
+      "Platform": "GameGear",
+      "Extension": [
+        ".gg"
+      ]
+    },
+    {
+      "Platform": "MegadriveGenesis",
+      "Extension": [
+        ".md",
+        ".smd",
+        ".gen",
+        ".bin"
+      ]
+    },
+    {
+      "Platform": "Saturn",
+      "Extension": [
+        ".cue",
+        ".bin",
+        ".chd",
+        ".iso"
+      ]
+    },
+    {
+      "Platform": "Atari2600",
+      "Extension": [
+        ".a26",
+        ".bin"
+      ]
+    },
+    {
+      "Platform": "NeoGeoPocketColor",
+      "Extension": [
+        ".ngc",
+        ".ngp"
+      ]
+    },
+    {
+      "Platform": "Android",
+      "Extension": [
+        ".apk",
+        ".xapk"
+      ]
+    },
+    {
+      "Platform": "PC",
+      "Extension": [
+        ".exe",
+        ".bat",
+        ".lnk"
+      ]
+    },
+    {
+      "Platform": "Steam",
+      "Extension": [
+        ".exe",
+        ".url"
+      ]
+    },
+    {
+      "Platform": "GOG",
+      "Extension": [
+        ".exe",
+        ".url"
+      ]
+    }
+  ],
+  "ScraperConfigurations": [
+    {
+      "Source": "SteamGridDb",
+      "IsFetch": true,
+      "IsFetchIcons": false,
+      "IsFetchLogos": true,
+      "IsFetchTitles": false,
+      "IsFetchHeros": true,
+      "IsFetchSlides": false,
+      "IsFetchVideos": false,
+      "IsFetchIconsIfNoneFound": true,
+      "IsFetchLogosIfNoneFound": false,
+      "IsFetchTitlesIfNoneFound": true,
+      "IsFetchHerosIfNoneFound": false,
+      "IsFetchSlidesIfNoneFound": false,
+      "IsAllowTitleAsIconWhenNoIconFound": true,
+      "IsUseSquareIconPriority": true,
+      "IconPriority": 3,
+      "LogoPriority": 1,
+      "TitlePriority": 3,
+      "HeroPriority": 1,
+      "SlidePriority": 3,
+      "IconStyles": [],
+      "LogoStyles": [
+        "official"
+      ],
+      "TitleStyles": [],
+      "HeroStyles": [],
+      "SlideStyles": [],
+      "PlatformTranslationConfigurations": []
+    },
+    {
+      "Source": "Igdb",
+      "IsFetch": true,
+      "IsFetchIcons": true,
+      "IsFetchLogos": false,
+      "IsFetchTitles": true,
+      "IsFetchHeros": false,
+      "IsFetchSlides": true,
+      "IsFetchVideos": false,
+      "IsFetchIconsIfNoneFound": false,
+      "IsFetchLogosIfNoneFound": false,
+      "IsFetchTitlesIfNoneFound": false,
+      "IsFetchHerosIfNoneFound": false,
+      "IsFetchSlidesIfNoneFound": false,
+      "IsAllowTitleAsIconWhenNoIconFound": true,
+      "IsUseSquareIconPriority": true,
+      "IconPriority": 2,
+      "LogoPriority": 2,
+      "TitlePriority": 2,
+      "HeroPriority": 3,
+      "SlidePriority": 1,
+      "IconStyles": [],
+      "LogoStyles": [],
+      "TitleStyles": [],
+      "HeroStyles": [],
+      "SlideStyles": [],
+      "PlatformTranslationConfigurations": [
+        {
+          "Platform": "NES",
+          "Identifier": "18"
+        },
+        {
+          "Platform": "SNES",
+          "Identifier": "19"
+        },
+        {
+          "Platform": "N64",
+          "Identifier": "4"
+        },
+        {
+          "Platform": "GB",
+          "Identifier": "33"
+        },
+        {
+          "Platform": "GBC",
+          "Identifier": "22"
+        },
+        {
+          "Platform": "GBA",
+          "Identifier": "24"
+        },
+        {
+          "Platform": "NDS",
+          "Identifier": "20"
+        },
+        {
+          "Platform": "3DS",
+          "Identifier": "37"
+        },
+        {
+          "Platform": "Wii",
+          "Identifier": "5"
+        },
+        {
+          "Platform": "WiiU",
+          "Identifier": "41"
+        },
+        {
+          "Platform": "Switch",
+          "Identifier": "130"
+        },
+        {
+          "Platform": "PSX",
+          "Identifier": "7"
+        },
+        {
+          "Platform": "PS2",
+          "Identifier": "8"
+        },
+        {
+          "Platform": "PSP",
+          "Identifier": "38"
+        }
+      ]
+    },
+    {
+      "Source": "Ign",
+      "IsFetch": true,
+      "IsFetchIcons": true,
+      "IsFetchLogos": false,
+      "IsFetchTitles": true,
+      "IsFetchHeros": false,
+      "IsFetchSlides": false,
+      "IsFetchVideos": false,
+      "IsFetchIconsIfNoneFound": false,
+      "IsFetchLogosIfNoneFound": false,
+      "IsFetchTitlesIfNoneFound": false,
+      "IsFetchHerosIfNoneFound": false,
+      "IsFetchSlidesIfNoneFound": false,
+      "IsAllowTitleAsIconWhenNoIconFound": true,
+      "IsUseSquareIconPriority": true,
+      "IconPriority": 1,
+      "LogoPriority": 3,
+      "TitlePriority": 1,
+      "HeroPriority": 3,
+      "SlidePriority": 2,
+      "IconStyles": [],
+      "LogoStyles": [],
+      "TitleStyles": [],
+      "HeroStyles": [],
+      "SlideStyles": [],
+      "PlatformTranslationConfigurations": [
+        {
+          "Platform": "NES",
+          "Identifier": "4473779"
+        },
+        {
+          "Platform": "SNES",
+          "Identifier": "4477048"
+        },
+        {
+          "Platform": "N64",
+          "Identifier": "4474817"
+        },
+        {
+          "Platform": "GB",
+          "Identifier": "4476650"
+        },
+        {
+          "Platform": "GBC",
+          "Identifier": "4473472"
+        },
+        {
+          "Platform": "GBA",
+          "Identifier": "4475142"
+        },
+        {
+          "Platform": "NDS",
+          "Identifier": "4473788"
+        },
+        {
+          "Platform": "3DS",
+          "Identifier": "4477347"
+        },
+        {
+          "Platform": "Wii",
+          "Identifier": "4473724"
+        },
+        {
+          "Platform": "WiiU",
+          "Identifier": "4486224"
+        },
+        {
+          "Platform": "Switch",
+          "Identifier": "5233074"
+        },
+        {
+          "Platform": "PSX",
+          "Identifier": "4473465"
+        },
+        {
+          "Platform": "PS2",
+          "Identifier": "4473463"
+        },
+        {
+          "Platform": "PSP",
+          "Identifier": "4473469"
+        }
+      ]
+    }
+  ],
+  "UpscalerConfigurations": [
+    {
+      "Name": "Light",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "lab",
+      "InputNoiseScale": 0,
+      "LatentNoiseScale": 0
+    },
+    {
+      "Name": "Medium",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "lab",
+      "InputNoiseScale": 0.02,
+      "LatentNoiseScale": 0.01
+    },
+    {
+      "Name": "Heavy",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "lab",
+      "InputNoiseScale": 0.05,
+      "LatentNoiseScale": 0.02
+    },
+    {
+      "Name": "Extra Heavy",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "wavelet",
+      "InputNoiseScale": 0.1,
+      "LatentNoiseScale": 0.05
+    },
+    {
+      "Name": "Huge",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "wavelet_adaptive",
+      "InputNoiseScale": 0.15,
+      "LatentNoiseScale": 0.05
+    },
+    {
+      "Name": "Extra Huge",
+      "MaxResolution": 0,
+      "Seed": 42,
+      "ColorCorrection": "wavelet_adaptive",
+      "InputNoiseScale": 0.2,
+      "LatentNoiseScale": 0.1
+    }
+  ],
+  "PlatformConfigurations": [
+    {
+      "Code": "NES",
+      "Name": "Nintendo Entertainment System",
+      "IconPath": null
+    },
+    {
+      "Code": "SNES",
+      "Name": "Super Nintendo Entertainment System",
+      "IconPath": null
+    },
+    {
+      "Code": "N64",
+      "Name": "Nintendo 64",
+      "IconPath": null
+    },
+    {
+      "Code": "GB",
+      "Name": "Game Boy",
+      "IconPath": null
+    },
+    {
+      "Code": "GBC",
+      "Name": "Game Boy Color",
+      "IconPath": null
+    },
+    {
+      "Code": "GBA",
+      "Name": "Game Boy Advance",
+      "IconPath": null
+    },
+    {
+      "Code": "GC",
+      "Name": "GameCube",
+      "IconPath": null
+    },
+    {
+      "Code": "EShop",
+      "Name": "eShop",
+      "IconPath": null
+    },
+    {
+      "Code": "NDS",
+      "Name": "Nintendo DS",
+      "IconPath": null
+    },
+    {
+      "Code": "3DS",
+      "Name": "Nintendo 3DS",
+      "IconPath": null
+    },
+    {
+      "Code": "Wii",
+      "Name": "Wii",
+      "IconPath": null
+    },
+    {
+      "Code": "WiiU",
+      "Name": "Wii U",
+      "IconPath": null
+    },
+    {
+      "Code": "Switch",
+      "Name": "Nintendo Switch",
+      "IconPath": null
+    },
+    {
+      "Code": "PSX",
+      "Name": "PlayStation",
+      "IconPath": null
+    },
+    {
+      "Code": "PS2",
+      "Name": "PlayStation 2",
+      "IconPath": null
+    },
+    {
+      "Code": "PS3",
+      "Name": "PlayStation 3",
+      "IconPath": null
+    },
+    {
+      "Code": "PS4",
+      "Name": "PlayStation 4",
+      "IconPath": null
+    },
+    {
+      "Code": "PSP",
+      "Name": "PlayStation Portable",
+      "IconPath": null
+    },
+    {
+      "Code": "PSVita",
+      "Name": "PlayStation Vita",
+      "IconPath": null
+    },
+    {
+      "Code": "Xbox",
+      "Name": "Xbox",
+      "IconPath": null
+    },
+    {
+      "Code": "Xbox360",
+      "Name": "Xbox 360",
+      "IconPath": null
+    },
+    {
+      "Code": "DreamCast",
+      "Name": "Dreamcast",
+      "IconPath": null
+    },
+    {
+      "Code": "GameGear",
+      "Name": "Game Gear",
+      "IconPath": null
+    },
+    {
+      "Code": "MegadriveGenesis",
+      "Name": "Sega Genesis / Mega Drive",
+      "IconPath": null
+    },
+    {
+      "Code": "Saturn",
+      "Name": "Sega Saturn",
+      "IconPath": null
+    },
+    {
+      "Code": "Android",
+      "Name": "Android",
+      "IconPath": null
+    },
+    {
+      "Code": "Atari2600",
+      "Name": "Atari 2600",
+      "IconPath": null
+    },
+    {
+      "Code": "GOG",
+      "Name": "GOG",
+      "IconPath": null
+    },
+    {
+      "Code": "NeoGeoPocketColor",
+      "Name": "Neo Geo Pocket Color",
+      "IconPath": null
+    },
+    {
+      "Code": "PC",
+      "Name": "PC",
+      "IconPath": null
+    },
+    {
+      "Code": "Steam",
+      "Name": "Steam",
+      "IconPath": null
+    }
+  ],
+  "SpecificPlatforms": [],
+  "SpecificGames": []
+}

@@ -1,0 +1,30 @@
+# SeedVR2 Image Upscaler Server Requirements
+# Note: For best results, install PyTorch with CUDA support first:
+# pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# FastAPI server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+
+# Image processing
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# PyTorch (CPU version - replace with CUDA version for GPU support)
+# Uncomment the appropriate line for your system:
+# torch>=2.0.0  # CPU only
+# For CUDA, install separately: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
+
+# SeedVR2 dependencies (from ComfyUI-SeedVR2_VideoUpscaler)
+safetensors>=0.4.0
+einops>=0.7.0
+accelerate>=0.24.0
+huggingface_hub>=0.19.0
+diffusers>=0.24.0
+transformers>=4.35.0
+opencv-python>=4.8.0
+
+# Optional: For better performance
+# flash-attn>=2.3.0  # Requires CUDA and specific PyTorch version
+# triton>=2.1.0  # For torch.compile optimization

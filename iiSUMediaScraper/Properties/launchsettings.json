@@ -1,0 +1,10 @@
+﻿{
+    "profiles": {
+      "iiSUMediaScraper (Package)": {
+        "commandName": "MsixPackage"
+      },
+      "iiSUMediaScraper (Unpackaged)": {
+        "commandName": "Project"
+      }
+    }
+}

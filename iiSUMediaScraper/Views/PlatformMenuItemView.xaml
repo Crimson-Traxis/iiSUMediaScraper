@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="iiSUMediaScraper.Views.PlatformMenuItemView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:iiSUMediaScraper.Views"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+             xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+        <customconverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+
+        <customconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
+
+        <customconverters:PathToValidImagePathConverter x:Key="PathToValidImagePathConverter" />
+
+        <customconverters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+
+        <customconverters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+
+        <customconverters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+
+        <customconverters:InverseStringToVisibilityConverter x:Key="InverseStringToVisibilityConverter" />
+    </UserControl.Resources>
+
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
+        </Grid.ColumnDefinitions>
+        <Grid Visibility="{x:Bind IsLarge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+              Margin="0,0,12,0">
+            <Image Stretch="Fill"
+                   Height="54"
+                   Width="54"
+                   Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                   Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+            <Border Background="{ThemeResource SystemFillColorNeutralBrush}"
+                    Height="54"
+                    Width="54"
+                    CornerRadius="4"
+                    Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource InverseStringToVisibilityConverter}}">
+                <TextBlock Text="{x:Bind ViewModel.Code, Mode=OneWay}"
+                           Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="22" />
+            </Border>
+        </Grid>
+        <Grid Visibility="{x:Bind IsLarge, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+              Margin="0,0,12,0">
+            <Image Stretch="Fill"
+                   Height="24"
+                   Width="24"
+                   Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                   Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+            <Border Background="{ThemeResource SystemFillColorNeutralBrush}"
+                    Height="24"
+                    Width="24"
+                    CornerRadius="4"
+                    Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource InverseStringToVisibilityConverter}}">
+                <TextBlock Text="{x:Bind ViewModel.Code, Mode=OneWay}"
+                           Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           FontSize="14" />
+            </Border>
+        </Grid>
+        <TextBlock Grid.Column="1"
+                   Text="{x:Bind ViewModel.PlatformConfiguration.Name, Mode=OneWay}"
+                   VerticalAlignment="Center"
+                   FontSize="18" />
+    </Grid>
+</UserControl>

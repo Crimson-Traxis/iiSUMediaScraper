@@ -1,0 +1,169 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:iiSUMediaScraper.Controls">
+    <Style TargetType="controls:DropZone">
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="DefaultBorderBrush"
+                Value="{ThemeResource ControlStrokeColorDefaultBrush}" />
+        <Setter Property="HoverBorder"
+                Value="{ThemeResource AccentFillColorDefaultBrush}" />
+        <Setter Property="BackdropBrush"
+                Value="{ThemeResource LayerOnAcrylicFillColorDefaultBrush}" />
+        <Setter Property="BorderThickness"
+                Value="1" />
+        <Setter Property="CornerRadius"
+                Value="8" />
+        <Setter Property="MinHeight"
+                Value="120" />
+        <Setter Property="MinWidth"
+                Value="200" />
+        <Setter Property="Padding"
+                Value="16" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Stretch" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Stretch" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:DropZone">
+                    <!-- Outer grid maintains layout bounds and does not scale -->
+                    <Grid x:Name="RootGrid">
+                        <VisualStateManager.VisualStateGroups>
+                            <VisualStateGroup x:Name="DragStates">
+                                <VisualState x:Name="Normal">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="1"
+                                                         Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         To="1"
+                                                         Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="BackdropBorder"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.15" />
+                                        <DoubleAnimation Storyboard.TargetName="DropMessagePanel"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.15" />
+                                        <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0:0:0.15" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MainBorder"
+                                                                       Storyboard.TargetProperty="BorderBrush">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{Binding DefaultBorderBrush, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+
+                                <VisualState x:Name="DragOver">
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                         Storyboard.TargetProperty="ScaleX"
+                                                         To="{Binding HoverScale, RelativeSource={RelativeSource TemplatedParent}}"
+                                                         Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="ScaleTransform"
+                                                         Storyboard.TargetProperty="ScaleY"
+                                                         To="{Binding HoverScale, RelativeSource={RelativeSource TemplatedParent}}"
+                                                         Duration="0:0:0.15">
+                                            <DoubleAnimation.EasingFunction>
+                                                <CubicEase EasingMode="EaseOut" />
+                                            </DoubleAnimation.EasingFunction>
+                                        </DoubleAnimation>
+                                        <DoubleAnimation Storyboard.TargetName="BackdropBorder"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0.8"
+                                                         Duration="0:0:0.15" />
+                                        <DoubleAnimation Storyboard.TargetName="DropMessagePanel"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="1"
+                                                         Duration="0:0:0.15" />
+                                        <DoubleAnimation Storyboard.TargetName="ContentPresenter"
+                                                         Storyboard.TargetProperty="Opacity"
+                                                         To="0"
+                                                         Duration="0:0:0.15" />
+                                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="MainBorder"
+                                                                       Storyboard.TargetProperty="BorderBrush">
+                                            <DiscreteObjectKeyFrame KeyTime="0"
+                                                                    Value="{Binding HoverBorder, RelativeSource={RelativeSource TemplatedParent}}" />
+                                        </ObjectAnimationUsingKeyFrames>
+                                    </Storyboard>
+                                </VisualState>
+                            </VisualStateGroup>
+                        </VisualStateManager.VisualStateGroups>
+
+                        <!-- Inner container that scales without affecting layout -->
+                        <Border x:Name="ScalableContainer"
+                                RenderTransformOrigin="0.5,0.5">
+                            <Border.RenderTransform>
+                                <ScaleTransform x:Name="ScaleTransform"
+                                                ScaleX="1"
+                                                ScaleY="1" />
+                            </Border.RenderTransform>
+
+                            <!-- Main Border -->
+                            <Border x:Name="MainBorder"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding DefaultBorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="{TemplateBinding CornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+
+                                <Grid>
+                                    <!-- Backdrop overlay (shown during drag) -->
+                                    <Border x:Name="BackdropBorder"
+                                            Background="{TemplateBinding BackdropBrush}"
+                                            CornerRadius="{TemplateBinding CornerRadius}"
+                                            Opacity="0" />
+
+                                    <!-- Content -->
+                                    <ContentPresenter x:Name="ContentPresenter"
+                                                      Content="{TemplateBinding Content}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      ContentTransitions="{TemplateBinding ContentTransitions}"
+                                                      HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                                    <!-- Drop message (shown during drag) -->
+                                    <StackPanel x:Name="DropMessagePanel"
+                                                HorizontalAlignment="Center"
+                                                VerticalAlignment="Center"
+                                                Opacity="0"
+                                                Spacing="8"
+                                                IsHitTestVisible="False">
+                                        <FontIcon Glyph="&#xE896;"
+                                                  FontSize="32"
+                                                  HorizontalAlignment="Center"
+                                                  Foreground="{ThemeResource AccentTextFillColorPrimaryBrush}" />
+                                        <TextBlock x:Name="DropMessageText"
+                                                   Text="{TemplateBinding DropMessage}"
+                                                   Style="{ThemeResource SubtitleTextBlockStyle}"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                    </StackPanel>
+                                </Grid>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+</ResourceDictionary>

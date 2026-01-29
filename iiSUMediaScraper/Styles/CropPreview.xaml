@@ -1,0 +1,30 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:controls="using:iiSUMediaScraper.Controls">
+
+    <Style TargetType="controls:CropPreview">
+        <Setter Property="OverlayBrush"
+                Value="Black" />
+        <Setter Property="OverlayOpacity"
+                Value="0.6" />
+        <Setter Property="Stretch"
+                Value="Uniform" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="controls:CropPreview">
+                    <Grid x:Name="RootGrid"
+                          Background="{TemplateBinding Background}">
+                        <Image x:Name="SourceImage"
+                               HorizontalAlignment="Stretch"
+                               VerticalAlignment="Stretch" />
+
+                        <Path x:Name="OverlayPath"
+                              HorizontalAlignment="Stretch"
+                              VerticalAlignment="Stretch" />
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

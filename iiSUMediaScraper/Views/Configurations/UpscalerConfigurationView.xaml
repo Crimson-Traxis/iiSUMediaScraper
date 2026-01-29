@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="iiSUMediaScraper.Views.Configurations.UpscalerConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="using:iiSUMediaScraper.Views.Configurations"
+             xmlns:configurationviewmodels="using:iiSUMediaScraper.ViewModels.Configurations"
+             mc:Ignorable="d">
+
+
+
+    <StackPanel Background="{x:Bind Background, Mode=OneWay}"
+                BorderBrush="{x:Bind BorderBrush, Mode=OneWay}"
+                BorderThickness="{x:Bind BorderThickness, Mode=OneWay}"
+                CornerRadius="{x:Bind CornerRadius, Mode=OneWay}"
+                Padding="{x:Bind Padding, Mode=OneWay}">
+        <Grid Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox PlaceholderText="Name"
+                     Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
+                     Margin="0,0,16,0" />
+            <Button Grid.Column="2"
+                    Height="32"
+                    Width="32"
+                    Padding="0"
+                    VerticalAlignment="Bottom"
+                    Command="{x:Bind ViewModel.RequestRemoveCommand, Mode=OneWay}">
+                <Viewbox Height="14">
+                    <SymbolIcon Symbol="Delete" />
+                </Viewbox>
+            </Button>
+        </Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="auto" />
+                <RowDefinition Height="auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+            <NumberBox Header="Latent Noise Scale"
+                       Text="{x:Bind ViewModel.LatentNoiseScale, Mode=TwoWay}"
+                       Margin="0,0,16,16"
+                       MinWidth="140" />
+            <NumberBox Header="Input Noise Scale"
+                       Value="{x:Bind ViewModel.InputNoiseScale, Mode=TwoWay}"
+                       Grid.Column="1"
+                       VerticalAlignment="Center" />
+            <NumberBox Header="Seed"
+                       Text="{x:Bind ViewModel.Seed, Mode=TwoWay}"
+                       Grid.Row="1"
+                       Margin="0,0,16,16"
+                       MinWidth="140" />
+            <ComboBox Header="Color Correction"
+                      ItemsSource="{x:Bind ViewModel.ColorCorrections, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.SelectedColorCorrection,Mode=TwoWay}"
+                      DisplayMemberPath="Name"
+                      Grid.Row="1"
+                      Grid.Column="1" />
+        </Grid>
+    </StackPanel>
+</UserControl>

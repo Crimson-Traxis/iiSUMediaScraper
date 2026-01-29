@@ -1,0 +1,1010 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="iiSUMediaScraper.Views.Configurations.ConfigurationView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:iiSUMediaScraper.Views.Configurations"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:media="using:CommunityToolkit.WinUI.Media"
+             xmlns:ui="using:CommunityToolkit.WinUI"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+             xmlns:configurationmodels="using:iiSUMediaScraper.Models.Configurations"
+             xmlns:configurationviewmodels="using:iiSUMediaScraper.ViewModels.Configurations"
+             xmlns:controls1="using:iiSUMediaScraper.Controls"
+             xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+             xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+
+        <customconverters:PathToValidImagePathConverter x:Key="PathToValidImagePathConverter" />
+
+        <customconverters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+
+        <customconverters:InverseNullToVisibilityConverter x:Key="InverseNullToVisibilityConverter" />
+
+        <customconverters:StringToVisibilityConverter x:Key="StringToVisibilityConverter" />
+
+        <customconverters:InverseStringToVisibilityConverter x:Key="InverseStringToVisibilityConverter" />
+
+        <DataTemplate x:Key="GameIconOverlayConfigurationTemplate"
+                      x:DataType="configurationviewmodels:GameIconOverlayConfigurationViewModel">
+            <local:GameIconOverlayConfigurationView ViewModel="{x:Bind Mode=OneWay}"
+                                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                                    CornerRadius="8"
+                                                    Padding="16" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="PlatformIconConfigurationTemplate"
+                      x:DataType="configurationviewmodels:PlatformIconConfigurationViewModel">
+            <local:PlatformIconConfigurationView ViewModel="{x:Bind Mode=OneWay}"
+                                                 Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                                 CornerRadius="8"
+                                                 Padding="16" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ExtensionConfigurationTemplate"
+                      x:DataType="configurationviewmodels:ExtensionConfigurationViewModel">
+            <local:ExtensionConfigurationView ViewModel="{x:Bind Mode=OneWay}"/>
+        </DataTemplate>
+
+        <DataTemplate x:Key="FolderNameConfigurationTemplate"
+                      x:DataType="configurationviewmodels:FolderNameConfigurationViewModel">
+            <local:FolderNameConfigurationView ViewModel="{x:Bind Mode=OneWay}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="PlatformConfigurationTemplate"
+                      x:DataType="configurationviewmodels:PlatformConfigurationViewModel">
+            <local:PlatformConfigurationView ViewModel="{x:Bind Mode=OneWay}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="ScraperConfigurationTemplate"
+                      x:DataType="configurationviewmodels:ScraperConfigurationViewModel">
+            <local:ScraperConfigurationView ViewModel="{x:Bind Mode=OneWay}" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SpecificGameTemplate"
+                      x:DataType="configurationviewmodels:SpecificGameViewModel">
+            <local:SpecificGameView ViewModel="{x:Bind Mode=OneWay}"
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="16" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="SpecificPlatformTemplate"
+                      x:DataType="configurationviewmodels:SpecificPlatformViewModel">
+            <local:SpecificPlatformView ViewModel="{x:Bind Mode=OneWay}"
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                        BorderThickness="1"
+                                        CornerRadius="8"
+                                        Padding="16" />
+        </DataTemplate>
+
+        <DataTemplate x:Key="UpscalerConfigurationTemplate"
+                      x:DataType="configurationviewmodels:UpscalerConfigurationViewModel">
+            <local:UpscalerConfigurationView ViewModel="{x:Bind Mode=OneWay}"
+                                             Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                             BorderThickness="1"
+                                             CornerRadius="8"
+                                             Padding="16" />
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <ListView x:Name="ConfigurationNavigationListView">
+            <ListViewItem Tag="Main"
+                          MinWidth="200"
+                          IsSelected="True">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Home" />
+                    <TextBlock Grid.Column="1"
+                               Text="Main"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="ImageFormating"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Edit" />
+                    <TextBlock Grid.Column="1"
+                               Text="Image Formating"
+                               Margin="8,0,16,0" />
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Applying"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Save" />
+                    <TextBlock Grid.Column="1"
+                               Text="Applying"
+                               Margin="8,0,16,0" />
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Games"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Find" />
+                    <TextBlock Grid.Column="1"
+                               Text="Specifc Games"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="PlatformDefinitions"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Flag" />
+                    <TextBlock Grid.Column="1"
+                               Text="Platform Definitions"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="SpecifcPlatforms"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Find" />
+                    <TextBlock Grid.Column="1"
+                               Text="Specifc Platforms"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="ImageUpscalers"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Upload" />
+                    <TextBlock Grid.Column="1"
+                               Text="Upscaling"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="APIKeys"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Permissions" />
+                    <TextBlock Grid.Column="1"
+                               Text="API Keys"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Folders"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Folder" />
+                    <TextBlock Grid.Column="1"
+                               Text="Folders"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Overlays"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Pictures" />
+                    <TextBlock Grid.Column="1"
+                               Text="Game Icon Overlays"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="SystemIcons"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Pictures" />
+                    <TextBlock Grid.Column="1"
+                               Text="Platform Icons"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Extensions"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="More" />
+                    <TextBlock Grid.Column="1"
+                               Text="Extensions"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Scrapers"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Globe" />
+                    <TextBlock Grid.Column="1"
+                               Text="Scrapers"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+        </ListView>
+        <Grid Background="{ThemeResource LayerFillColorDefaultBrush}"
+              CornerRadius="8"
+              Padding="16"
+              Grid.Column="1"
+              Margin="16,0,0,16">
+
+            <controls:SwitchPresenter Value="{Binding SelectedItem.Tag, ElementName=ConfigurationNavigationListView}">
+                <!--  And then only dynamically displays the Case with the matching Value  -->
+                <controls:Case Value="Main">
+                    <ScrollView>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Margin="0,0,0,16"
+                                     Text="{x:Bind ViewModel.GamesPath, Mode=TwoWay}"
+                                     Header="Games Folder"
+                                     ToolTipService.ToolTip="Location that contains all your game folders. Suggest browsing to folder on device connected via usb"/>
+                            <Button Content="Pick Folder"
+                                    Margin="16,0,0,16"
+                                    VerticalAlignment="Bottom"
+                                    Grid.Column="1"
+                                    Click="PickGamesFolderButton_Click" />
+                            <TextBox Header="Asset Folder"
+                                     Text="{x:Bind ViewModel.ApplyAssetPath, Mode=TwoWay}"
+                                     Margin="0,0,0,16"
+                                     MinWidth="200"
+                                     Grid.Row="3"
+                                     ToolTipService.ToolTip="Location that contains all your game assets. Generates the same folder structure as your game folder and places assets in each sanitized game folder. Suggest browsing to folder on device connected via usb" />
+                            <Button Content="Pick Folder"
+                                    Grid.Row="3"
+                                    Margin="16,0,0,16"
+                                    VerticalAlignment="Bottom"
+                                    Grid.Column="1"
+                                    Click="PickAssetsFolderButton_Click" />
+                            <NumberBox Value="{x:Bind ViewModel.MaxNumberOfConcurrentGames, Mode=TwoWay}"
+                                       Grid.Row="4" 
+                                       Margin="0,0,0,16"
+                                       Header="Max Concurrency"
+                                       ToolTipService.ToolTip="Maximum number of games to concurrently scrape at one. Only applies at the begining of the process. Higher values will increase ram usage. Max 100"
+                                       Width="160"
+                                       HorizontalAlignment="Left"/>
+                            <ToggleSwitch OffContent="Scan games folder"
+                                          OnContent="Scan games folder"
+                                          IsOn="{x:Bind ViewModel.IsScanGames, Mode=TwoWay}"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="5"
+                                          Grid.ColumnSpan="2" />
+                            <ToggleSwitch OffContent="Scan unfound games folder"
+                                          OnContent="Scan unfound games folder"
+                                          IsOn="{x:Bind ViewModel.IsScanUnfoundGames, Mode=TwoWay}"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="6"
+                                          Grid.ColumnSpan="2" />
+                            <StackPanel Grid.Row="8"
+                                        Grid.ColumnSpan="2"
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        HorizontalAlignment="Left"
+                                        Padding="16"
+                                        CornerRadius="8">
+                                <TextBlock Text="Game qualifies as unfound when"
+                                           FontSize="18"
+                                           Margin="0,0,0,16" />
+                                <ToggleSwitch OffContent="No icons found"
+                                              OnContent="No icons found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoIcons, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No logos found"
+                                              OnContent="No logos found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoLogos, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No titles found"
+                                              OnContent="No titles found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoTitles, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No heros found"
+                                              OnContent="No heros found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoHeros, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No slides found"
+                                              OnContent="No slides found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoSlides, Mode=TwoWay}" />
+                            </StackPanel>
+                        </Grid>
+                    </ScrollView>
+                </controls:Case>
+                <controls:Case Value="ImageFormating">
+                    <ScrollView>
+                        <StackPanel>
+                            <ToggleSwitch OffContent="Logos as titles"
+                                          OnContent="Logos as titles"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="4"
+                                          ToolTipService.ToolTip="If found a logo in Steam Grid DB prioritize as title"
+                                          IsOn="{x:Bind ViewModel.IsUseLogoAsTitle, Mode=TwoWay}"
+                                          Grid.ColumnSpan="2" />
+                            <ToggleSwitch OffContent="Prioritize logos as titles"
+                                          OnContent="Prioritize logos as titles"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="4"
+                                          ToolTipService.ToolTip="If found a logo in Steam Grid DB prioritize as title"
+                                          IsOn="{x:Bind ViewModel.IsPrioritizeLogoAsTitle, Mode=TwoWay}"
+                                          Grid.ColumnSpan="2" />
+                            <StackPanel Padding="16"
+                                        Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                        CornerRadius="4">
+                                <TextBlock Text="Sizes"
+                                           FontSize="18" />
+                                <TextBlock Text="If both width and height set an aspect ratio will be forced during cropping"
+                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                           Margin="0,0,0,16" />
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                        <ColumnDefinition Width="auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="auto" />
+                                    </Grid.RowDefinitions>
+                                    <NumberBox Header="Icon size"
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Width"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.IconWidth, Mode=TwoWay}" />
+                                    <TextBlock Text="x"
+                                               Margin="8,4,8,22"
+                                               Grid.Column="1"
+                                               VerticalAlignment="Bottom" />
+                                    <NumberBox Header=" "
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Height"
+                                               Grid.Column="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.IconHeight, Mode=TwoWay}" />
+                                    <NumberBox Header="Logo size"
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Width"
+                                               Grid.Row="1"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.LogoWidth, Mode=TwoWay}" />
+                                    <TextBlock Text="x"
+                                               Margin="8,4,8,22"
+                                               Grid.Row="1"
+                                               Grid.Column="1"
+                                               VerticalAlignment="Bottom" />
+                                    <NumberBox Header=" "
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Height"
+                                               Grid.Row="1"
+                                               Grid.Column="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.LogoHeight, Mode=TwoWay}" />
+                                    <NumberBox Header="Title size"
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Width"
+                                               Grid.Row="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.TitleWidth, Mode=TwoWay}" />
+                                    <TextBlock Text="x"
+                                               Margin="8,4,8,22"
+                                               Grid.Row="2"
+                                               Grid.Column="1"
+                                               VerticalAlignment="Bottom" />
+                                    <NumberBox Header=" "
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Height"
+                                               Grid.Row="2"
+                                               Grid.Column="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.TitleHeight, Mode=TwoWay}" />
+                                    <NumberBox Header="Hero size"
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Width"
+                                               Grid.Row="3"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.HeroWidth, Mode=TwoWay}" />
+                                    <TextBlock Text="x"
+                                               Margin="8,4,8,22"
+                                               Grid.Row="3"
+                                               Grid.Column="1"
+                                               VerticalAlignment="Bottom" />
+                                    <NumberBox Header=" "
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Height"
+                                               Grid.Row="3"
+                                               Grid.Column="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.HeroHeight, Mode=TwoWay}" />
+                                    <NumberBox Header="Slide size"
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Width"
+                                               Grid.Row="4"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.SlideWidth, Mode=TwoWay}" />
+                                    <TextBlock Text="x"
+                                               Margin="8,4,8,22"
+                                               Grid.Row="4"
+                                               Grid.Column="1"
+                                               VerticalAlignment="Bottom" />
+                                    <NumberBox Header=" "
+                                               SpinButtonPlacementMode="Compact"
+                                               MinWidth="120"
+                                               PlaceholderText="Height"
+                                               Grid.Row="4"
+                                               Grid.Column="2"
+                                               Margin="0,0,0,16"
+                                               Value="{x:Bind ViewModel.SlideHeight, Mode=TwoWay}" />
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </ScrollView>
+                </controls:Case>
+                <controls:Case Value="Applying">
+                    <ScrollView>
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox Header="Unfound Game Folder"
+                                         Text="{x:Bind ViewModel.UnfoundMediaMovePath, Mode=TwoWay}"
+                                         ToolTipService.ToolTip="If there is no media found for a game then games will be moved to this folder"
+                                         Margin="0,0,0,16"
+                                         Grid.Row="2" />
+                                <Button Content="Pick Folder"
+                                        Grid.Row="2"
+                                        Margin="16,0,0,16"
+                                        VerticalAlignment="Bottom"
+                                        Grid.Column="1"
+                                        Click="PickUnfoundGamesFolderButton_Click" />
+                            </Grid>
+                            <ToggleSwitch OffContent="Move Unfound Games"
+                                          OnContent="Move Unfound Games"
+                                          Margin="0,0,0,8"
+                                          ToolTipService.ToolTip="If media was missing the game will be moved"
+                                          IsOn="{x:Bind ViewModel.IsMoveToUnfoundGamesFolder, Mode=TwoWay}" />
+                            <ToggleSwitch OffContent="Apply Unfound Games"
+                                          OnContent="Apply Unfound Games"
+                                          Margin="0,0,0,16"
+                                          IsOn="{x:Bind ViewModel.IsApplyUnfoundGames, Mode=TwoWay}" />
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                    <RowDefinition Height="auto" />
+                                </Grid.RowDefinitions>
+                                <TextBox Text="{x:Bind ViewModel.IconNameFormat, Mode=TwoWay}"
+                                         Header="Icon Name Format"
+                                         Margin="0,0,32,16"
+                                         MinWidth="200" />
+                                <ToggleSwitch OffContent="Apply Icon"
+                                              OnContent="Apply Icon"
+                                              Margin="0,16,0,0"
+                                              Grid.Column="1"
+                                              VerticalAlignment="Center"
+                                              IsOn="{x:Bind ViewModel.IsApplyIcon, Mode=TwoWay}" />
+                                <TextBox Text="{x:Bind ViewModel.TitleNameFormat, Mode=TwoWay}"
+                                         Header="Title Name Format"
+                                         Margin="0,0,32,16"
+                                         Grid.Row="1"
+                                         MinWidth="200" />
+                                <ToggleSwitch OffContent="Apply Title"
+                                              OnContent="Apply Title"
+                                              Margin="0,16,0,8"
+                                              Grid.Row="1"
+                                              Grid.Column="1"
+                                              IsOn="{x:Bind ViewModel.IsApplyTitle, Mode=TwoWay}" />
+                                <TextBox Text="{x:Bind ViewModel.HeroNameFormat, Mode=TwoWay}"
+                                         Header="Hero Name Format"
+                                         Margin="0,0,32,16"
+                                         Grid.Row="2"
+                                         MinWidth="200" />
+                                <ToggleSwitch OffContent="Apply Heros"
+                                              OnContent="Apply Heros"
+                                              Margin="0,16,0,8"
+                                              Grid.Row="2"
+                                              Grid.Column="1"
+                                              IsOn="{x:Bind ViewModel.IsApplyHeros, Mode=TwoWay}" />
+                                <TextBox Text="{x:Bind ViewModel.SlideNameFormat, Mode=TwoWay}"
+                                         Header="Slide Name Format"
+                                         Margin="0,0,32,16"
+                                         Grid.Row="3"
+                                         MinWidth="200" />
+                                <ToggleSwitch OffContent="Apply Slides"
+                                              OnContent="Apply Slides"
+                                              Margin="0,16,0,8"
+                                              Grid.Row="3"
+                                              Grid.Column="1"
+                                              IsOn="{x:Bind ViewModel.IsApplySlides, Mode=TwoWay}" />
+                            </Grid>
+                        </StackPanel>
+                    </ScrollView>
+                </controls:Case>
+                <controls:Case Value="APIKeys">
+                    <StackPanel>
+                        <TextBox Header="Steam Grid Db Key"
+                                 Margin="0,0,0,16"
+                                 Text="{x:Bind ViewModel.SteamGridDbKey, Mode=TwoWay}" />
+                        <TextBox Header="Igdb Client Id"
+                                 Margin="0,0,0,16"
+                                 Text="{x:Bind ViewModel.IgdbClientId, Mode=TwoWay}" />
+                        <TextBox Header="Igdb Client Secret"
+                                 Margin="0,0,0,16"
+                                 Text="{x:Bind ViewModel.IgdbClientSecret, Mode=TwoWay}" />
+                    </StackPanel>
+                </controls:Case>
+                <controls:Case Value="Games">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.SpecificGamesSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Button Content="Clear Selections"
+                                        Margin="0,0,16,0"
+                                        Command="{x:Bind ViewModel.ClearAllSpecificGameSelectionsCommand, Mode=OneWay}" />
+                                <Button Content="Select All"
+                                        Command="{x:Bind ViewModel.SelectAllSpecificGamesCommand, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
+                        <InfoBar Severity="Informational"
+                                 Message="Games are pulled from the games directory specified in the main settings"
+                                 IsOpen="True"
+                                 Grid.Row="1"
+                                 Margin="0,16,0,0" />
+                        <ScrollView Grid.Row="2"
+                                    Margin="0,16,0,0">
+                            <ItemsRepeater ItemsSource="{x:Bind SpecificGamesSearch, Mode=OneWay}"
+                                           ItemTemplate="{StaticResource SpecificGameTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </ScrollView>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="PlatformDefinitions">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.PlatformDefinitionConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Height="32"
+                                    Width="32"
+                                    Padding="0"
+                                    Command="{x:Bind ViewModel.CreateNewPlatformConfigurationCommand, Mode=OneWay}">
+                                <SymbolIcon Symbol="Add" />
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Row="1"
+                              Background="{ThemeResource LayerFillColorDefaultBrush}"
+                              CornerRadius="8"
+                              Padding="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Code"
+                                           Margin="0,0,16,16"
+                                           MinWidth="200" />
+                                <TextBlock Grid.Column="1"
+                                           Text="Name"
+                                           Margin="0,0,16,16" />
+                            </Grid>
+                            <ScrollView Grid.Row="1">
+                                <ItemsRepeater ItemsSource="{x:Bind PlatformDefinitionConfigurationsSearch, Mode=OneWay}"
+                                               ItemTemplate="{StaticResource PlatformConfigurationTemplate}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="16" />
+                                    </ItemsRepeater.Layout>
+                                </ItemsRepeater>
+                            </ScrollView>
+                        </Grid>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="SpecifcPlatforms">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.SpecificPlatformsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal">
+                                <Button Content="Clear Selections"
+                                        Margin="0,0,16,0"
+                                        Command="{x:Bind ViewModel.ClearAllSpecificPlatformSelectionsCommand, Mode=OneWay}" />
+                                <Button Content="Select All"
+                                        Command="{x:Bind ViewModel.SelectAllSpecificPlatformsCommand, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
+                        <InfoBar Severity="Informational"
+                                 Message="Platforms are pulled from the platform definitions"
+                                 IsOpen="True"
+                                 Grid.Row="1"
+                                 Margin="0,16,0,0" />
+                        <ScrollView Grid.Row="2"
+                                    Margin="0,16,0,0">
+                            <ItemsRepeater ItemsSource="{x:Bind SpecificPlatformsSearch, Mode=OneWay}"
+                                           ItemTemplate="{StaticResource SpecificPlatformTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </ScrollView>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="ImageUpscalers">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <StackPanel>
+                            <controls1:CustomComboBox Header="Default"
+                                                      Margin="0,0,0,16"
+                                                      ItemsSource="{x:Bind ViewModel.UpscalerConfigurations, Mode=OneWay}"
+                                                      DisplayMemberPath="Name"
+                                                      SelectedValuePath="Name"
+                                                      SelectedItem="{x:Bind ViewModel.SelectedUpscalerConfiguration, Mode=TwoWay}" />
+                            <MenuFlyoutSeparator Margin="0,0,0,16" />
+                        </StackPanel>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBox PlaceholderText="Search"
+                                         Width="300"
+                                         HorizontalAlignment="Left"
+                                         Text="{x:Bind ViewModel.ImageUpscalerConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                <Button Grid.Column="1"
+                                        Height="32"
+                                        Width="32"
+                                        Padding="0"
+                                        Command="{x:Bind ViewModel.CreateNewUpscalerConfigurationCommand, Mode=OneWay}">
+                                    <SymbolIcon Symbol="Add" />
+                                </Button>
+                            </Grid>
+                            <Grid Grid.Row="1">
+                                <ScrollView Grid.Row="1">
+                                    <ItemsRepeater ItemsSource="{x:Bind ImageUpscalerConfigurationsSearch, Mode=OneWay}"
+                                                   ItemTemplate="{StaticResource UpscalerConfigurationTemplate}">
+                                        <ItemsRepeater.Layout>
+                                            <StackLayout Spacing="16" />
+                                        </ItemsRepeater.Layout>
+                                    </ItemsRepeater>
+                                </ScrollView>
+                            </Grid>
+                        </Grid>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="Folders">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.FolderConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Height="32"
+                                    Width="32"
+                                    Padding="0"
+                                    Command="{x:Bind ViewModel.CreateNewFolderNameConfigurationCommand, Mode=OneWay}">
+                                <SymbolIcon Symbol="Add" />
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Row="1"
+                              Background="{ThemeResource LayerFillColorDefaultBrush}"
+                              CornerRadius="8"
+                              Padding="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="350" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Folder Name"
+                                           Margin="0,0,16,16"
+                                           MinWidth="200" />
+                                <TextBlock Grid.Column="1"
+                                           Text="Platform"
+                                           Margin="0,0,16,16" />
+                            </Grid>
+                            <ScrollView Grid.Row="1">
+                                <ItemsRepeater ItemsSource="{x:Bind FolderConfigurationsSearch, Mode=OneWay}"
+                                               ItemTemplate="{StaticResource FolderNameConfigurationTemplate}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="16" />
+                                    </ItemsRepeater.Layout>
+                                </ItemsRepeater>
+                            </ScrollView>
+                        </Grid>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="Overlays">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.GameIconOverlayConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Height="32"
+                                    Width="32"
+                                    Padding="0"
+                                    Command="{x:Bind ViewModel.CreateNewGameIconOverlayConfigurationCommand, Mode=OneWay}">
+                                <SymbolIcon Symbol="Add" />
+                            </Button>
+                        </Grid>
+                        <ScrollView Grid.Row="1">
+                            <ItemsRepeater ItemsSource="{x:Bind GameIconOverlayConfigurationsSearch, Mode=OneWay}"
+                                           ItemTemplate="{StaticResource GameIconOverlayConfigurationTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </ScrollView>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="SystemIcons">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.PlatformIconConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Height="32"
+                                    Width="32"
+                                    Padding="0"
+                                    Command="{x:Bind ViewModel.CreateNewPlatformIconConfigurationCommand, Mode=OneWay}">
+                                <SymbolIcon Symbol="Add" />
+                            </Button>
+                        </Grid>
+                        <ScrollView Grid.Row="1">
+                            <ItemsRepeater ItemsSource="{x:Bind PlatformIconConfigurationsSearch, Mode=OneWay}"
+                                           ItemTemplate="{StaticResource PlatformIconConfigurationTemplate}">
+                                <ItemsRepeater.Layout>
+                                    <StackLayout Spacing="16" />
+                                </ItemsRepeater.Layout>
+                            </ItemsRepeater>
+                        </ScrollView>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="Extensions">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,16">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox PlaceholderText="Search"
+                                     Width="300"
+                                     HorizontalAlignment="Left"
+                                     Text="{x:Bind ViewModel.ExtensionConfigurationsSearch, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <Button Grid.Column="1"
+                                    Height="32"
+                                    Width="32"
+                                    Padding="0"
+                                    Command="{x:Bind ViewModel.CreateNewExtensionConfigurationCommand, Mode=OneWay}">
+                                <SymbolIcon Symbol="Add" />
+                            </Button>
+                        </Grid>
+                        <Grid Grid.Row="1"
+                              Background="{ThemeResource LayerFillColorDefaultBrush}"
+                              CornerRadius="8"
+                              Padding="16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="350" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Extensions"
+                                           Margin="0,0,16,16"
+                                           MinWidth="200" />
+                                <TextBlock Grid.Column="1"
+                                           Text="Platform"
+                                           Margin="0,0,16,16" />
+                            </Grid>
+                            <ScrollView Grid.Row="1">
+                                <ItemsRepeater ItemsSource="{x:Bind ExtensionConfigurationsSearch, Mode=OneWay}"
+                                               ItemTemplate="{StaticResource ExtensionConfigurationTemplate}">
+                                    <ItemsRepeater.Layout>
+                                        <StackLayout Spacing="16" />
+                                    </ItemsRepeater.Layout>
+                                </ItemsRepeater>
+                            </ScrollView>
+                        </Grid>
+                    </Grid>
+                </controls:Case>
+                <controls:Case Value="Scrapers">
+                    <ScrollView>
+                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.ScraperConfigurations, Mode=OneWay}"
+                                       ItemTemplate="{StaticResource ScraperConfigurationTemplate}">
+                            <ItemsRepeater.Layout>
+                                <StackLayout Spacing="16" />
+                            </ItemsRepeater.Layout>
+                        </ItemsRepeater>
+                    </ScrollView>
+                </controls:Case>
+            </controls:SwitchPresenter>
+        </Grid>
+    </Grid>
+</UserControl>

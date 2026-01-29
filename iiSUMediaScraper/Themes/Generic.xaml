@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="using:iiSUMediaScraper"
+                    xmlns:customcontrols="using:iiSUMediaScraper.Controls">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="ms-appx:///Styles/CropPreview.xaml" />
+        <ResourceDictionary Source="ms-appx:///Styles/DropZone.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="customcontrols:CustomComboBox"
+           BasedOn="{StaticResource DefaultComboBoxStyle}">
+    </Style>
+</ResourceDictionary>
