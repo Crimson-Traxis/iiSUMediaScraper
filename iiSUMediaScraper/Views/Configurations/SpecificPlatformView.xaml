@@ -7,6 +7,7 @@
              xmlns:local="using:iiSUMediaScraper.Views.Configurations"
              xmlns:configurationviewmodels="using:iiSUMediaScraper.ViewModels.Configurations"
              xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             xmlns:imageex="using:ImageEx"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -39,12 +40,12 @@
                        HorizontalAlignment="Center"
                        FontSize="22" />
         </Border>
-        <Image Stretch="Fill"
-               Height="60"
-               Width="60"
-               Margin="0,0,16,0"
-               Source="{x:Bind ViewModel.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-               Visibility="{x:Bind ViewModel.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+        <imageex:ImageEx Stretch="Fill"
+                         Height="60"
+                         Width="60"
+                         Margin="0,0,16,0"
+                         Source="{x:Bind ViewModel.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                         Visibility="{x:Bind ViewModel.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
         <TextBlock Text="{x:Bind ViewModel.PlatformConfiguration.Name, Mode=OneWay}"
                    FontSize="18"
                    VerticalAlignment="Center"

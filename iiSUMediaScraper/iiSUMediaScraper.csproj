@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<OutputType>WinExe</OutputType>
-		<TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
-		<TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
+		<TargetFramework>net8.0-windows10.0.22621.0</TargetFramework>
+		<TargetPlatformMinVersion>10.0.22621.0</TargetPlatformMinVersion>
 		<RootNamespace>iiSUMediaScraper</RootNamespace>
 		<ApplicationIcon>Assets/icon.ico</ApplicationIcon>
 		<ApplicationManifest>app.manifest</ApplicationManifest>
@@ -22,6 +22,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\icon.ico" />
+		<None Remove="Styles\AnimatedImageWebView.xaml" />
 		<None Remove="Styles\CropPreview.xaml" />
 		<None Remove="Styles\DropZone.xaml" />
 		<None Remove="Themes\Generic.xaml" />
@@ -51,6 +52,7 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
+		<PackageReference Include="ImageEx.WinUI" Version="4.0.0" />
 		<PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.2" />
 		<PackageReference Include="Magick.NET.Core" Version="14.10.2" />
 		<PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.2" />
@@ -68,6 +70,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Tools\ffmpeg.exe">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="Icons\3ds.png">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
@@ -206,6 +211,21 @@
 		<None Update="Configuration.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+		<None Update="Tools\ffplay.exe">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Tools\ffprobe.exe">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Tools\yt-dlp.exe">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<Page Update="Views\VideoView.xaml">
+		  <SubType>Designer</SubType>
+		</Page>
+		<Page Update="Views\MusicView.xaml">
+		  <SubType>Designer</SubType>
+		</Page>
 		<Page Update="Views\PlatformConfigurationView.xaml">
 		  <SubType>Designer</SubType>
 		</Page>
@@ -245,6 +265,9 @@
 		<None Update="UpscaleServer\SeedVr2Server.py">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<Page Update="Styles\AnimatedImageWebView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</Page>
 		<Page Update="Styles\CropPreview.xaml">
 			<Generator>MSBuild:Compile</Generator>
 		</Page>

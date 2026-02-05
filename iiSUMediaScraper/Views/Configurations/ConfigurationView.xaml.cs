@@ -1,9 +1,12 @@
 using CommunityToolkit.WinUI.Collections;
 using iiSUMediaScraper.ViewModels.Configurations;
+using Microsoft.UI.Composition;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Hosting;
 using Microsoft.Windows.Storage.Pickers;
 using System.ComponentModel;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -33,6 +36,32 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
         InitializeComponent();
     }
 
+    private void ConfigurationNavigationListView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ConfigurationSwitchPresenter == null) return;
+
+        ElementCompositionPreview.SetIsTranslationEnabled(ConfigurationSwitchPresenter, true);
+
+        var visual = ElementCompositionPreview.GetElementVisual(ConfigurationSwitchPresenter);
+        var compositor = visual.Compositor;
+
+        visual.Properties.InsertVector3("Translation", new Vector3(0, 50, 0));
+        visual.Opacity = 0;
+
+        var easing = compositor.CreateCubicBezierEasingFunction(new Vector2(0.1f, 0.9f), new Vector2(0.2f, 1f));
+
+        var translationAnimation = compositor.CreateVector3KeyFrameAnimation();
+        translationAnimation.InsertKeyFrame(1f, Vector3.Zero, easing);
+        translationAnimation.Duration = TimeSpan.FromMilliseconds(300);
+
+        var opacityAnimation = compositor.CreateScalarKeyFrameAnimation();
+        opacityAnimation.InsertKeyFrame(1f, 1f, easing);
+        opacityAnimation.Duration = TimeSpan.FromMilliseconds(300);
+
+        visual.StartAnimation("Translation", translationAnimation);
+        visual.StartAnimation("Opacity", opacityAnimation);
+    }
+
     /// <summary>
     /// Handles the games folder picker button click.
     /// Opens a folder picker to select the root directory containing game files.
@@ -46,7 +75,7 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
             // disable the button to avoid double-clicking
             button.IsEnabled = false;
 
-            FolderPicker picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
+            var picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
             {
                 CommitButtonText = "Pick Folder",
                 SuggestedStartLocation = PickerLocationId.ComputerFolder,
@@ -79,7 +108,7 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
             // disable the button to avoid double-clicking
             button.IsEnabled = false;
 
-            FolderPicker picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
+            var picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
             {
                 CommitButtonText = "Pick Folder",
                 SuggestedStartLocation = PickerLocationId.ComputerFolder,
@@ -112,7 +141,7 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
             // disable the button to avoid double-clicking
             button.IsEnabled = false;
 
-            FolderPicker picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
+            var picker = new FolderPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
             {
                 CommitButtonText = "Pick Folder",
                 SuggestedStartLocation = PickerLocationId.ComputerFolder,

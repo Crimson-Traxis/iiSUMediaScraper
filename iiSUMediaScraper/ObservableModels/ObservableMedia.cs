@@ -20,15 +20,22 @@ public class ObservableMedia : BaseObservableModel<Media>
         set => SetProperty(_baseModel.Extension, value, _baseModel, (o, v) => o.Extension = v);
     }
 
-    public byte[] Bytes
-    {
-        get => _baseModel.Bytes;
-        set => SetProperty(_baseModel.Bytes, value, _baseModel, (o, v) => o.Bytes = v);
-    }
-
     public SourceFlag Source
     {
         get => _baseModel.Source;
         set => SetProperty(_baseModel.Source, value, _baseModel, (o, v) => o.Source = v);
+    }
+
+
+    public string? LocalPath
+    {
+        get => _baseModel.LocalPath;
+        set => SetProperty(_baseModel.LocalPath, value, _baseModel, (o, v) => o.LocalPath = v);
+    }
+
+    public Crop? Crop
+    {
+        get => _baseModel.Crop;
+        set => SetProperty(_baseModel.Crop, value, _baseModel, (o, v) => o.Crop = v);
     }
 }

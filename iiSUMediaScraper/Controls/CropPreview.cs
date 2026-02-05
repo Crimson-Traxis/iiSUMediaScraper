@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using ImageEx;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Media.Imaging;
@@ -12,7 +13,8 @@ namespace iiSUMediaScraper.Controls;
 /// </summary>
 public sealed class CropPreview : Control
 {
-    private Image? _sourceImage;
+    private ImageEx.ImageEx? _sourceImage;
+    private AnimatedImageWebView? _animatedImage;
     private Path? _overlayPath;
 
     #region Dependency Properties
@@ -80,6 +82,27 @@ public sealed class CropPreview : Control
             typeof(CropPreview),
             new PropertyMetadata(Stretch.Uniform, OnStretchChanged));
 
+    public static readonly DependencyProperty ImagePathProperty =
+        DependencyProperty.Register(
+            nameof(ImagePath),
+            typeof(string),
+            typeof(CropPreview),
+            new PropertyMetadata(null, OnImagePathChanged));
+
+    public static readonly DependencyProperty IsAnimatedProperty =
+        DependencyProperty.Register(
+            nameof(IsAnimated),
+            typeof(bool),
+            typeof(CropPreview),
+            new PropertyMetadata(false, OnIsAnimatedChanged));
+
+    public static readonly DependencyProperty ExtensionProperty =
+        DependencyProperty.Register(
+            nameof(Extension),
+            typeof(string),
+            typeof(CropPreview),
+            new PropertyMetadata(null, OnExtensionChanged));
+
     #endregion
 
     #region Properties
@@ -138,6 +161,24 @@ public sealed class CropPreview : Control
         set => SetValue(StretchProperty, value);
     }
 
+    public string? ImagePath
+    {
+        get => (string?)GetValue(ImagePathProperty);
+        set => SetValue(ImagePathProperty, value);
+    }
+
+    public bool IsAnimated
+    {
+        get => (bool)GetValue(IsAnimatedProperty);
+        set => SetValue(IsAnimatedProperty, value);
+    }
+
+    public string? Extension
+    {
+        get => (string?)GetValue(ExtensionProperty);
+        set => SetValue(ExtensionProperty, value);
+    }
+
     #endregion
 
     public CropPreview()
@@ -150,7 +191,8 @@ public sealed class CropPreview : Control
     {
         base.OnApplyTemplate();
 
-        _sourceImage = GetTemplateChild("SourceImage") as Image;
+        _sourceImage = GetTemplateChild("SourceImage") as ImageEx.ImageEx;
+        _animatedImage = GetTemplateChild("AnimatedImage") as AnimatedImageWebView;
         _overlayPath = GetTemplateChild("OverlayPath") as Path;
 
         if (_sourceImage != null)
@@ -159,18 +201,48 @@ public sealed class CropPreview : Control
             _sourceImage.Stretch = Stretch;
         }
 
+        if (_animatedImage != null)
+        {
+            _animatedImage.ImagePath = ImagePath;
+        }
+
         if (_overlayPath != null)
         {
             _overlayPath.Fill = OverlayBrush ?? new SolidColorBrush(Microsoft.UI.Colors.Black);
             _overlayPath.Opacity = OverlayOpacity;
         }
 
+        UpdateVisibility();
+        UpdateAnimatedImageSize();
         UpdateOverlay();
+    }
+
+    private void UpdateVisibility()
+    {
+        if (_sourceImage != null)
+        {
+            _sourceImage.Visibility = IsAnimated ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        if (_animatedImage != null)
+        {
+            _animatedImage.Visibility = IsAnimated ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
         UpdateOverlay();
+        UpdateAnimatedImageSize();
+    }
+
+    private void UpdateAnimatedImageSize()
+    {
+        if (_animatedImage != null && ActualWidth > 0 && ActualHeight > 0)
+        {
+            _animatedImage.Width = ActualWidth;
+            _animatedImage.Height = ActualHeight;
+        }
     }
 
     private static void OnHasCropChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -235,6 +307,32 @@ public sealed class CropPreview : Control
         }
     }
 
+    private static void OnImagePathChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is CropPreview control && control._animatedImage != null)
+        {
+            control._animatedImage.ImagePath = e.NewValue as string;
+        }
+    }
+
+    private static void OnExtensionChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is CropPreview control)
+        {
+            var extension = (e.NewValue as string)?.ToLowerInvariant();
+            // Treat .gif and .webp as animated formats
+            control.IsAnimated = extension == ".gif" || extension == ".webp";
+        }
+    }
+
+    private static void OnIsAnimatedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+    {
+        if (d is CropPreview control)
+        {
+            control.UpdateVisibility();
+        }
+    }
+
     private void UpdateOverlay()
     {
         if (_overlayPath == null || ActualWidth <= 0 || ActualHeight <= 0)
@@ -280,7 +378,7 @@ public sealed class CropPreview : Control
         cropHeight = Math.Max(0, cropBottom - cropTop);
 
         // Create 4 rectangles around the crop region instead of using EvenOdd
-        GeometryGroup geometryGroup = new GeometryGroup
+        var geometryGroup = new GeometryGroup
         {
             FillRule = FillRule.Nonzero
         };

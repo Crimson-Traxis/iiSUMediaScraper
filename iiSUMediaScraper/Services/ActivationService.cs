@@ -13,8 +13,6 @@ namespace iiSUMediaScraper.Services;
 /// </summary>
 public class ActivationService : IActivationService
 {
-    private readonly ActivationHandler<LaunchActivatedEventArgs> _defaultHandler;
-    private readonly IEnumerable<IActivationHandler> _activationHandlers;
     private readonly UIElement? _shell = null;
 
     /// <summary>
@@ -25,8 +23,8 @@ public class ActivationService : IActivationService
     /// <param name="logger">Logger instance for diagnostic output.</param>
     public ActivationService(ActivationHandler<LaunchActivatedEventArgs> defaultHandler, IEnumerable<IActivationHandler> activationHandlers, ILogger<ActivationService> logger)
     {
-        _defaultHandler = defaultHandler;
-        _activationHandlers = activationHandlers;
+        DefaultHandler = defaultHandler;
+        ActivationHandlers = activationHandlers;
         Logger = logger;
     }
 
@@ -37,16 +35,16 @@ public class ActivationService : IActivationService
     {
         try
         {
-            var activationHandler = _activationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
+            var activationHandler = ActivationHandlers.FirstOrDefault(h => h.CanHandle(activationArgs));
 
             if (activationHandler != null)
             {
                 await activationHandler.HandleAsync(activationArgs);
             }
 
-            if (_defaultHandler.CanHandle(activationArgs))
+            if (DefaultHandler.CanHandle(activationArgs))
             {
-                await _defaultHandler.HandleAsync(activationArgs);
+                await DefaultHandler.HandleAsync(activationArgs);
             }
         }
         catch (Exception ex)
@@ -86,7 +84,7 @@ public class ActivationService : IActivationService
             // Set the MainWindow Content.
             if (App.MainWindow.Content == null)
             {
-                RootView root = new RootView();
+                var root = new RootView();
 
                 App.MainWindow.Content = _shell ?? root;
 
@@ -111,5 +109,18 @@ public class ActivationService : IActivationService
         }
     }
 
+    /// <summary>
+    /// Gets the default activation handler for launch events.
+    /// </summary>
+    protected ActivationHandler<LaunchActivatedEventArgs> DefaultHandler { get; private set; }
+
+    /// <summary>
+    /// Gets the collection of activation handlers for processing different activation types.
+    /// </summary>
+    protected IEnumerable<IActivationHandler> ActivationHandlers { get; private set; }
+
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 }

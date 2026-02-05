@@ -96,14 +96,24 @@ public partial class MainViewModel : ObservableRecipient
     private ObservableCollection<GameViewModel> applyingGames;
 
     /// <summary>
+    /// Raised when editing is requested for an image.
+    /// </summary>
+    public event EventHandler<ImageViewModel> EditRequested;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="MainViewModel"/> class.
     /// </summary>
     /// <param name="configurationService">The configuration service.</param>
     /// <param name="fileService">The file service.</param>
     /// <param name="scrapingService">The scraping service.</param>
-    /// <param name="imageFormatterService">The image formatter service.</param>
+    /// <param name="mediaFormatterService">The media formatter service.</param>
     /// <param name="upscalerService">The upscaler service.</param>
-    public MainViewModel(IConfigurationService configurationService, IFileService fileService, IScrapingService scrapingService, IImageFormatterService imageFormatterService, IUpscalerService upscalerService)
+    public MainViewModel(IConfigurationService configurationService, 
+                         IFileService fileService, 
+                         IScrapingService scrapingService, 
+                         IMediaFormatterService mediaFormatterService, 
+                         IUpscalerService upscalerService, 
+                         IDownloader downloader)
     {
         ConfigurationService = configurationService;
 
@@ -111,9 +121,11 @@ public partial class MainViewModel : ObservableRecipient
 
         ScrapingService = scrapingService;
 
-        ImageFormatterService = imageFormatterService;
+        MediaFormatterService = mediaFormatterService;
 
         UpscalerService = upscalerService;
+
+        Downloader = downloader;
 
         isShowingConfiguration = true;
 
@@ -124,26 +136,60 @@ public partial class MainViewModel : ObservableRecipient
         Load();
     }
 
+    /// <summary>
+    /// Handles the edit image event from the platform.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The image to edit.</param>
+    private void OnEditRequested(object? sender, ImageViewModel e)
+    {
+        EditRequested?.Invoke(this, e);
+    }
+
+    /// <summary>
+    /// Handles the show configuration requested event from the configuration.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The event args.</param>
     private void Configuration_ShowConfiguraitonRequested(object? sender, EventArgs e)
     {
         _ = ShowConfiguration();
     }
 
+    /// <summary>
+    /// Handles the stage apply games requested event from platforms.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The games to stage for applying.</param>
     private async void StageApplyGamesRequested(object? sender, IEnumerable<GameViewModel> e)
     {
         await StageApplyGames(e);
     }
 
+    /// <summary>
+    /// Initializes event handlers for a platform.
+    /// </summary>
+    /// <param name="platform">The platform to initialize.</param>
     private void InitializePlatform(PlatformViewModel platform)
     {
         platform.StageApplyGamesRequested += StageApplyGamesRequested;
+        platform.EditRequested += OnEditRequested;
     }
 
+    /// <summary>
+    /// Removes event handlers from a platform.
+    /// </summary>
+    /// <param name="platform">The platform to de-initialize.</param>
     private void DeInitializePlatform(PlatformViewModel platform)
     {
         platform.StageApplyGamesRequested -= StageApplyGamesRequested;
+        platform.EditRequested -= OnEditRequested;
     }
 
+    /// <summary>
+    /// Stages games for applying media assets.
+    /// </summary>
+    /// <param name="games">The games to stage.</param>
     protected async Task StageApplyGames(IEnumerable<GameViewModel> games)
     {
         IsShowingApplyConfiguration = true;
@@ -268,7 +314,9 @@ public partial class MainViewModel : ObservableRecipient
 
             IsLoading = true;
 
-            SemaphoreSlim semaphore = new SemaphoreSlim((int)Math.Min(MaxConcurrency, Configuration.MaxNumberOfConcurrentGames));
+            SelectedPlatform = null;
+
+            var semaphore = new SemaphoreSlim((int)Math.Min(MaxConcurrency, Configuration.MaxNumberOfConcurrentGames));
 
             foreach (string scanLocation in scanLocations)
             {
@@ -288,7 +336,7 @@ public partial class MainViewModel : ObservableRecipient
                             }
                             else
                             {
-                                platform = new PlatformViewModel(FileService, ScrapingService, ImageFormatterService, UpscalerService, Configuration, platformConfiguration, semaphore);
+                                platform = new PlatformViewModel(FileService, ScrapingService, MediaFormatterService, UpscalerService, Downloader, Configuration, platformConfiguration, semaphore);
 
                                 InitializePlatform(platform);
 
@@ -311,13 +359,16 @@ public partial class MainViewModel : ObservableRecipient
                 }
             }
 
-            SelectedPlatform = Platforms.FirstOrDefault();
-
             foreach (PlatformViewModel platform in Platforms)
             {
                 platform.IsLoading = true;
 
                 await platform.FindGames();
+
+                if(platform.Games.Count > 0)
+                {
+                    SelectedPlatform ??= platform;
+                }
 
                 foreach (GameViewModel game in platform.Games)
                 {
@@ -341,6 +392,8 @@ public partial class MainViewModel : ObservableRecipient
     public async Task Load()
     {
         IsLoadingConfiguration = true;
+
+        await FileService.CleanupTemporaryFiles();
 
         await ConfigurationService.LoadConfiguration();
 
@@ -375,14 +428,19 @@ public partial class MainViewModel : ObservableRecipient
     protected IScrapingService ScrapingService { get; private set; }
 
     /// <summary>
-    /// Gets the image formatter service.
+    /// Gets the meida formatter service.
     /// </summary>
-    protected IImageFormatterService ImageFormatterService { get; private set; }
+    protected IMediaFormatterService MediaFormatterService { get; private set; }
 
     /// <summary>
     /// Gets the upscaler service.
     /// </summary>
     protected IUpscalerService UpscalerService { get; private set; }
+
+    /// <summary>
+    /// Gets the downloader service.
+    /// </summary>
+    protected IDownloader Downloader { get; private set; }
 
     /// <summary>
     /// Gets the platforms that have games being applied.

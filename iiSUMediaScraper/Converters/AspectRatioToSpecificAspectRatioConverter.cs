@@ -2,8 +2,15 @@
 
 namespace iiSUMediaScraper.Converters;
 
+/// <summary>
+/// Converts a decimal aspect ratio to a known aspect ratio type if it matches within tolerance.
+/// Returns the ratio value if recognized, null otherwise.
+/// </summary>
 public class AspectRatioToSpecificAspectRatioConverter : IValueConverter
 {
+    /// <summary>
+    /// Converts a decimal aspect ratio to itself if it matches a known type, null otherwise.
+    /// </summary>
     public object? Convert(object value, Type targetType, object parameter, string language)
     {
         if (value is double d)
@@ -17,25 +24,60 @@ public class AspectRatioToSpecificAspectRatioConverter : IValueConverter
         return null;
     }
 
+    /// <summary>
+    /// Not implemented.
+    /// </summary>
     public object ConvertBack(object value, Type targetType, object parameter, string language)
     {
         throw new NotImplementedException();
     }
 
+    /// <summary>
+    /// Known aspect ratio types.
+    /// </summary>
     public enum AspectRatioType
     {
+        /// <summary>
+        /// Unknown aspect ratio.
+        /// </summary>
         Unknown,
-        OneToOne,      // 1:1
-        NineteenToNine, // 19:9
-        NineToSixteen, // 9:16
-        FourToThree,   // 4:3
-        ThreeToTwo     // 3:2
+
+        /// <summary>
+        /// 1:1 aspect ratio (square).
+        /// </summary>
+        OneToOne,
+
+        /// <summary>
+        /// 19:9 aspect ratio.
+        /// </summary>
+        NineteenToNine,
+
+        /// <summary>
+        /// 9:16 or 16:9 aspect ratio.
+        /// </summary>
+        NineToSixteen,
+
+        /// <summary>
+        /// 4:3 or 3:4 aspect ratio.
+        /// </summary>
+        FourToThree,
+
+        /// <summary>
+        /// 3:2 or 2:3 aspect ratio.
+        /// </summary>
+        ThreeToTwo
     }
 
+    /// <summary>
+    /// Gets the aspect ratio type for a given ratio value within tolerance.
+    /// </summary>
+    /// <param name="ratio">The decimal aspect ratio value.</param>
+    /// <param name="tolerance">The tolerance for matching (default 0.01).</param>
+    /// <returns>The matched AspectRatioType or Unknown.</returns>
     public static AspectRatioType GetAspectRatioTypeWithTolerance(double ratio, double tolerance = 0.01)
     {
 
-        Dictionary<double, AspectRatioType> ratioValues = new Dictionary<double, AspectRatioType>
+        var ratioValues = new Dictionary<double, AspectRatioType>
         {
             { 1.0, AspectRatioType.OneToOne },           // 1:1
             { 19.0 / 9.0, AspectRatioType.NineteenToNine }, // 19:9

@@ -1,7 +1,6 @@
 ﻿using iiSUMediaScraper.Activation;
 using iiSUMediaScraper.Contracts.Services;
 using iiSUMediaScraper.Extensions;
-using iiSUMediaScraper.Http;
 using iiSUMediaScraper.Services;
 using iiSUMediaScraper.ViewModels;
 using iiSUMediaScraper.Views;
@@ -12,7 +11,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.EventLog;
 using Microsoft.UI.Xaml;
 using System.IO;
-using System.Threading.RateLimiting;
 
 namespace iiSUMediaScraper;
 
@@ -98,39 +96,17 @@ public partial class App : Application
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<IConfigurationService, ConfigurationService>();
             services.AddSingleton<IScrapingService, ScrapingService>();
-            services.AddSingleton<IImageFormatterService, ImageFormatterService>();
+            services.AddSingleton<IMediaFormatterService, MediaFormatterService>();
+            services.AddSingleton<IUIThreadService, UIThreadService>();
+            services.AddSingleton<IDownloader, Downloader>();
 
             services.AddUpscalerService(options =>
             {
                 options.ServerDirectory = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "UpscaleServer");
             });
 
-            services.AddTransient(_ => new RateLimitingHandler(
-                new TokenBucketRateLimiter(new TokenBucketRateLimiterOptions
-                {
-                    TokenLimit = 4,
-                    ReplenishmentPeriod = TimeSpan.FromSeconds(1.5),
-                    TokensPerPeriod = 4,
-                    QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
-                    QueueLimit = int.MaxValue // requests will wait in queue
-                })));
-
-            services.AddHttpClient("Igdb").AddHttpMessageHandler<RateLimitingHandler>();
-
-            services.AddHttpClient("Ign").ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-            {
-                MaxConnectionsPerServer = 8
-            });
-
-            services.AddHttpClient("SteamGridDb").ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-            {
-                MaxConnectionsPerServer = 8
-            });
-
-            services.AddHttpClient("Download").ConfigurePrimaryHttpMessageHandler(() => new SocketsHttpHandler
-            {
-                MaxConnectionsPerServer = 100
-            });
+            // HTTP clients for scraping and downloading
+            services.AddScrapingHttpClients();
 
             // Core Services
             services.AddSingleton<IFileService, FileService>();

@@ -1,7 +1,9 @@
-﻿using iiSUMediaScraper.Models;
+﻿using iiSUMediaScraper.Contracts.Services;
+using iiSUMediaScraper.Models;
 using iiSUMediaScraper.Models.Configurations;
 using iiSUMediaScraper.Models.Scraping.SteamGridDb;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -16,6 +18,8 @@ public class SteamGridDbScraper : Scraper
 {
     private Game _game;
 
+    private bool _hasFetchedIcons;
+
     private bool _hasFetchedLogos;
 
     private bool _hasFetchedTitles;
@@ -26,9 +30,10 @@ public class SteamGridDbScraper : Scraper
     /// Initializes a new instance of the SteamGridDbScraper.
     /// </summary>
     /// <param name="httpClientFactory">Factory for creating HTTP clients.</param>
+    /// <param name="mediaCache">Shared media cache for this scraping session.</param>
     /// <param name="configuration">Application configuration.</param>
     /// <param name="logger">Logger instance for diagnostic output.</param>
-    public SteamGridDbScraper(IHttpClientFactory httpClientFactory, Configuration configuration, ILogger logger) : base(httpClientFactory, configuration, logger)
+    public SteamGridDbScraper(IHttpClientFactory httpClientFactory, IDownloader downloader, Configuration configuration, ILogger logger) : base(httpClientFactory, downloader, configuration, logger)
     {
 
     }
@@ -44,9 +49,14 @@ public class SteamGridDbScraper : Scraper
     {
         try
         {
-            if (HasScrapedGame && _game != null)
+            if (HasScraped && _game != null)
             {
                 List<Task> tasks = [];
+
+                if (Configuration.IsFetchIconsIfNoneFound && !_hasFetchedIcons && previous?.Icons.Count == 0)
+                {
+                    tasks.Add(ScrapeGrids(_game.Id, true).ContinueWith(async t => _game.Icons = await t));
+                }
 
                 if (Configuration.IsFetchLogosIfNoneFound && !_hasFetchedLogos && previous?.Logos.Count == 0)
                 {
@@ -55,12 +65,12 @@ public class SteamGridDbScraper : Scraper
 
                 if (Configuration.IsFetchTitlesIfNoneFound && !_hasFetchedTitles && previous?.Titles.Count == 0)
                 {
-                    tasks.Add(ScrapeGrids(_game.Id).ContinueWith(async t => _game.Grids = await t));
+                    tasks.Add(ScrapeGrids(_game.Id, false).ContinueWith(async t => _game.Titles = await t));
                 }
 
                 if (Configuration.IsFetchHerosIfNoneFound && !_hasFetchedHeros && previous?.Heros.Count == 0)
                 {
-                    tasks.Add(ScrapeHero(_game.Id).ContinueWith(async t => _game.Heros = await t));
+                    tasks.Add(ScrapeHeros(_game.Id).ContinueWith(async t => _game.Heros = await t));
                 }
 
                 await Task.WhenAll(tasks);
@@ -71,16 +81,19 @@ public class SteamGridDbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("SteamGridDb");
 
-                Uri requestUri = new Uri($"https://www.steamgriddb.com/api/v2/search/autocomplete/{name}");
+                var requestUri = new Uri($"https://www.steamgriddb.com/api/v2/search/autocomplete/{name}");
 
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri)
-                {
-                    Content = new StringContent("", Encoding.UTF8, "application/json")
-                };
-
-                requestMessage.Headers.Add("Authorization", "Bearer 3cba3f74328cba0b55ee8b31c05d59b0");
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Get, requestUri)
+                        {
+                            Content = new StringContent("", Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {GlobalConfiguration.SteamGridDbKey}");
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -98,6 +111,13 @@ public class SteamGridDbScraper : Scraper
 
                             List<Task> tasks = [];
 
+                            if (Configuration.IsFetchIcons)
+                            {
+                                tasks.Add(ScrapeGrids(game.Id, true).ContinueWith(async t => game.Icons = await t));
+
+                                _hasFetchedIcons = true;
+                            }
+
                             if (Configuration.IsFetchLogos)
                             {
                                 tasks.Add(ScrapeLogos(game.Id).ContinueWith(async t => game.Logos = await t));
@@ -107,14 +127,14 @@ public class SteamGridDbScraper : Scraper
 
                             if (Configuration.IsFetchTitles)
                             {
-                                tasks.Add(ScrapeGrids(game.Id).ContinueWith(async t => game.Grids = await t));
+                                tasks.Add(ScrapeGrids(game.Id, false).ContinueWith(async t => game.Titles = await t));
 
                                 _hasFetchedTitles = true;
                             }
 
                             if (Configuration.IsFetchHeros)
                             {
-                                tasks.Add(ScrapeHero(game.Id).ContinueWith(async t => game.Heros = await t));
+                                tasks.Add(ScrapeHeros(game.Id).ContinueWith(async t => game.Heros = await t));
 
                                 _hasFetchedHeros = true;
                             }
@@ -141,22 +161,32 @@ public class SteamGridDbScraper : Scraper
     /// </summary>
     /// <param name="gameId">SteamGridDB game ID.</param>
     /// <returns>Collection of hero images.</returns>
-    private async Task<IEnumerable<Hero>> ScrapeHero(int gameId)
+    private async Task<IEnumerable<Hero>> ScrapeHeros(int gameId)
     {
         try
         {
             HttpClient client = HttpClientFactory.CreateClient("SteamGridDb");
 
-            Uri requestUri = new Uri($"https://www.steamgriddb.com/api/v2/heroes/game/{gameId}");
+            string query = "?types=static,animated";
 
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri)
+            if (Configuration.HeroFetchLimit is int limit)
             {
-                Content = new StringContent("", Encoding.UTF8, "application/json")
-            };
+                query += $"&limit={limit}";
+            }
 
-            requestMessage.Headers.Add("Authorization", "Bearer 3cba3f74328cba0b55ee8b31c05d59b0");
+            var requestUri = new Uri($"https://www.steamgriddb.com/api/v2/heroes/game/{gameId}{query}");
 
-            using HttpResponseMessage response = await client.SendAsync(requestMessage);
+            using HttpResponseMessage response = await SendWithRetryAsync(
+                client,
+                () =>
+                {
+                    var msg = new HttpRequestMessage(HttpMethod.Get, requestUri)
+                    {
+                        Content = new StringContent("", Encoding.UTF8, "application/json")
+                    };
+                    msg.Headers.Add("Authorization", $"Bearer {GlobalConfiguration.SteamGridDbKey}");
+                    return msg;
+                });
 
             response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -187,23 +217,37 @@ public class SteamGridDbScraper : Scraper
     /// Filters by configured title styles if specified.
     /// </summary>
     /// <param name="gameId">SteamGridDB game ID.</param>
+    /// <param name="isIcon">Look for square only grids</param>
     /// <returns>Collection of grid images.</returns>
-    private async Task<IEnumerable<Grid>> ScrapeGrids(int gameId)
+    private async Task<IEnumerable<Grid>> ScrapeGrids(int gameId, bool isIcon)
     {
         try
         {
             HttpClient client = HttpClientFactory.CreateClient("SteamGridDb");
 
-            Uri requestUri = new Uri($"https://www.steamgriddb.com/api/v2/grids/game/{gameId}");
+            string dimensions = isIcon ? "512x512,1024x1024" : "600x900";
+            string query = $"?dimensions={dimensions}";
 
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri)
+            int? fetchLimit = isIcon ? Configuration.IconFetchLimit : Configuration.TitleFetchLimit;
+
+            if (fetchLimit is int limit)
             {
-                Content = new StringContent("", Encoding.UTF8, "application/json")
-            };
+                query += $"&limit={limit}";
+            }
 
-            requestMessage.Headers.Add("Authorization", "Bearer 3cba3f74328cba0b55ee8b31c05d59b0");
+            var requestUri = new Uri($"https://www.steamgriddb.com/api/v2/grids/game/{gameId}{query}");
 
-            using HttpResponseMessage response = await client.SendAsync(requestMessage);
+            using HttpResponseMessage response = await SendWithRetryAsync(
+                client,
+                () =>
+                {
+                    var msg = new HttpRequestMessage(HttpMethod.Get, requestUri)
+                    {
+                        Content = new StringContent("", Encoding.UTF8, "application/json")
+                    };
+                    msg.Headers.Add("Authorization", $"Bearer {GlobalConfiguration.SteamGridDbKey}");
+                    return msg;
+                });
 
             response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -213,9 +257,11 @@ public class SteamGridDbScraper : Scraper
 
             if (json != null)
             {
-                if (Configuration.TitleStyles.Count != 0)
+                List<string> styles = isIcon ? Configuration.IconStyles : Configuration.TitleStyles;
+
+                if (styles.Count != 0)
                 {
-                    return json.Data.Where(d => Configuration.TitleStyles.Contains(d.Style));
+                    return json.Data.Where(d => styles.Contains(d.Style));
                 }
 
                 return json.Data;
@@ -241,16 +287,26 @@ public class SteamGridDbScraper : Scraper
         {
             HttpClient client = HttpClientFactory.CreateClient("SteamGridDb");
 
-            Uri requestUri = new Uri($"https://www.steamgriddb.com/api/v2/logos/game/{gameId}");
+            string query = "";
 
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri)
+            if (Configuration.LogoFetchLimit is int limit)
             {
-                Content = new StringContent("", Encoding.UTF8, "application/json")
-            };
+                query = $"?limit={limit}";
+            }
 
-            requestMessage.Headers.Add("Authorization", "Bearer 3cba3f74328cba0b55ee8b31c05d59b0");
+            var requestUri = new Uri($"https://www.steamgriddb.com/api/v2/logos/game/{gameId}{query}");
 
-            using HttpResponseMessage response = await client.SendAsync(requestMessage);
+            using HttpResponseMessage response = await SendWithRetryAsync(
+                client,
+                () =>
+                {
+                    var msg = new HttpRequestMessage(HttpMethod.Get, requestUri)
+                    {
+                        Content = new StringContent("", Encoding.UTF8, "application/json")
+                    };
+                    msg.Headers.Add("Authorization", $"Bearer {GlobalConfiguration.SteamGridDbKey}");
+                    return msg;
+                });
 
             response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -296,7 +352,21 @@ public class SteamGridDbScraper : Scraper
         {
             _game = game;
 
-            MediaContext mediaContext = new MediaContext();
+            var mediaContext = new MediaContext();
+
+            List<Image> icons = [];
+
+            foreach (var grid in game.Icons)
+            {
+                icons.Add(new Image()
+                {
+                    Url = grid.Url,
+                    Height = grid.Height,
+                    Width = grid.Width,
+                });
+            }
+
+            mediaContext.Icons = icons;
 
             List<Image> heros = [];
 
@@ -310,11 +380,11 @@ public class SteamGridDbScraper : Scraper
                 });
             }
 
-            mediaContext.Heros = [.. heros.Cast<Media>()];
+            mediaContext.Heros = [.. heros.Cast<Image>()];
 
             List<Image> titles = [];
 
-            foreach (var grid in game.Grids)
+            foreach (var grid in game.Titles)
             {
                 titles.Add(new Image()
                 {
@@ -339,6 +409,20 @@ public class SteamGridDbScraper : Scraper
             }
 
             mediaContext.Logos = logos;
+
+            List<Video> videos = [];
+
+            foreach (var video in game.AnimatedHeros)
+            {
+                videos.Add(new Video()
+                {
+                    Url = video.Url,
+                    ApplyMediaType = MediaType.Hero,
+                    Title = "Animated Hero"
+                });
+            }
+
+            mediaContext.Videos = videos;
 
             return mediaContext;
         }

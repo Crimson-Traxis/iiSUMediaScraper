@@ -1,4 +1,5 @@
 ﻿using iiSUMediaScraper.Helpers;
+using iiSUMediaScraper.Services;
 using System.IO;
 using Windows.UI.ViewManagement;
 
@@ -31,6 +32,9 @@ public sealed partial class MainWindow : WindowEx
 
         // Theme change code picked from https://github.com/microsoft/WinUI-Gallery/pull/1239
         dispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue.GetForCurrentThread();
+
+        UIThreadService.DispatcherQueue = dispatcherQueue;
+
         settings = new UISettings();
         settings.ColorValuesChanged += Settings_ColorValuesChanged; // cannot use FrameworkElement.ActualThemeChanged event
 

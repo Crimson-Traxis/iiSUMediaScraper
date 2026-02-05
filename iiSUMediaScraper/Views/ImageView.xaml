@@ -48,7 +48,9 @@
           PointerEntered="Grid_PointerEntered"
           PointerExited="Grid_PointerExited">
         <controls1:CropPreview Stretch="Uniform"
-                               Height="140"
+                               Height="120"
+                               Extension="{x:Bind ViewModel.Extension, Mode=OneWay}"
+                               ImagePath="{x:Bind ViewModel.LocalPath, Mode=OneWay}"
                                VerticalAlignment="Center"
                                HorizontalAlignment="Center"
                                HasCrop="{x:Bind ViewModel.HasCrop, Mode=OneWay}"
@@ -56,7 +58,8 @@
                                CropLeft="{x:Bind ViewModel.Crop.Left, Mode=OneWay}"
                                CropWidth="{x:Bind ViewModel.Crop.Width, Mode=OneWay}"
                                CropHeight="{x:Bind ViewModel.Crop.Height, Mode=OneWay}"
-                               Source="{x:Bind ViewModel.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+                               Source="{x:Bind ViewModel.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                               Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
         <controls:Shimmer Height="140"
                           Width="{x:Bind CalculateScaledWidth(ViewModel.Width, ViewModel.Height), Mode=OneWay}" 
                           Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>

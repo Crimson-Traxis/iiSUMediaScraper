@@ -30,6 +30,11 @@ public partial class SpecificPlatformViewModel : ObservableObject
     /// </summary>
     public event EventHandler? SelectedChanged;
 
+    /// <summary>
+    /// Called when the platform configuration changes to manage property change subscriptions.
+    /// </summary>
+    /// <param name="oldValue">The previous platform configuration.</param>
+    /// <param name="newValue">The new platform configuration.</param>
     partial void OnPlatformConfigurationChanged(PlatformConfigurationViewModel? oldValue, PlatformConfigurationViewModel newValue)
     {
         if (oldValue != null)
@@ -43,6 +48,11 @@ public partial class SpecificPlatformViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Handles property changes from the platform configuration to update the Code property.
+    /// </summary>
+    /// <param name="sender">The source of the event.</param>
+    /// <param name="e">The event arguments containing the property name.</param>
     private void Platform_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Code));

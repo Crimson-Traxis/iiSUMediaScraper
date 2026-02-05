@@ -47,6 +47,10 @@ public partial class UpscalerConfigurationViewModel : ObservableUpscalerConfigur
         selectedColorCorrection = colorCorrections.FirstOrDefault(c => c.Value == BaseModel.ColorCorrection);
     }
 
+    /// <summary>
+    /// Called when the selected color correction method changes to update the base model.
+    /// </summary>
+    /// <param name="value">The new selected color correction method.</param>
     partial void OnSelectedColorCorrectionChanged(NameValueViewModel value)
     {
         BaseModel.ColorCorrection = value?.Value;

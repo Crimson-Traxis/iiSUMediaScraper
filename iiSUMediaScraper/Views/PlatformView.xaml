@@ -35,31 +35,11 @@
     </UserControl.Resources>
 
     <Grid x:Name="GridContent">
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                <VisualState>
-                    <VisualState.StateTriggers>
-                        <triggers:ControlSizeTrigger MinWidth="1200"
-                                                     TargetElement="{Binding ElementName=GridContent}" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="ImageViewSide.Width"
-                                Value="*" />
-                        <Setter Target="CardViewSide.Width"
-                                Value="700" />
-                        <Setter Target="CardViewTop.Height"
-                                Value="*" />
-                        <Setter Target="BotomViewSide.Height"
-                                Value="0" />
-                    </VisualState.Setters>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
         <Grid.RowDefinitions>
             <RowDefinition x:Name="CardViewTop"
                            Height="*" />
             <RowDefinition x:Name="BotomViewSide"
-                           Height="400" />
+                           Height="0" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition x:Name="CardViewSide"
@@ -70,17 +50,21 @@
         <Grid>
             <ScrollView>
                 <interactivity:Interaction.Behaviors>
-                    <behaviors:QuickReturnHeaderBehavior HeaderElement="{x:Bind Header}" />
+                    <behaviors:QuickReturnHeaderBehavior HeaderElement="{x:Bind Header}" HeaderSpacing="32" />
                 </interactivity:Interaction.Behaviors>
-                <ItemsRepeater Margin="0,16"
+                <ItemsRepeater Margin="16"
                                ItemsSource="{x:Bind ViewModel.Games, Mode=OneWay}">
                     <ItemsRepeater.Layout>
-                        <StackLayout Spacing="16" />
+                        <!--<StackLayout Spacing="16" />-->
+                        <controls1:UniformHeightStaggeredLayout DesiredColumnWidth="600"
+                                                                ColumnSpacing="32"
+                                                                RowSpacing="32" 
+                                                                ItemsStretch="Fill"/>
                     </ItemsRepeater.Layout>
                     <ItemsRepeater.ItemTemplate>
                         <DataTemplate x:DataType="viewmodels:GameViewModel">
                             <local:GameView ViewModel="{x:Bind Mode=OneWay}"
-                                            Margin="16,0" />
+                                            MaxWidth="600"/>
                         </DataTemplate>
                     </ItemsRepeater.ItemTemplate>
                 </ItemsRepeater>
@@ -129,261 +113,56 @@
               BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
               BorderThickness="1,0,0,0"
               Grid.Column="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <ScrollView>
-                    <StackPanel Orientation="Horizontal">
-                        <SplitButton Margin="16,16,0,16"
-                                     Height="38"
-                                     Padding="6"
-                                     ToolTipService.ToolTip="Upscale with default configuration"
-                                     Command="{x:Bind ViewModel.EditImage.UpscaleCommand, Mode=OneWay}"
-                                     CommandParameter="{x:Bind ViewModel.Configuration.SelectedUpscalerConfiguration, Mode=OneWay}">
-                            <SymbolIcon Symbol="Upload" />
-                            <SplitButton.Flyout>
-                                <Flyout Placement="Bottom">
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.ImageUpscaleConfigurations, Mode=OneWay}">
-                                        <ItemsRepeater.ItemTemplate>
-                                            <DataTemplate x:DataType="viewmodels:ImageUpscaleConfigurationViewModel">
-                                                <MenuFlyoutItem Text="{x:Bind UpscalerConfigurationViewModel.Name, Mode=OneWay}"
-                                                                Command="{x:Bind UpscaleCommand, Mode=OneWay}" />
-                                            </DataTemplate>
-                                        </ItemsRepeater.ItemTemplate>
-                                    </ItemsRepeater>
-                                </Flyout>
-                            </SplitButton.Flyout>
-                        </SplitButton>
-                    </StackPanel>
-                </ScrollView>
-                <StackPanel Orientation="Horizontal"
-                            Grid.Column="1">
-                    <Button Height="38"
-                            Width="38"
-                            Padding="6"
-                            Margin="0,16,16,16"
-                            Grid.Column="1"
-                            Click="ButtonSaveRight_Click">
-                        <SymbolIcon Symbol="Save" />
-                    </Button>
-                    <Button Height="38"
-                            Width="38"
-                            Padding="6"
-                            Margin="0,16,16,16"
-                            Command="{x:Bind ViewModel.StopEditCommand, Mode=OneWay}">
-                        <SymbolIcon Symbol="Clear" />
-                    </Button>
-                </StackPanel>
-            </Grid>
-            <StackPanel Grid.Row="1"
-                        HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}">
-                <TextBlock Text="While not in demo mode"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="Hover an image to see a preview"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="or"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="Hover an image and edit to edit image"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
-            <Grid Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"
-                  Grid.Row="1"
-                  VerticalAlignment="Center"
+            <TextBlock Text="Hover an image to see a preview"
+                       VerticalAlignment="Center"
+                       HorizontalAlignment="Center"
+                       FontSize="18"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}"/>
+            <Grid VerticalAlignment="Center"
                   HorizontalAlignment="Center">
                 <controls1:CropPreview Margin="16"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
                                        Stretch="Uniform"
+                                       Extension="{x:Bind ViewModel.EditImage.Extension, Mode=OneWay}"
+                                       ImagePath="{x:Bind ViewModel.EditImage.LocalPath, Mode=OneWay}"
                                        HasCrop="{x:Bind ViewModel.EditImage.HasCrop, Mode=OneWay, FallbackValue='false'}"
                                        CropTop="{x:Bind ViewModel.EditImage.Crop.Top, Mode=OneWay}"
                                        CropLeft="{x:Bind ViewModel.EditImage.Crop.Left, Mode=OneWay}"
                                        CropWidth="{x:Bind ViewModel.EditImage.Crop.Width, Mode=OneWay}"
                                        CropHeight="{x:Bind ViewModel.EditImage.Crop.Height, Mode=OneWay}"
-                                       Source="{x:Bind ViewModel.EditImage.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-                                       Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                       Source="{x:Bind ViewModel.EditImage.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                                       Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
             </Grid>
-            <controls:ImageCropper x:Name="ImageCropperBottom"
-                                   Grid.Row="1"
-                                   AspectRatio="{x:Bind ViewModel.EditImage.AspectRatio, Mode=OneWay}"
-                                   Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-            <InfoBar Severity="Error"
-                     Message="Error during upscaling"
-                     IsOpen="{x:Bind ViewModel.EditImage.HasUpscaleError}"
-                     IsClosable="False"
-                     VerticalAlignment="Bottom"
-                     HorizontalAlignment="Center"
-                     Margin="0,0,0,16"
-                     Grid.Row="1" />
-            <Border Visibility="{x:Bind ViewModel.EditImage.IsUpscaling, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
-                    Grid.Row="1">
-                <Border.Background>
-                    <media:BackdropBlurBrush Amount="5.0" />
-                </Border.Background>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
-                    <ProgressRing IsIndeterminate="True"
-                                  Height="60"
-                                  Width="60"
-                                  Margin="0,0,0,16"/>
-                    <TextBlock Text="Upscaling" />
-                </StackPanel>
-            </Border>
-            <Border Visibility="{x:Bind ViewModel.EditImage.IsReconstructing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
-                    Grid.Row="1">
-                <Border.Background>
-                    <media:BackdropBlurBrush Amount="5.0" />
-                </Border.Background>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
-                    <ProgressRing IsIndeterminate="True"
-                                  Height="60"
-                                  Width="60"
-                                  Margin="0,0,0,16" />
-                    <TextBlock Text="Reconstructing" />
-                </StackPanel>
-            </Border>
         </Grid>
         <Grid Background="{ThemeResource LayerFillColorDefaultBrush}"
               Grid.ColumnSpan="2"
               Grid.Row="1"
               BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
               BorderThickness="0,1,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="auto" />
-            </Grid.ColumnDefinitions>
-            <StackPanel HorizontalAlignment="Center"
-                        VerticalAlignment="Center"
-                        Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}">
-                <TextBlock Text="While not in demo mode"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="Hover an image to see a preview"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="or"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                <TextBlock Text="Hover an image and edit to edit image"
-                           HorizontalAlignment="Center"
-                           FontSize="18"
-                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-            </StackPanel>
-
-            <controls:ImageCropper x:Name="ImageCropperRight"
-                                   AspectRatio="{x:Bind ViewModel.EditImage.AspectRatio, Mode=OneWay}"
-                                   Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-
-            <Grid Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"
-                  VerticalAlignment="Center"
+            <TextBlock Text="Hover an image to see a preview"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       FontSize="18"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource InverseNullToVisibilityConverter}}" />
+            <Grid VerticalAlignment="Center"
                   HorizontalAlignment="Center">
                 <controls1:CropPreview Margin="16"
                                        VerticalAlignment="Center"
                                        HorizontalAlignment="Center"
                                        Stretch="Uniform"
+                                       Extension="{x:Bind ViewModel.EditImage.Extension, Mode=OneWay}"
+                                       ImagePath="{x:Bind ViewModel.EditImage.LocalPath, Mode=OneWay}"
                                        HasCrop="{x:Bind ViewModel.EditImage.HasCrop, Mode=OneWay, FallbackValue='false'}"
                                        CropTop="{x:Bind ViewModel.EditImage.Crop.Top, Mode=OneWay}"
                                        CropLeft="{x:Bind ViewModel.EditImage.Crop.Left, Mode=OneWay}"
                                        CropWidth="{x:Bind ViewModel.EditImage.Crop.Width, Mode=OneWay}"
                                        CropHeight="{x:Bind ViewModel.EditImage.Crop.Height, Mode=OneWay}"
-                                       Source="{x:Bind ViewModel.EditImage.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-                                       Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                       Source="{x:Bind ViewModel.EditImage.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                                       Visibility="{x:Bind ViewModel.EditImage, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}" />
             </Grid>
-            <Grid Grid.Column="1"
-                  Visibility="{x:Bind ViewModel.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
-                <StackPanel Orientation="Vertical">
-                    <Button Height="38"
-                            Width="38"
-                            Padding="6"
-                            Margin="16,16,16,0"
-                            Command="{x:Bind ViewModel.StopEditCommand, Mode=OneWay}">
-                        <SymbolIcon Symbol="Clear" />
-                    </Button>
-                    <Button Height="38"
-                            Width="38"
-                            Padding="6"
-                            Margin="16,16,16,0"
-                            Click="ButtonSaveBottom_Click">
-                        <SymbolIcon Symbol="Save" />
-                    </Button>
-                </StackPanel>
-                <ScrollView Grid.Row="1"
-                            VerticalAlignment="Bottom">
-                    <StackPanel Padding="16">
-                        <Button Margin="0,16,0,0"
-                                Height="38"
-                                Padding="6"
-                                ToolTipService.ToolTip="Upscale with default configuration"
-                                Command="{x:Bind ViewModel.EditImage.UpscaleCommand, Mode=OneWay}"
-                                CommandParameter="{x:Bind ViewModel.Configuration.SelectedUpscalerConfiguration, Mode=OneWay}">
-                            <SymbolIcon Symbol="Upload" />
-                            <Button.Flyout>
-                                <Flyout Placement="Bottom">
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.ImageUpscaleConfigurations, Mode=OneWay}">
-                                        <ItemsRepeater.ItemTemplate>
-                                            <DataTemplate x:DataType="viewmodels:ImageUpscaleConfigurationViewModel">
-                                                <MenuFlyoutItem Text="{x:Bind UpscalerConfigurationViewModel.Name, Mode=OneWay}"
-                                                                Command="{x:Bind UpscaleCommand, Mode=OneWay}"/>
-                                            </DataTemplate>
-                                        </ItemsRepeater.ItemTemplate>
-                                    </ItemsRepeater>
-                                </Flyout>
-                            </Button.Flyout>
-                        </Button>
-                    </StackPanel>
-                </ScrollView>
-            </Grid>
-            <Border Visibility="{x:Bind ViewModel.EditImage.IsUpscaling, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
-                    Grid.Column="1">
-                <Border.Background>
-                    <media:BackdropBlurBrush Amount="5.0" />
-                </Border.Background>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
-                    <ProgressRing IsIndeterminate="True"
-                                  Height="60"
-                                  Width="60"
-                                  Margin="0,0,0,16 "/>
-                    <TextBlock Text="Upscaling" />
-                </StackPanel>
-            </Border>
-            <Border Visibility="{x:Bind ViewModel.EditImage.IsReconstructing, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
-                    Grid.RowSpan="2">
-                <Border.Background>
-                    <media:BackdropBlurBrush Amount="5.0" />
-                </Border.Background>
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center">
-                    <ProgressRing IsIndeterminate="True"
-                                  Height="60"
-                                  Width="60"
-                                  Margin="0,0,0,16" />
-                    <TextBlock Text="Reconstructing" />
-                </StackPanel>
-            </Border>
         </Grid>
         <controls:GridSplitter Grid.ColumnSpan="2"
                                Grid.Row="1"

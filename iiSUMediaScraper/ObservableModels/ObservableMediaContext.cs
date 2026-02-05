@@ -26,15 +26,21 @@ public class ObservableMediaContext : BaseObservableModel<MediaContext>
         set => SetProperty(_baseModel.Titles, value, _baseModel, (o, v) => o.Titles = v);
     }
 
-    public List<Media> Heros
+    public List<Image> Heros
     {
         get => _baseModel.Heros;
         set => SetProperty(_baseModel.Heros, value, _baseModel, (o, v) => o.Heros = v);
     }
 
-    public List<Media> Slides
+    public List<Image> Slides
     {
         get => _baseModel.Slides;
         set => SetProperty(_baseModel.Slides, value, _baseModel, (o, v) => o.Slides = v);
+    }
+
+    public List<Video> Videos
+    {
+        get => _baseModel.Videos;
+        set => SetProperty(_baseModel.Videos, value, _baseModel, (o, v) => o.Videos = v);
     }
 }

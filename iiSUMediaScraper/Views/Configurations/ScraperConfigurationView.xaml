@@ -7,6 +7,7 @@
              xmlns:local="using:iiSUMediaScraper.Views.Configurations"
              xmlns:configurationviewmodels="using:iiSUMediaScraper.ViewModels.Configurations"
              xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -15,7 +16,15 @@
 
         <customconverters:NotEqualsStringToVisibilityConverter x:Key="NotSteamGridDbVisibilityConverter"
                                                                NotEqualsValue="SteamGridDb" />
-        
+
+        <customconverters:CanFetchImagesToVisibilityConverter x:Key="CanFetchImagesToVisibilityConverter" />
+
+        <customconverters:CanFetchMusicToVisibilityConverter x:Key="CanFetchMusicToVisibilityConverter" />
+
+        <customconverters:CanFetchVideosToVisibilityConverter x:Key="CanFetchVideosToVisibilityConverter" />
+
+        <customconverters:CanEnterPlatformIdentifiersToVisibilityConverter x:Key="CanEnterPlatformIdentifiersToVisibilityConverter" />
+
         <DataTemplate x:Key="PlatformTranslationConfigurationTemplate"
                       x:DataType="configurationviewmodels:PlatformTranslationConfigurationViewModel">
             <local:PlatformTranslationConfigurationView ViewModel="{x:Bind Mode=OneWay}" />
@@ -41,7 +50,7 @@
                               ToolTipService.ToolTip="Global fetch for the scraper. Setting this to off will disable all other fetch settings even if they are on"
                               Margin="0,0,0,8"
                               IsOn="{x:Bind ViewModel.IsFetch, Mode=TwoWay}" />
-                <Grid>
+                <Grid Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchImagesToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="*" />
@@ -107,52 +116,94 @@
                                   Grid.Column="1"
                                   IsOn="{x:Bind ViewModel.IsFetchSlidesIfNoneFound, Mode=TwoWay}" />
                 </Grid>
-                <ToggleSwitch OffContent="Fetch Videos"
-                              OnContent="Fetch Videos"
+                <ToggleSwitch OffContent="Fetch videos"
+                              OnContent="Fetch videos"
                               Margin="0,0,0,8"
+                              Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchVideosToVisibilityConverter}}"
                               IsOn="{x:Bind ViewModel.IsFetchVideos, Mode=TwoWay}" />
+                <ToggleSwitch OffContent="Fetch music"
+                              OnContent="Fetch music"
+                              Margin="0,0,0,8"
+                              Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchMusicToVisibilityConverter}}"
+                              IsOn="{x:Bind ViewModel.IsFetchMusic, Mode=TwoWay}" />
                 <ToggleSwitch OffContent="Allow title as icon when no icon found"
                               OnContent="Allow title as icon when no icon found"
                               ToolTipService.ToolTip="If no icon is found pick the best title and crop"
                               Margin="0,0,0,8"
+                              Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchImagesToVisibilityConverter}}"
                               IsOn="{x:Bind ViewModel.IsAllowTitleAsIconWhenNoIconFound, Mode=TwoWay}" />
                 <ToggleSwitch OffContent="Use square icon priority"
                               OnContent="Use square icon priority"
                               ToolTipService.ToolTip="Square icons have priority over other non square assets for titles and icons"
                               Margin="0,0,0,8"
+                              Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchImagesToVisibilityConverter}}"
                               IsOn="{x:Bind ViewModel.IsUseSquareIconPriority, Mode=TwoWay}" />
             </StackPanel>
-            <StackPanel Grid.Column="1">
-                <NumberBox Header="Icon Priority"
-                           Width="160"
-                           Margin="0,0,0,16"
-                           SpinButtonPlacementMode="Compact"
-                           ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
-                           HorizontalAlignment="Left"
-                           Value="{x:Bind ViewModel.IconPriority, Mode=TwoWay}" />
-                <NumberBox Header="Title Priority"
-                           Width="160"
-                           Margin="0,0,0,16"
-                           SpinButtonPlacementMode="Compact"
-                           ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
-                           HorizontalAlignment="Left"
-                           Value="{x:Bind ViewModel.TitlePriority, Mode=TwoWay}" />
-                <NumberBox Header="Hero Priority"
-                           Width="160"
-                           Margin="0,0,0,16"
-                           SpinButtonPlacementMode="Compact"
-                           ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
-                           HorizontalAlignment="Left"
-                           Value="{x:Bind ViewModel.HeroPriority, Mode=TwoWay}" />
-                <NumberBox Header="Slide Priority"
-                           Width="160"
-                           Margin="0,0,0,16"
-                           SpinButtonPlacementMode="Compact"
-                           ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
-                           HorizontalAlignment="Left"
-                           Value="{x:Bind ViewModel.SlidePriority, Mode=TwoWay}" />
-            </StackPanel>
         </Grid>
+        <controls:WrapPanel Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchImagesToVisibilityConverter}}"
+                            HorizontalSpacing="16"
+                            VerticalSpacing="16"
+                            Margin="0,0,0,16">
+            <NumberBox Header="Icon Priority"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.IconPriority, Mode=TwoWay}" />
+            <NumberBox Header="Title Priority"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.TitlePriority, Mode=TwoWay}" />
+            <NumberBox Header="Hero Priority"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.HeroPriority, Mode=TwoWay}" />
+            <NumberBox Header="Slide Priority"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="Priority for using assets found via this scraper vs others"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.SlidePriority, Mode=TwoWay}" />
+        </controls:WrapPanel>
+        <controls:WrapPanel Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanFetchImagesToVisibilityConverter}}"
+                            HorizontalSpacing="16"
+                            VerticalSpacing="16"
+                            Margin="0,0,0,16">
+            <NumberBox Header="Icon Fetch Limit"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="The maximum number of icons the application will fetch"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.IconFetchLimit, Mode=TwoWay}" />
+            <NumberBox Header="Title Fetch Limit"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="The maximum number of titles the application will fetch"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.TitleFetchLimit, Mode=TwoWay}" />
+            <NumberBox Header="Hero Fetch Limit"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="The maximum number of heros the application will fetch"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.HeroFetchLimit, Mode=TwoWay}" />
+            <NumberBox Header="Slide Fetch Limit"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="The maximum number of slides the application will fetch"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.SlideFetchLimit, Mode=TwoWay}" />
+            <NumberBox Header="Logo Fetch Limit"
+                       Width="160"
+                       SpinButtonPlacementMode="Compact"
+                       ToolTipService.ToolTip="The maximum number of logos the application will fetch"
+                       HorizontalAlignment="Left"
+                       Value="{x:Bind ViewModel.LogoFetchLimit, Mode=TwoWay}" />
+        </controls:WrapPanel>
         <StackPanel Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource SteamGridDbVisibilityConverter}}">
             <TextBox Header="Icon Styles"
                      Margin="0,0,0,16"
@@ -180,7 +231,7 @@
                 MaxHeight="600"
                 VerticalAlignment="Top"
                 Margin="0,0,0,16"
-                Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource NotSteamGridDbVisibilityConverter}}">
+                Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource CanEnterPlatformIdentifiersToVisibilityConverter}}">
             <StackPanel>
                 <Grid Margin="0,0,0,16">
                     <Grid.ColumnDefinitions>

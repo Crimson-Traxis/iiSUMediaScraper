@@ -18,7 +18,7 @@
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
         <StackPanel>
-            <TextBlock Text="{x:Bind ViewModel.Name, Mode=OneWay}"
+            <TextBlock Text="{x:Bind ViewModel.FormattedName, Mode=OneWay}"
                        FontSize="18"
                        VerticalAlignment="Center"
                        Grid.Column="1"

@@ -10,12 +10,12 @@ namespace iiSUMediaScraper.Services;
 /// </summary>
 public class ConfigurationService : IConfigurationService
 {
-    private readonly IFileService _fileService;
     private readonly string _folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), nameof(iiSUMediaScraper));
     private readonly string _baseFolder = AppDomain.CurrentDomain.BaseDirectory;
     private readonly string _file = $"{nameof(Configuration)}.json";
     private readonly string _overlayFolder = $"Overlays";
     private readonly string _iconsFolder = $"Icons";
+    private readonly string _toolsFolder = $"Tools";
 
     /// <summary>
     /// Initializes a new instance of the ConfigurationService.
@@ -24,7 +24,7 @@ public class ConfigurationService : IConfigurationService
     /// <param name="logger">Logger instance for diagnostic output.</param>
     public ConfigurationService(IFileService fileService, ILogger<ConfigurationService> logger)
     {
-        _fileService = fileService;
+        FileService = fileService;
         Logger = logger;
     }
 
@@ -40,7 +40,7 @@ public class ConfigurationService : IConfigurationService
             {
                 if (Configuration != null)
                 {
-                List<GameIconOverlayConfiguration> iconOverlays = new List<GameIconOverlayConfiguration>(Configuration.GameIconOverlayConfigurations);
+                var iconOverlays = new List<GameIconOverlayConfiguration>(Configuration.GameIconOverlayConfigurations);
 
                 foreach (string png in Directory.EnumerateFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _overlayFolder), "*.png", new EnumerationOptions() { RecurseSubdirectories = true }))
                 {
@@ -281,7 +281,7 @@ public class ConfigurationService : IConfigurationService
             {
                 if (Configuration != null)
                 {
-                List<PlatformIconConfiguration> platformIcons = new List<PlatformIconConfiguration>(Configuration.PlatformIconConfigurations);
+                var platformIcons = new List<PlatformIconConfiguration>(Configuration.PlatformIconConfigurations);
 
                 foreach (string png in Directory.EnumerateFiles(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, _iconsFolder), "*.png", new EnumerationOptions() { RecurseSubdirectories = true }))
                 {
@@ -499,6 +499,45 @@ public class ConfigurationService : IConfigurationService
     }
 
     /// <summary>
+    /// Copies external tools (yt-dlp.exe, ffmpeg.exe, ffprobe.exe, ffplay.exe) from the application's Tools directory
+    /// to the user's documents folder if they don't already exist. This allows users to update the executables independently.
+    /// </summary>
+    private Task CopyExternalTools()
+    {
+        return Task.Run(() =>
+        {
+            try
+            {
+                var toolsSourceFolder = Path.Combine(_baseFolder, _toolsFolder);
+                var toolsDestFolder = Path.Combine(_folder, _toolsFolder);
+
+                if (!Directory.Exists(toolsDestFolder))
+                {
+                    Directory.CreateDirectory(toolsDestFolder);
+                }
+
+                string[] tools = ["yt-dlp.exe", "ffmpeg.exe", "ffprobe.exe", "ffplay.exe"];
+
+                foreach (var tool in tools)
+                {
+                    var sourcePath = Path.Combine(toolsSourceFolder, tool);
+                    var destPath = Path.Combine(toolsDestFolder, tool);
+
+                    if (File.Exists(sourcePath) && !File.Exists(destPath))
+                    {
+                        File.Copy(sourcePath, destPath);
+                        Logger.LogDebug("Copied {Tool} to {Destination}", tool, destPath);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Failed to copy external tools");
+            }
+        });
+    }
+
+    /// <summary>
     /// Loads the configuration from disk.
     /// First attempts to load from the user's Documents folder, then falls back to the application directory.
     /// Creates a default configuration if none exists, then loads overlays and icons.
@@ -507,7 +546,7 @@ public class ConfigurationService : IConfigurationService
     {
         try
         {
-            Configuration = await _fileService.Read<Configuration>(_folder, _file);
+            Configuration = await FileService.Read<Configuration>(_folder, _file);
             Logger.LogDebug("Configuration loaded from user folder: {Folder}", _folder);
         }
         catch (Exception ex)
@@ -517,7 +556,7 @@ public class ConfigurationService : IConfigurationService
 
         try
         {
-            Configuration ??= await _fileService.Read<Configuration>(_baseFolder, _file);
+            Configuration ??= await FileService.Read<Configuration>(_baseFolder, _file);
             if (Configuration != null)
             {
                 Logger.LogDebug("Configuration loaded from base folder: {Folder}", _baseFolder);
@@ -537,6 +576,8 @@ public class ConfigurationService : IConfigurationService
         await LoadOverlays();
 
         await LoadIcons();
+
+        await CopyExternalTools();
     }
 
     /// <summary>
@@ -548,7 +589,7 @@ public class ConfigurationService : IConfigurationService
         {
             try
             {
-                await _fileService.Save(_folder, _file, Configuration);
+                await FileService.Save(_folder, _file, Configuration);
                 Logger.LogDebug("Configuration saved to: {Folder}", _folder);
             }
             catch (Exception ex)
@@ -559,10 +600,23 @@ public class ConfigurationService : IConfigurationService
         }
     }
 
+    /// <summary>
+    /// Gets the file service for reading and writing files.
+    /// </summary>
+    protected IFileService FileService { get; private set; }
+
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 
     /// <summary>
     /// Gets or sets the current application configuration.
     /// </summary>
     public Configuration? Configuration { get; set; }
+
+    /// <summary>
+    /// Gets the folder path where external tools (yt-dlp.exe, ffmpeg.exe, ffprobe.exe, ffplay.exe) are located.
+    /// </summary>
+    public string ToolsFolder => Path.Combine(_folder, _toolsFolder);
 }

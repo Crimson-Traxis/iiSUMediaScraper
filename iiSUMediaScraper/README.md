@@ -12,7 +12,7 @@ A powerful WinUI 3 application for scraping, managing, and formatting game media
 ### Intelligent Media Management
 - **Smart Cropping** - Automatic intelligent cropping for icons, logos, titles, heroes, and slides
 - **Cropping** - Cropping for icons, logos, titles, heroes, and slides
-- **Image Upscaling** - Integration with SpeedVR2 to enhance low-resolution images
+- **Image Upscaling** - Integration with SeedVR2 to enhance low-resolution images
 - **Drag & Drop Support** - Easy media import with intuitive drag-and-drop zones
 
 ### Platform Configuration
@@ -43,7 +43,7 @@ A powerful WinUI 3 application for scraping, managing, and formatting game media
 - Windows 10 version 1809 (build 17763) or later
 - Windows 11 recommended
 - .NET 8.0 Runtime
-- **Python (non-Windows Store version)** - Required for SpeedVR2 image upscaling
+- **[Python](https://www.python.org/downloads/) (non-Windows Store version)** - Required for SeedVR2 image upscaling
 - Internet connection for media scraping
 - **API Keys Required** - SteamGridDB and IGDB accounts with API keys needed for media scraping (see API Keys section below)
 
@@ -122,9 +122,10 @@ Configure media scrapers:
 
 ### Image Upscaler Settings
 
-Configure [SpeedVR2](https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler) for image upscaling:
-- **Python Requirement**: Python (non-Windows Store version) must be installed and accessible from PATH
-- **SpeedVR2**: Fast video/image upscaling tool used by this application
+Configure [SeedVR2](https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler) for image upscaling:
+- **Python Requirement**: [Python](https://www.python.org/downloads/) (non-Windows Store version) must be installed and accessible from PATH
+- **Dependencies**: Install required packages by running: `pip install -r UpscaleServer/requirements.txt`
+- **SeedVR2**: Fast video/image upscaling tool used by this application
 - Arguments
 
 ### Output Formatting
@@ -151,7 +152,7 @@ Define output settings:
 - **.NET 8.0** - Latest .NET runtime
 - **CommunityToolkit.Mvvm** - MVVM helpers and generators
 - **ImageMagick** - Advanced image processing
-- **SpeedVR2** - Fast image upscaling
+- **SeedVR2** - Fast image upscaling
 - **HttpClient** - HTTP communication with rate limiting
 - **OAuth 2.0** - Secure API authentication
 

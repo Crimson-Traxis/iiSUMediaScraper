@@ -18,6 +18,7 @@
              xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
              xmlns:behaviors="using:iiSUMediaScraper.Behaviors"
              xmlns:local="using:iiSUMediaScraper.Views.Configurations"
+             xmlns:imageex="using:ImageEx"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -44,11 +45,11 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
-        <Image Stretch="Fill"
-               Height="140"
-               Width="140"
-               Margin="0,0,16,0"
-               Source="{x:Bind ViewModel.Path, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+        <imageex:ImageEx Stretch="Fill"
+                         Height="140"
+                         Width="140"
+                         Margin="0,0,16,0"
+                         Source="{x:Bind ViewModel.Path, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
         <StackPanel Grid.Column="1">
             <Grid Margin="0,0,16,16">
                 <Grid.ColumnDefinitions>
@@ -60,8 +61,8 @@
                          Margin="0,0,16,0" />
                 <Button Content="Pick File"
                         Grid.Column="1"
-                        VerticalAlignment="Bottom" 
-                        Click="Button_Click"/>
+                        VerticalAlignment="Bottom"
+                        Click="Button_Click" />
             </Grid>
             <controls1:CustomComboBox Header="Platform"
                                       Width="300"

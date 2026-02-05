@@ -60,6 +60,10 @@ public partial class ExtensionConfigurationViewModel : ObservableExtensionConfig
         extensionDilimited = string.Join(", ", extensions);
     }
 
+    /// <summary>
+    /// Called when the extension delimited string changes to parse and update the extensions collection.
+    /// </summary>
+    /// <param name="value">The new comma-delimited string of extensions.</param>
     partial void OnExtensionDilimitedChanged(string? value)
     {
         if (value != null)
@@ -73,6 +77,10 @@ public partial class ExtensionConfigurationViewModel : ObservableExtensionConfig
         }
     }
 
+    /// <summary>
+    /// Called when the selected platform changes to update the platform code.
+    /// </summary>
+    /// <param name="value">The new selected platform configuration.</param>
     partial void OnSelectedPlatformChanged(PlatformConfigurationViewModel? value)
     {
         if (value != null)
@@ -81,6 +89,10 @@ public partial class ExtensionConfigurationViewModel : ObservableExtensionConfig
         }
     }
 
+    /// <summary>
+    /// Creates a new empty extension string.
+    /// </summary>
+    /// <returns>An empty string representing a new extension.</returns>
     public string CreateExtension()
     {
         return string.Empty;
@@ -95,21 +107,37 @@ public partial class ExtensionConfigurationViewModel : ObservableExtensionConfig
         InsertExtension(0, CreateExtension());
     }
 
+    /// <summary>
+    /// Adds a file extension to the collection.
+    /// </summary>
+    /// <param name="item">The extension to add.</param>
     public void AddExtension(string item)
     {
         Extensions.Add(item);
     }
 
+    /// <summary>
+    /// Inserts a file extension at the specified index in the collection.
+    /// </summary>
+    /// <param name="index">The zero-based index at which to insert the extension.</param>
+    /// <param name="item">The extension to insert.</param>
     public void InsertExtension(int index, string item)
     {
         Extensions.Insert(index, item);
     }
 
+    /// <summary>
+    /// Removes a file extension from the collection.
+    /// </summary>
+    /// <param name="item">The extension to remove.</param>
     public void RemoveExtension(string item)
     {
         Extensions.Remove(item);
     }
 
+    /// <summary>
+    /// Removes all file extensions from the collection.
+    /// </summary>
     public void ClearExtensions()
     {
         foreach (string? item in Extensions.ToList())

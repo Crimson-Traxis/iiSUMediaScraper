@@ -44,7 +44,7 @@ public sealed partial class GameIconOverlayConfigurationView : UserControl, INot
             // disable the button to avoid double-clicking
             button.IsEnabled = false;
 
-            FileOpenPicker picker = new FileOpenPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
+            var picker = new FileOpenPicker(button.XamlRoot.ContentIslandEnvironment.AppWindowId)
             {
                 CommitButtonText = "Pick File",
                 SuggestedStartLocation = PickerLocationId.DocumentsLibrary,

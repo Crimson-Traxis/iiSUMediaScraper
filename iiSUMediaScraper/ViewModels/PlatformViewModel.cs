@@ -14,6 +14,9 @@ namespace iiSUMediaScraper.ViewModels;
 /// </summary>
 public partial class PlatformViewModel : ObservableObject
 {
+    /// <summary>
+    /// Semaphore for controlling concurrent scraping operations.
+    /// </summary>
     private readonly SemaphoreSlim _semaphore;
 
     /// <summary>
@@ -99,15 +102,16 @@ public partial class PlatformViewModel : ObservableObject
     /// </summary>
     /// <param name="fileService">The file service.</param>
     /// <param name="scrapingService">The scraping service.</param>
-    /// <param name="imageFormatterService">The image formatter service.</param>
+    /// <param name="mediaFormatterService">The media formatter service.</param>
     /// <param name="upscalerService">The upscaler service.</param>
     /// <param name="configuration">The configuration view model.</param>
     /// <param name="platformConfiguration">The platform configuration.</param>
     /// <param name="semaphore">The semaphore for controlling concurrency.</param>
     public PlatformViewModel(IFileService fileService,
                              IScrapingService scrapingService,
-                             IImageFormatterService imageFormatterService,
+                             IMediaFormatterService mediaFormatterService,
                              IUpscalerService upscalerService,
+                             IDownloader downloader,
                              ConfigurationViewModel configuration,
                              PlatformConfigurationViewModel platformConfiguration,
                              SemaphoreSlim semaphore)
@@ -118,7 +122,9 @@ public partial class PlatformViewModel : ObservableObject
 
         ScrapingService = scrapingService;
 
-        ImageFormatterService = imageFormatterService;
+        MediaFormatterService = mediaFormatterService;
+
+        Downloader = downloader;
 
         UpscalerService = upscalerService;
 
@@ -133,6 +139,11 @@ public partial class PlatformViewModel : ObservableObject
         imageUpscaleConfigurations = [];
     }
 
+    /// <summary>
+    /// Called when the PlatformConfiguration property changes.
+    /// </summary>
+    /// <param name="oldValue">The old platform configuration.</param>
+    /// <param name="newValue">The new platform configuration.</param>
     partial void OnPlatformConfigurationChanged(PlatformConfigurationViewModel? oldValue, PlatformConfigurationViewModel newValue)
     {
         if (oldValue != null)
@@ -146,11 +157,21 @@ public partial class PlatformViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Handles platform property changed events to update the Code property.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The property changed event args.</param>
     private void Platform_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         OnPropertyChanged(nameof(Code));
     }
 
+    /// <summary>
+    /// Called when the EditImage property changes.
+    /// </summary>
+    /// <param name="oldValue">The old edit image.</param>
+    /// <param name="newValue">The new edit image.</param>
     partial void OnEditImageChanged(ImageViewModel? oldValue, ImageViewModel? newValue)
     {
         if (oldValue != null)
@@ -171,16 +192,26 @@ public partial class PlatformViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Handles the upscale completed event for an image.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The upscaled image view model.</param>
     private void Image_UpscaleCompleted(object? sender, ImageViewModel e)
     {
         EditRequested?.Invoke(this, e);
     }
 
+    /// <summary>
+    /// Creates a copy of an image view model with independent data.
+    /// </summary>
+    /// <param name="imageViewModel">The image view model to copy.</param>
+    /// <returns>A new image view model with copied data.</returns>
     private ImageViewModel CreateCopy(ImageViewModel imageViewModel)
     {
         return new ImageViewModel(new Image()
         {
-            Bytes = imageViewModel.Bytes.ToArray(),
+            LocalPath = imageViewModel.LocalPath,
             Width = imageViewModel.Width,
             Height = imageViewModel.Height,
             Crop = imageViewModel.Crop != null ? new Crop()
@@ -190,9 +221,14 @@ public partial class PlatformViewModel : ObservableObject
                 Width = imageViewModel.Crop.Width,
                 Height = imageViewModel.Crop.Height,
             } : null,
-        }, imageViewModel.MediaType, ImageFormatterService, UpscalerService, Configuration);
+        }, imageViewModel.MediaType, MediaFormatterService, UpscalerService, Downloader, Configuration);
     }
 
+    /// <summary>
+    /// Handles preview requested events from games.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The game image edit request event args.</param>
     private void OnPreviewRequested(object? sender, GameViewModel.GameImageEditRequestedEventArgs e)
     {
         if (!IsEditingImage)
@@ -205,6 +241,11 @@ public partial class PlatformViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Handles stop preview requested events from games.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The game image edit request event args.</param>
     private void OnStopPreviewRequested(object? sender, GameViewModel.GameImageEditRequestedEventArgs e)
     {
         if (!IsEditingImage)
@@ -214,9 +255,16 @@ public partial class PlatformViewModel : ObservableObject
             EditImage = null;
 
             EditImageGame = null;
+
+            IsEditingImage = false;
         }
     }
 
+    /// <summary>
+    /// Handles edit requested events from games.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The game image edit request event args.</param>
     private void OnEditRequested(object? sender, GameViewModel.GameImageEditRequestedEventArgs e)
     {
         IsEditingImage = true;
@@ -230,11 +278,20 @@ public partial class PlatformViewModel : ObservableObject
         EditRequested?.Invoke(this, e.ImageViewModel);
     }
 
+    /// <summary>
+    /// Handles stage apply game requested events.
+    /// </summary>
+    /// <param name="sender">The event sender.</param>
+    /// <param name="e">The game view model to stage.</param>
     private void StageApplyGameRequested(object? sender, GameViewModel e)
     {
         StageApplyGamesRequested?.Invoke(this, [e]);
     }
 
+    /// <summary>
+    /// Initializes event handlers for a game.
+    /// </summary>
+    /// <param name="game">The game to initialize.</param>
     private void InitializeGame(GameViewModel game)
     {
         game.PreviewRequested += OnPreviewRequested;
@@ -243,6 +300,10 @@ public partial class PlatformViewModel : ObservableObject
         game.StageApplyGameRequested += StageApplyGameRequested;
     }
 
+    /// <summary>
+    /// Removes event handlers from a game.
+    /// </summary>
+    /// <param name="game">The game to de-initialize.</param>
     private void DeInitializeGame(GameViewModel game)
     {
         game.PreviewRequested -= OnPreviewRequested;
@@ -251,6 +312,10 @@ public partial class PlatformViewModel : ObservableObject
         game.StageApplyGameRequested -= StageApplyGameRequested;
     }
 
+    /// <summary>
+    /// Adds a game to the platform.
+    /// </summary>
+    /// <param name="game">The game to add.</param>
     public void AddGame(GameViewModel game)
     {
         InitializeGame(game);
@@ -258,12 +323,19 @@ public partial class PlatformViewModel : ObservableObject
         Games.Add(game);
     }
 
+    /// <summary>
+    /// Removes a game from the platform.
+    /// </summary>
+    /// <param name="game">The game to remove.</param>
     public void RemoveGame(GameViewModel game)
     {
         DeInitializeGame(game);
         Games.Remove(game);
     }
 
+    /// <summary>
+    /// Clears all games from the platform.
+    /// </summary>
     public void ClearGames()
     {
         foreach (GameViewModel? game in Games.ToList())
@@ -272,6 +344,10 @@ public partial class PlatformViewModel : ObservableObject
         }
     }
 
+    /// <summary>
+    /// Scrapes media for a single game with semaphore-controlled concurrency.
+    /// </summary>
+    /// <param name="game">The game to scrape.</param>
     public async Task OnScrapeGame(GameViewModel game)
     {
         await _semaphore.WaitAsync();
@@ -307,7 +383,7 @@ public partial class PlatformViewModel : ObservableObject
                 {
                     foreach (var file in await FileService.GetFiles(folder, $"*{exension}"))
                     {
-                        GameViewModel game = new GameViewModel(FileService, ScrapingService, ImageFormatterService, UpscalerService, Configuration)
+                        var game = new GameViewModel(FileService, ScrapingService, MediaFormatterService, UpscalerService, Downloader, Configuration)
                         {
                             Path = file,
 
@@ -347,14 +423,16 @@ public partial class PlatformViewModel : ObservableObject
             game.IsLoading = true;
         }
 
-        List<Task> scrapeTasks = [];
+        List<Task> tasks = [];
 
         foreach (GameViewModel game in Games)
         {
-            scrapeTasks.Add(OnScrapeGame(game));
+            tasks.Add(OnScrapeGame(game));
+
+            tasks.Add(game.Format());
         }
 
-        await Task.WhenAll(scrapeTasks);
+        await Task.WhenAll(tasks);
 
         IsLoading = false;
     }
@@ -377,7 +455,7 @@ public partial class PlatformViewModel : ObservableObject
     {
         if (OriginalImage != null && EditImage != null)
         {
-            OriginalImage.Bytes = EditImage.Bytes;
+            OriginalImage.LocalPath = EditImage.LocalPath;
             OriginalImage.Width = EditImage.Width;
             OriginalImage.Height = EditImage.Height;
 
@@ -416,14 +494,19 @@ public partial class PlatformViewModel : ObservableObject
     protected IScrapingService ScrapingService { get; private set; }
 
     /// <summary>
-    /// Gets the image formatter service.
+    /// Gets the meida formatter service.
     /// </summary>
-    protected IImageFormatterService ImageFormatterService { get; private set; }
+    protected IMediaFormatterService MediaFormatterService { get; private set; }
 
     /// <summary>
     /// Gets the upscaler service.
     /// </summary>
     protected IUpscalerService UpscalerService { get; private set; }
+
+    /// <summary>
+    /// Gets the downloader service.
+    /// </summary>
+    protected IDownloader Downloader { get; private set; }
 
     /// <summary>
     /// Gets the scraping progress percentage for this platform.

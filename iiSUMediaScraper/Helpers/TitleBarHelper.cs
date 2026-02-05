@@ -28,7 +28,7 @@ internal class TitleBarHelper
         {
             if (theme == ElementTheme.Default)
             {
-                UISettings uiSettings = new UISettings();
+                var uiSettings = new UISettings();
                 Color background = uiSettings.GetColorValue(UIColorType.Background);
 
                 theme = background == Colors.White ? ElementTheme.Light : ElementTheme.Dark;

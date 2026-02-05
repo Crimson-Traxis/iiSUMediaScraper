@@ -6,6 +6,7 @@
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="ms-appx:///Styles/CropPreview.xaml" />
         <ResourceDictionary Source="ms-appx:///Styles/DropZone.xaml" />
+        <ResourceDictionary Source="ms-appx:///Styles/AnimatedImageWebView.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="customcontrols:CustomComboBox"

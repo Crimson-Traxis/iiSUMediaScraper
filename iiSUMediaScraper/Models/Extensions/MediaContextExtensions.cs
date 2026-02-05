@@ -1,7 +1,15 @@
 ﻿namespace iiSUMediaScraper.Models.Extensions;
 
+/// <summary>
+/// Extension methods for MediaContext operations.
+/// </summary>
 public static class MediaContextExtensions
 {
+    /// <summary>
+    /// Flattens multiple media contexts into a single context by combining all collections.
+    /// </summary>
+    /// <param name="mediaContexts">The collection of media contexts to flatten.</param>
+    /// <returns>A new MediaContext with all media items combined.</returns>
     public static MediaContext Flatten(this IEnumerable<MediaContext> mediaContexts)
     {
         return new MediaContext

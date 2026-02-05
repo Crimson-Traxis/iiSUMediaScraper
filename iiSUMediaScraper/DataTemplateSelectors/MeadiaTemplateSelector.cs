@@ -19,8 +19,14 @@ public class MeadiaTemplateSelector : DataTemplateSelector
 
     private new DataTemplate SelectTemplate(object item)
     {
-        if (item is ImageViewModel)
+        if (item is ImageViewModel imageViewModel)
         {
+            if (new string[] { "webp", "gif" }.Contains(imageViewModel.Extension?.ToLower().Replace(".", "")))
+            {
+                // Fall back to ImageTemplate if AnimatedImageTemplate is not set
+                return AnimatedImageTemplate ?? ImageTemplate!;
+            }
+
             return ImageTemplate!;
         }
         else if (item is VideoViewModel)
@@ -32,6 +38,8 @@ public class MeadiaTemplateSelector : DataTemplateSelector
     }
 
     public DataTemplate? ImageTemplate { get; set; }
+
+    public DataTemplate? AnimatedImageTemplate { get; set; }
 
     public DataTemplate? VideoTemplate { get; set; }
 

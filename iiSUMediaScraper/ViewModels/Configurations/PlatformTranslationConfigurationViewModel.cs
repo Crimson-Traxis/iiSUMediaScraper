@@ -39,6 +39,10 @@ public partial class PlatformTranslationConfigurationViewModel : ObservablePlatf
         selectedPlatform = PlatformConfigurations.FirstOrDefault(p => p.Code == baseModel.Platform);
     }
 
+    /// <summary>
+    /// Called when the selected platform changes to update the platform code.
+    /// </summary>
+    /// <param name="value">The new selected platform configuration.</param>
     partial void OnSelectedPlatformChanged(PlatformConfigurationViewModel? value)
     {
         if (value != null)

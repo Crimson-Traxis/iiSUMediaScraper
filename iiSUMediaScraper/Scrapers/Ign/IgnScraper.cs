@@ -1,7 +1,9 @@
-﻿using iiSUMediaScraper.Models;
+﻿using iiSUMediaScraper.Contracts.Services;
+using iiSUMediaScraper.Models;
 using iiSUMediaScraper.Models.Configurations;
 using iiSUMediaScraper.Models.Scraping.Ign;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.IO;
 using System.IO.Compression;
 using System.Text;
@@ -22,9 +24,10 @@ public class IgnScraper : Scraper
     /// Initializes a new instance of the IgnScraper.
     /// </summary>
     /// <param name="httpClientFactory">Factory for creating HTTP clients.</param>
+    /// <param name="mediaCache">Shared media cache for this scraping session.</param>
     /// <param name="configuration">Application configuration.</param>
     /// <param name="logger">Logger instance for diagnostic output.</param>
-    public IgnScraper(IHttpClientFactory httpClientFactory, Configuration configuration, ILogger logger) : base(httpClientFactory, configuration, logger)
+    public IgnScraper(IHttpClientFactory httpClientFactory, IDownloader downloader, Configuration configuration, ILogger logger) : base(httpClientFactory, downloader, configuration, logger)
     {
 
     }
@@ -46,14 +49,14 @@ public class IgnScraper : Scraper
 
             string extensions = "{\"persistedQuery\":{\"version\":1,\"sha256Hash\":\"e1c2e012a21b4a98aaa618ef1b43eb0cafe9136303274a34f5d9ea4f2446e884\"}}";
 
-            Uri requestUri = new Uri($"https://mollusk.apis.ign.com/graphql?operationName=SearchObjectsByName&variables={variables}&extensions={extensions}");
+            var requestUri = new Uri($"https://mollusk.apis.ign.com/graphql?operationName=SearchObjectsByName&variables={variables}&extensions={extensions}");
 
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri)
-            {
-                Content = new StringContent("", Encoding.UTF8, "application/json")
-            };
-
-            using HttpResponseMessage response = await client.SendAsync(requestMessage);
+            using HttpResponseMessage response = await SendWithRetryAsync(
+                client,
+                () => new HttpRequestMessage(HttpMethod.Get, requestUri)
+                {
+                    Content = new StringContent("", Encoding.UTF8, "application/json")
+                });
 
             response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -111,16 +114,19 @@ public class IgnScraper : Scraper
         {
             HttpClient client = HttpClientFactory.CreateClient("Ign");
 
-            Uri requestUri = new Uri($"https://www.ign.com/games/{game}");
+            var requestUri = new Uri($"https://www.ign.com/games/{game}");
 
-            using HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Get, requestUri);
-
-            requestMessage.Headers.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
-            requestMessage.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
-            requestMessage.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
-            requestMessage.Headers.TryAddWithoutValidation("Accept-Charset", "ISO-8859-1");
-
-            using HttpResponseMessage response = await client.SendAsync(requestMessage);
+            using HttpResponseMessage response = await SendWithRetryAsync(
+                client,
+                () =>
+                {
+                    var msg = new HttpRequestMessage(HttpMethod.Get, requestUri);
+                    msg.Headers.TryAddWithoutValidation("Accept", "text/html,application/xhtml+xml,application/xml");
+                    msg.Headers.TryAddWithoutValidation("Accept-Encoding", "gzip, deflate");
+                    msg.Headers.TryAddWithoutValidation("User-Agent", "Mozilla/5.0 (Windows NT 6.2; WOW64; rv:19.0) Gecko/20100101 Firefox/19.0");
+                    msg.Headers.TryAddWithoutValidation("Accept-Charset", "ISO-8859-1");
+                    return msg;
+                });
 
             response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -146,7 +152,7 @@ public class IgnScraper : Scraper
                 html = streamReader.ReadToEnd();
             }
 
-            Regex regex = new Regex(@"src=""(https://assets[^""]*)""", RegexOptions.IgnoreCase);
+            var regex = new Regex(@"src=""(https://assets[^""]*)""", RegexOptions.IgnoreCase);
 
             MatchCollection matches = regex.Matches(html);
 
@@ -187,7 +193,7 @@ public class IgnScraper : Scraper
             platformId = -1;
         }
 
-        if (HasScrapedGame && _game != null)
+        if (HasScraped && _game != null)
         {
             var mediaContext = new MediaContext();
 

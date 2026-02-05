@@ -52,9 +52,9 @@ public class BaseObservableModel<T> : ObservableObject, IBaseObservableModel<T>
             }
         }
 
-        BoundCollectionWithUnbind<C> boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
+        var boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
 
-        NotifyCollectionChangedEventHandler callback = new NotifyCollectionChangedEventHandler((sender, args) =>
+        var callback = new NotifyCollectionChangedEventHandler((sender, args) =>
         {
             original.Clear();
 
@@ -110,9 +110,9 @@ public class BaseObservableModel<T> : ObservableObject, IBaseObservableModel<T>
             newCollection.Add(item);
         }
 
-        BoundCollectionWithUnbind<C> boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
+        var boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
 
-        NotifyCollectionChangedEventHandler callback = new NotifyCollectionChangedEventHandler((sender, args) =>
+        var callback = new NotifyCollectionChangedEventHandler((sender, args) =>
         {
             original.Clear();
 
@@ -191,9 +191,9 @@ public class BaseObservableModel<T> : ObservableObject, IBaseObservableModel<T>
             original.Add(item.BaseModel);
         }
 
-        BoundCollectionWithUnbind<C> boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
+        var boundCollection = new BoundCollectionWithUnbind<C>(newCollection, original);
 
-        NotifyCollectionChangedEventHandler callback = new NotifyCollectionChangedEventHandler((sender, args) =>
+        var callback = new NotifyCollectionChangedEventHandler((sender, args) =>
         {
             original.Clear();
 

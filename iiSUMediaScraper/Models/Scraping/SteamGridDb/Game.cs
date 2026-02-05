@@ -18,6 +18,12 @@ public class Game
 
     public IEnumerable<Hero> Heros { get; set; } = [];
 
+    public IEnumerable<AnimatedHero> AnimatedHeros { get; set; } = [];
+
+    public IEnumerable<Grid> Icons { get; set; } = [];
+
+    public IEnumerable<Grid> Titles { get; set; } = [];
+
     public IEnumerable<Grid> Grids { get; set; } = [];
 
     public IEnumerable<Logo> Logos { get; set; } = [];

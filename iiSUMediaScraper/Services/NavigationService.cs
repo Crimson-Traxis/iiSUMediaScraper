@@ -18,8 +18,6 @@ namespace iiSUMediaScraper.Services;
 /// </summary>
 public class NavigationService : INavigationService
 {
-    private readonly IPageService _pageService;
-
     private object? _lastParameterUsed;
     private Frame? _frame;
 
@@ -35,7 +33,7 @@ public class NavigationService : INavigationService
     /// <param name="logger">Logger instance for diagnostic output.</param>
     public NavigationService(IPageService pageService, ILogger<NavigationService> logger)
     {
-        _pageService = pageService;
+        PageService = pageService;
         Logger = logger;
     }
 
@@ -131,7 +129,7 @@ public class NavigationService : INavigationService
     {
         try
         {
-            var pageType = _pageService.GetPageType(pageKey);
+            var pageType = PageService.GetPageType(pageKey);
 
             if (_frame != null && (_frame.Content?.GetType() != pageType || (parameter != null && !parameter.Equals(_lastParameterUsed))))
             {
@@ -158,6 +156,14 @@ public class NavigationService : INavigationService
         return false;
     }
 
+    /// <summary>
+    /// Gets the page service for resolving page types.
+    /// </summary>
+    protected IPageService PageService { get; private set; }
+
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 
     /// <summary>

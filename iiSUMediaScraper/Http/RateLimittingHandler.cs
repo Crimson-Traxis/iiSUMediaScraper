@@ -41,12 +41,9 @@ public class RateLimitingHandler : DelegatingHandler
         return await base.SendAsync(request, cancellationToken);
     }
 
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing)
-        {
-            _rateLimiter.Dispose();
-        }
-        base.Dispose(disposing);
-    }
+    // Note: We do NOT dispose the rate limiter here because it's a shared instance
+    // that lives for the application lifetime. The rate limiter is created once in
+    // App.xaml.cs and shared across all handlers. IHttpClientFactory periodically
+    // disposes and recreates handlers to refresh connections, so disposing the
+    // rate limiter here would break other handlers using the same limiter.
 }

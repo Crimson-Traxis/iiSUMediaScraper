@@ -7,6 +7,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:converters="using:CommunityToolkit.WinUI.Converters"
              xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             xmlns:imageex="using:ImageEx"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
              mc:Ignorable="d">
 
     <UserControl.Resources>
@@ -35,30 +37,30 @@
         </Grid.ColumnDefinitions>
         <Grid Visibility="{x:Bind IsLarge, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
               Margin="0,0,12,0">
-            <Image Stretch="Fill"
-                   Height="54"
-                   Width="54"
-                   Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-                   Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+            <imageex:ImageEx Stretch="Fill"
+                             Height="48"
+                             Width="48"
+                             Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                             Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
             <Border Background="{ThemeResource SystemFillColorNeutralBrush}"
-                    Height="54"
-                    Width="54"
+                    Height="48"
+                    Width="48"
                     CornerRadius="4"
                     Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource InverseStringToVisibilityConverter}}">
                 <TextBlock Text="{x:Bind ViewModel.Code, Mode=OneWay}"
                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
                            VerticalAlignment="Center"
                            HorizontalAlignment="Center"
-                           FontSize="22" />
+                           FontSize="20" />
             </Border>
         </Grid>
         <Grid Visibility="{x:Bind IsLarge, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
               Margin="0,0,12,0">
-            <Image Stretch="Fill"
-                   Height="24"
-                   Width="24"
-                   Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-                   Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
+            <imageex:ImageEx Stretch="Fill"
+                             Height="24"
+                             Width="24"
+                             Source="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                             Visibility="{x:Bind ViewModel.PlatformConfiguration.IconPath, Mode=OneWay, Converter={StaticResource StringToVisibilityConverter}}" />
             <Border Background="{ThemeResource SystemFillColorNeutralBrush}"
                     Height="24"
                     Width="24"
@@ -74,6 +76,6 @@
         <TextBlock Grid.Column="1"
                    Text="{x:Bind ViewModel.PlatformConfiguration.Name, Mode=OneWay}"
                    VerticalAlignment="Center"
-                   FontSize="18" />
+                   FontSize="16" />
     </Grid>
 </UserControl>

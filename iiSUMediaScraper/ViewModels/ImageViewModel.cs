@@ -6,6 +6,7 @@ using iiSUMediaScraper.ObservableModels;
 using iiSUMediaScraper.ViewModels;
 using iiSUMediaScraper.ViewModels.Configurations;
 using System.ComponentModel;
+using System.IO;
 
 namespace iiSUMediaScraper.ViewModels;
 
@@ -45,13 +46,6 @@ public partial class ImageViewModel : MediaViewModel<Image>, IBaseObservableMode
     private bool isReconstructing;
 
     /// <summary>
-    /// Gets or sets the crop settings for the image.
-    /// </summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(HasCrop))]
-    private CropViewModel? crop;
-
-    /// <summary>
     /// Raised when a preview is requested for the image.
     /// </summary>
     public event EventHandler<ImageViewModel>? PreviewRequested;
@@ -76,28 +70,31 @@ public partial class ImageViewModel : MediaViewModel<Image>, IBaseObservableMode
     /// </summary>
     /// <param name="baseModel">The underlying image model.</param>
     /// <param name="mediaType">The type of media.</param>
-    /// <param name="imageFormatterService">The image formatter service.</param>
+    /// <param name="configuration">The configuration view model.</param>
+    public ImageViewModel(Image baseModel, MediaType mediaType, IDownloader downloader, ConfigurationViewModel configuration) : base(baseModel, mediaType, downloader, configuration)
+    {
+        aspectRatio = GetAspectRatio(mediaType, configuration);
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ImageViewModel"/> class.
+    /// </summary>
+    /// <param name="baseModel">The underlying image model.</param>
+    /// <param name="mediaType">The type of media.</param>
+    /// <param name="mediaFormatterService">The media formatter service.</param>
     /// <param name="upscalerService">The upscaler service.</param>
     /// <param name="configuration">The configuration view model.</param>
-    public ImageViewModel(Image baseModel, MediaType mediaType, IImageFormatterService imageFormatterService, IUpscalerService upscalerService, ConfigurationViewModel configuration) : base(baseModel, mediaType, configuration)
+    public ImageViewModel(Image baseModel, MediaType mediaType, IMediaFormatterService mediaFormatterService, IUpscalerService upscalerService, IDownloader downloader, ConfigurationViewModel configuration) : this(baseModel, mediaType, downloader, configuration)
     {
-        ImageFormatterService = imageFormatterService;
+        MediaFormatterService = mediaFormatterService;
 
         UpscalerService = upscalerService;
-
-        aspectRatio = GetAspectRatio(mediaType, configuration);
-
-        if (BaseModel.Crop != null)
-        {
-            crop = new CropViewModel(BaseModel.Crop);
-        }
     }
 
-    partial void OnCropChanged(CropViewModel? value)
-    {
-        BaseModel.Crop = value?.BaseModel;
-    }
-
+    /// <summary>
+    /// Gets the target width and height based on the media type and configuration.
+    /// </summary>
+    /// <returns>A tuple containing the target width and height.</returns>
     private (int, int) GetTargetWidthHeight()
     {
         int targetWidth = Width;
@@ -166,6 +163,12 @@ public partial class ImageViewModel : MediaViewModel<Image>, IBaseObservableMode
         return (targetWidth, targetHeight);
     }
 
+    /// <summary>
+    /// Gets the aspect ratio for the specified media type from configuration.
+    /// </summary>
+    /// <param name="mediaType">The type of media.</param>
+    /// <param name="configuration">The configuration view model.</param>
+    /// <returns>The aspect ratio value, or null if not configured.</returns>
     private double? GetAspectRatio(MediaType mediaType, ConfigurationViewModel configuration)
     {
         var (width, height) = mediaType switch
@@ -183,6 +186,10 @@ public partial class ImageViewModel : MediaViewModel<Image>, IBaseObservableMode
             : null);
     }
 
+    /// <summary>
+    /// Called when a property value changes.
+    /// </summary>
+    /// <param name="e">The property changed event args.</param>
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         switch (e.PropertyName)
@@ -266,49 +273,62 @@ public partial class ImageViewModel : MediaViewModel<Image>, IBaseObservableMode
     [RelayCommand]
     public async Task Upscale(UpscalerConfigurationViewModel upscalerConfiguration)
     {
-        IsUpscaling = true;
-
-        (int, int) target = GetTargetWidthHeight();
-
-        var response = await UpscalerService.UpscaleAsync(upscalerConfiguration.BaseModel, Bytes, target.Item1, target.Item2);
-
-        if (response.Success && response.ImageData != null && response.Width != null && response.Height != null && Crop != null)
+        if (UpscalerService != null && MediaFormatterService != null)
         {
-            Bytes = response.ImageData;
+            IsUpscaling = true;
 
-            var newCrop = await ImageFormatterService.CalculateNewCrop(Width, Height, Crop.BaseModel, (int)response.Width, (int)response.Height);
+            (int, int) target = GetTargetWidthHeight();
 
-            if (newCrop != null)
+            // Read bytes from LocalPath
+            var imageBytes = !string.IsNullOrWhiteSpace(LocalPath) && File.Exists(LocalPath)
+                ? await File.ReadAllBytesAsync(LocalPath)
+                : [];
+
+            if (imageBytes.Length == 0)
             {
-                Crop = new CropViewModel(newCrop);
+                HasUpscaleError = true;
+                IsUpscaling = false;
+                return;
             }
 
-            Width = (int)response.Width;
+            var response = await UpscalerService.UpscaleAsync(upscalerConfiguration.BaseModel, imageBytes, target.Item1, target.Item2);
 
-            Height = (int)response.Height;
+            if (response.Success && response.ImageData != null && response.Width != null && response.Height != null && Crop != null)
+            {
+                // Write result to new temp file
+                var tempPath = Path.Combine(Path.GetTempPath(), $"{Guid.NewGuid()}.png");
+                await File.WriteAllBytesAsync(tempPath, response.ImageData);
+                LocalPath = tempPath;
 
-            UpscaleCompleted?.Invoke(this, this);
+                var newCrop = await MediaFormatterService.CalculateNewCrop(Width, Height, Crop.BaseModel, (int)response.Width, (int)response.Height);
+
+                if (newCrop != null)
+                {
+                    Crop = new CropViewModel(newCrop);
+                }
+
+                Width = (int)response.Width;
+
+                Height = (int)response.Height;
+
+                UpscaleCompleted?.Invoke(this, this);
+            }
+            else
+            {
+                HasUpscaleError = true;
+            }
+
+            IsUpscaling = false;
         }
-        else
-        {
-            HasUpscaleError = true;
-        }
-
-        IsUpscaling = false;
     }
 
     /// <summary>
     /// Gets the upscaler service.
     /// </summary>
-    protected IUpscalerService UpscalerService { get; private set; }
+    protected IUpscalerService? UpscalerService { get; private set; }
 
     /// <summary>
-    /// Gets the image formatter service.
+    /// Gets the meida formatter service.
     /// </summary>
-    protected IImageFormatterService ImageFormatterService { get; private set; }
-
-    /// <summary>
-    /// Gets a value indicating whether the image has crop settings.
-    /// </summary>
-    public bool HasCrop => Crop != null;
+    protected IMediaFormatterService? MediaFormatterService { get; private set; }
 }

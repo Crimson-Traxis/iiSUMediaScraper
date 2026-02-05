@@ -1,7 +1,9 @@
-﻿using iiSUMediaScraper.Models;
+﻿using iiSUMediaScraper.Contracts.Services;
+using iiSUMediaScraper.Models;
 using iiSUMediaScraper.Models.Configurations;
 using iiSUMediaScraper.Models.Scraping.Igdb;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Text;
 using System.Text.Json;
@@ -22,13 +24,16 @@ public class IgdbScraper : Scraper
 
     private readonly bool _hasFetchedSlides;
 
+    private readonly bool _hasFetchedVideos;
+
     /// <summary>
     /// Initializes a new instance of the IgdbScraper.
     /// </summary>
     /// <param name="httpClientFactory">Factory for creating HTTP clients.</param>
+    /// <param name="mediaCache">Shared media cache for this scraping session.</param>
     /// <param name="configuration">Application configuration.</param>
     /// <param name="logger">Logger instance for diagnostic output.</param>
-    public IgdbScraper(IHttpClientFactory httpClientFactory, Configuration configuration, ILogger logger) : base(httpClientFactory, configuration, logger)
+    public IgdbScraper(IHttpClientFactory httpClientFactory, IDownloader downlaoder, Configuration configuration, ILogger logger) : base(httpClientFactory, downlaoder, configuration, logger)
     {
 
     }
@@ -46,14 +51,14 @@ public class IgdbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://id.twitch.tv/oauth2/token?client_id={GlobalConfiguration.IgdbClientId}&client_secret={GlobalConfiguration.IgdbClientSecret}&grant_type=client_credentials");
+                var requestUri = new Uri($"https://id.twitch.tv/oauth2/token?client_id={GlobalConfiguration.IgdbClientId}&client_secret={GlobalConfiguration.IgdbClientSecret}&grant_type=client_credentials");
 
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri)
-                {
-                    Content = new StringContent("", Encoding.UTF8, "application/json")
-                };
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () => new HttpRequestMessage(HttpMethod.Post, requestUri)
+                    {
+                        Content = new StringContent("", Encoding.UTF8, "application/json")
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -88,7 +93,7 @@ public class IgdbScraper : Scraper
     {
         try
         {
-            if (HasScrapedGame && _game != null)
+            if (HasScraped && _game != null)
             {
                 List<Task> tasks = [];
 
@@ -99,9 +104,12 @@ public class IgdbScraper : Scraper
 
                 if (Configuration.IsFetchSlidesIfNoneFound && !_hasFetchedSlides && previous?.Slides.Count == 0)
                 {
-                    tasks.Add(ScrapeVideos(_game.Id).ContinueWith(async t => _game.Videos = await t));
-
                     tasks.Add(ScrapeScreenshots(_game.Id).ContinueWith(async t => _game.Screenshots = await t));
+                }
+
+                if (Configuration.IsFetchVideos && !_hasFetchedVideos && previous?.Videos.Count() == 0)
+                {
+                    tasks.Add(ScrapeVideos(_game).ContinueWith(async t => _game.Videos = await t));
                 }
 
                 await Task.WhenAll(tasks);
@@ -112,20 +120,24 @@ public class IgdbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://api.igdb.com/v4/games");
-
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                var requestUri = new Uri($"https://api.igdb.com/v4/games");
 
                 string body = @$"fields *;
                             search ""{name}"";
                             limit 500;";
 
-                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
-                requestMessage.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
-                requestMessage.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Post, requestUri)
+                        {
+                            Content = new StringContent(body, Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
+                        msg.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -160,12 +172,12 @@ public class IgdbScraper : Scraper
 
                             if (Configuration.IsFetchSlides)
                             {
-                                if (Configuration.IsFetchVideos)
-                                {
-                                    tasks.Add(ScrapeVideos(game.Id).ContinueWith(async t => game.Videos = await t));
-                                }
-
                                 tasks.Add(ScrapeScreenshots(game.Id).ContinueWith(async t => game.Screenshots = await t));
+                            }
+
+                            if (Configuration.IsFetchVideos)
+                            {
+                                tasks.Add(ScrapeVideos(game).ContinueWith(async t => game.Videos = await t));
                             }
 
                             await Task.WhenAll(tasks);
@@ -200,19 +212,23 @@ public class IgdbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://api.igdb.com/v4/alternative_names");
-
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                var requestUri = new Uri($"https://api.igdb.com/v4/alternative_names");
 
                 string body = @$"fields *;
                                 where game = {gameId};";
 
-                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
-                requestMessage.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
-                requestMessage.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Post, requestUri)
+                        {
+                            Content = new StringContent(body, Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
+                        msg.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -240,27 +256,31 @@ public class IgdbScraper : Scraper
     /// </summary>
     /// <param name="gameId">IGDB game ID.</param>
     /// <returns>Collection of video URLs.</returns>
-    private async Task<IEnumerable<IgdbVideo>> ScrapeVideos(int gameId)
+    private async Task<IEnumerable<IgdbVideo>> ScrapeVideos(Game game)
     {
         try
         {
-            if (await GenerateToken() && _token != null)
+            if (await GenerateToken() && _token != null && game.Videos.Count() > 0)
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://api.igdb.com/v4/game_videos");
-
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                var requestUri = new Uri($"https://api.igdb.com/v4/game_videos");
 
                 string body = @$"fields *;
-                                where game = {gameId};";
+                                where game = {game.Id};";
 
-                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
-                requestMessage.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
-                requestMessage.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Post, requestUri)
+                        {
+                            Content = new StringContent(body, Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
+                        msg.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -281,7 +301,7 @@ public class IgdbScraper : Scraper
         }
         catch (Exception ex)
         {
-            Logger.LogWarning(ex, "IGDB: Failed to scrape videos for game {GameId}", gameId);
+            Logger.LogWarning(ex, "IGDB: Failed to scrape videos for game {GameId}", game.Id);
         }
 
         return [];
@@ -301,19 +321,23 @@ public class IgdbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://api.igdb.com/v4/covers");
-
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                var requestUri = new Uri($"https://api.igdb.com/v4/covers");
 
                 string body = @$"fields *;
                                 where game = {gameId};";
 
-                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
-                requestMessage.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
-                requestMessage.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Post, requestUri)
+                        {
+                            Content = new StringContent(body, Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
+                        msg.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -357,19 +381,23 @@ public class IgdbScraper : Scraper
             {
                 HttpClient client = HttpClientFactory.CreateClient("Igdb");
 
-                Uri requestUri = new Uri($"https://api.igdb.com/v4/screenshots");
-
-                HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, requestUri);
+                var requestUri = new Uri($"https://api.igdb.com/v4/screenshots");
 
                 string body = @$"fields *;
                                 where game = {gameId};";
 
-                requestMessage.Content = new StringContent(body, Encoding.UTF8, "application/json");
-
-                requestMessage.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
-                requestMessage.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
-
-                using HttpResponseMessage response = await client.SendAsync(requestMessage);
+                using HttpResponseMessage response = await SendWithRetryAsync(
+                    client,
+                    () =>
+                    {
+                        var msg = new HttpRequestMessage(HttpMethod.Post, requestUri)
+                        {
+                            Content = new StringContent(body, Encoding.UTF8, "application/json")
+                        };
+                        msg.Headers.Add("Authorization", $"Bearer {_token.AccessToken}");
+                        msg.Headers.Add("Client-ID", GlobalConfiguration.IgdbClientId);
+                        return msg;
+                    });
 
                 response.EnsureSuccessStatusCode(); // Throws if the status code is an error
 
@@ -433,11 +461,11 @@ public class IgdbScraper : Scraper
                     }];
             }
 
-            List<Media> media = [];
+            List<Image> slides = [];
 
             foreach (Screenshot screenshot in game.Screenshots)
             {
-                media.Add(new Image()
+                slides.Add(new Image()
                 {
                     Url = screenshot.Url,
                     Width = screenshot.Width,
@@ -445,15 +473,24 @@ public class IgdbScraper : Scraper
                 });
             }
 
-            foreach (IgdbVideo video in game.Videos)
-            {
-                media.Add(new Models.Video()
-                {
-                    Url = video.Url
-                });
-            }
+            mediaContext.Slides = slides;
 
-            mediaContext.Slides = media;
+            if(Configuration.IsFetchVideos)
+            {
+                List<Video> videos = [];
+
+                foreach (IgdbVideo video in game.Videos)
+                {
+                    videos.Add(new Models.Video()
+                    {
+                        Url = video.Url,
+                        ApplyMediaType = MediaType.Slide,
+                        Title = video.Name,
+                    });
+                }
+
+                mediaContext.Videos = videos;
+            }
 
             return mediaContext;
         }

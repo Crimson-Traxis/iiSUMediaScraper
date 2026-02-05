@@ -110,6 +110,18 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
         set => SetProperty(_baseModel.IsUnfoundMediaIfNoSlides, value, _baseModel, (o, v) => o.IsUnfoundMediaIfNoSlides = v);
     }
 
+    public bool IsUnfoundMediaIfNoMusic
+    {
+        get => _baseModel.IsUnfoundMediaIfNoMusic;
+        set => SetProperty(_baseModel.IsUnfoundMediaIfNoMusic, value, _baseModel, (o, v) => o.IsUnfoundMediaIfNoMusic = v);
+    }
+
+    public bool IsUnfoundMediaIfNoVideos
+    {
+        get => _baseModel.IsUnfoundMediaIfNoVideos;
+        set => SetProperty(_baseModel.IsUnfoundMediaIfNoVideos, value, _baseModel, (o, v) => o.IsUnfoundMediaIfNoVideos = v);
+    }
+
     public bool IsMoveToUnfoundGamesFolder
     {
         get => _baseModel.IsMoveToUnfoundGamesFolder;
@@ -140,28 +152,46 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
         set => SetProperty(_baseModel.IsApplySlides, value, _baseModel, (o, v) => o.IsApplySlides = v);
     }
 
-    public string IconNameFormat
+    public bool IsApplyMusic
+    {
+        get => _baseModel.IsApplyMusic;
+        set => SetProperty(_baseModel.IsApplyMusic, value, _baseModel, (o, v) => o.IsApplyMusic = v);
+    }
+
+    public bool IsPreviewerEnabled
+    {
+        get => _baseModel.IsPreviewerEnabled;
+        set => SetProperty(_baseModel.IsPreviewerEnabled, value, _baseModel, (o, v) => o.IsPreviewerEnabled = v);
+    }
+
+    public string? IconNameFormat
     {
         get => _baseModel.IconNameFormat;
         set => SetProperty(_baseModel.IconNameFormat, value, _baseModel, (o, v) => o.IconNameFormat = v);
     }
 
-    public string TitleNameFormat
+    public string? TitleNameFormat
     {
         get => _baseModel.TitleNameFormat;
         set => SetProperty(_baseModel.TitleNameFormat, value, _baseModel, (o, v) => o.TitleNameFormat = v);
     }
 
-    public string HeroNameFormat
+    public string? HeroNameFormat
     {
         get => _baseModel.HeroNameFormat;
         set => SetProperty(_baseModel.HeroNameFormat, value, _baseModel, (o, v) => o.HeroNameFormat = v);
     }
 
-    public string SlideNameFormat
+    public string? SlideNameFormat
     {
         get => _baseModel.SlideNameFormat;
         set => SetProperty(_baseModel.SlideNameFormat, value, _baseModel, (o, v) => o.SlideNameFormat = v);
+    }
+
+    public string? MusicNameFormat
+    {
+        get => _baseModel.MusicNameFormat;
+        set => SetProperty(_baseModel.MusicNameFormat, value, _baseModel, (o, v) => o.MusicNameFormat = v);
     }
 
     public int? MaxNumberOfConcurrentGames
@@ -247,6 +277,36 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
     {
         get => _baseModel.SlideHeight;
         set => SetProperty(_baseModel.SlideHeight, value, _baseModel, (o, v) => o.SlideHeight = v);
+    }
+
+    public TimeSpan? MaxMusicDuration
+    {
+        get => _baseModel.MaxMusicDuration;
+        set => SetProperty(_baseModel.MaxMusicDuration, value, _baseModel, (o, v) => o.MaxMusicDuration = v);
+    }
+
+    public string? MusicSearchTermPriority
+    {
+        get => _baseModel.MusicSearchTermPriority;
+        set => SetProperty(_baseModel.MusicSearchTermPriority, value, _baseModel, (o, v) => o.MusicSearchTermPriority = v);
+    }
+
+    public bool IsSortMusicByLikes
+    {
+        get => _baseModel.IsSortMusicByLikes;
+        set => SetProperty(_baseModel.IsSortMusicByLikes, value, _baseModel, (o, v) => o.IsSortMusicByLikes = v);
+    }
+
+    public TimeSpan? MaxVideoDuration
+    {
+        get => _baseModel.MaxVideoDuration;
+        set => SetProperty(_baseModel.MaxVideoDuration, value, _baseModel, (o, v) => o.MaxVideoDuration = v);
+    }
+
+    public string? VideoQuality
+    {
+        get => _baseModel.VideoQuality;
+        set => SetProperty(_baseModel.VideoQuality, value, _baseModel, (o, v) => o.VideoQuality = v);
     }
 
     public List<FolderNameConfiguration> FolderConfigurations

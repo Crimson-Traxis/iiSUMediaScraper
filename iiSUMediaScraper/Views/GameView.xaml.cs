@@ -1,7 +1,9 @@
-using iiSUMediaScraper.ViewModels;
 using iiSUMediaScraper;
+using iiSUMediaScraper.Models;
+using iiSUMediaScraper.ViewModels;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Xaml.Media.Animation;
 using Microsoft.Windows.Storage.Pickers;
 using System.ComponentModel;
 using System.IO;
@@ -17,14 +19,15 @@ namespace iiSUMediaScraper.Views;
 public sealed partial class GameView : UserControl, INotifyPropertyChanged
 {
     private GameViewModel? _viewModel;
-    private iiSUMediaScraper.Models.Image? _currentHero;
-    private Models.Image? _currentSlide;
+    private MediaViewModel? _currentHero;
+    private MediaViewModel? _currentSlide;
     private bool _isLoading;
     private int _currentHeroIndex;
     private int _currentSlideIndex;
     private int _heroCount;
     private int _slideCount;
     private readonly DispatcherTimer _timer;
+    private bool? _previousIsInDemoMode;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -44,6 +47,42 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
         };
 
         _timer.Tick += Timer_Tick;
+
+        PointerEntered += GameView_PointerEntered;
+        PointerExited += GameView_PointerExited;
+    }
+
+    /// <summary>
+    /// Handles the pointer exited event.
+    /// Sets the IsHover on the viewmodel
+    /// </summary>
+    private void GameView_PointerExited(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if(ViewModel != null)
+        {
+            ViewModel.IsHover = false;
+        }
+    }
+
+    /// <summary>
+    /// Handles the pointer exited event.
+    /// Sets the IsHover on the viewmodel
+    /// </summary>
+    private void GameView_PointerEntered(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (ViewModel != null)
+        {
+            ViewModel.IsHover = true;
+        }
+    }
+
+    /// <summary>
+    /// Handles the menu item click.
+    /// Closes the flyout.
+    /// </summary>
+    private void MenuFlyoutItem_Tapped(object sender, Microsoft.UI.Xaml.Input.TappedRoutedEventArgs e)
+    {
+        AddButton.Flyout?.Hide();
     }
 
     /// <summary>
@@ -117,6 +156,34 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Handles the Add Music menu item click.
+    /// Opens a file picker and adds selected files as music media.
+    /// </summary>
+    private async void MenuFlyoutItem_AddMusicClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement frameworkElement)
+        {
+            IEnumerable<string> files = await PickFiles(frameworkElement);
+
+            await AddMusic(files);
+        }
+    }
+
+    /// <summary>
+    /// Handles the Add video menu item click.
+    /// Opens a file picker and adds selected files as music media.
+    /// </summary>
+    private async void MenuFlyoutItem_AddVideosClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is FrameworkElement frameworkElement)
+        {
+            IEnumerable<string> files = await PickFiles(frameworkElement);
+
+            await AddVideos(files);
+        }
+    }
+
+    /// <summary>
     /// Handles files dropped on the icon drop zone.
     /// </summary>
     private async void DropZone_IconFilesDropped(object sender, Controls.FilesDroppedEventArgs e)
@@ -157,6 +224,22 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     }
 
     /// <summary>
+    /// Handles files dropped on the music drop zone.
+    /// </summary>
+    private async void DropZone_MusicFilesDropped(object sender, Controls.FilesDroppedEventArgs e)
+    {
+        await AddMusic(e.Files.Select(f => f.Path));
+    }
+
+    /// <summary>
+    /// Handles files dropped on the video drop zone.
+    /// </summary>
+    private async void DropZone_VideoFilesDropped(object sender, Controls.FilesDroppedEventArgs e)
+    {
+        await AddVideos(e.Files.Select(f => f.Path));
+    }
+
+    /// <summary>
     /// Handles timer tick to rotate through heroes and slides in demo mode.
     /// </summary>
     private void Timer_Tick(object? sender, object e)
@@ -177,11 +260,37 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
 
     /// <summary>
     /// Handles control unloaded event.
-    /// Stops the slideshow timer.
+    /// Stops the slideshow timer and all media playback.
     /// </summary>
     private void Game_Unloaded(object sender, RoutedEventArgs e)
     {
+        StopAllMedia();
+
+        CurrentHero = null;
+        CurrentSlide = null;
+
         _timer.Stop();
+    }
+
+    /// <summary>
+    /// Stops all media controls including music players, video previews, and the WebView2.
+    /// </summary>
+    private void StopAllMedia()
+    {
+        DemoModeMusicPlayer.MediaPlayer?.Pause();
+        EditModeMusicPlayer.MediaPlayer?.Pause();
+
+        if (HeroPreviewContentControl.ContentTemplateRoot is MediaPlayerElement heroPlayer)
+        {
+            heroPlayer.MediaPlayer?.Pause();
+        }
+
+        if (SlidePreviewContentControl.ContentTemplateRoot is MediaPlayerElement slidePlayer)
+        {
+            slidePlayer.MediaPlayer?.Pause();
+        }
+
+        try { PlayingVideoWebView.CoreWebView2?.Navigate("about:blank"); } catch { }
     }
 
     /// <summary>
@@ -190,6 +299,9 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// </summary>
     private void DemoModeSlides_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        CurrentHero = null;
+        CurrentSlide = null;
+
         UpdateHeroAndSlide();
     }
 
@@ -199,19 +311,60 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// </summary>
     private void DemoModeHeros_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
+        CurrentHero = null;
+        CurrentSlide = null;
+
         UpdateHeroAndSlide();
     }
 
     /// <summary>
     /// Handles view model property changes.
-    /// Updates the loading state on the UI thread.
+    /// Updates the loading state and triggers flip animation on the UI thread.
     /// </summary>
     private void ViewModel_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         DispatcherQueue.TryEnqueue(() =>
         {
             IsLoading = ViewModel?.IsLoading ?? false;
+
+            if (e.PropertyName == nameof(GameViewModel.IsInDemoMode))
+            {
+                PlayFlipAnimation();
+            }
         });
+    }
+
+    /// <summary>
+    /// Plays the card flip animation when toggling between demo mode and edit mode.
+    /// </summary>
+    private void PlayFlipAnimation()
+    {
+        if (ViewModel == null) return;
+
+        bool isInDemoMode = ViewModel.IsInDemoMode;
+
+        // Only play animation if the state actually changed
+        if (_previousIsInDemoMode.HasValue && _previousIsInDemoMode.Value != isInDemoMode)
+        {
+            if (isInDemoMode)
+            {
+                // Flip to demo mode
+                if (Resources.TryGetValue("FlipToDemoMode", out var flipToDemoStoryboard) && flipToDemoStoryboard is Storyboard storyboard)
+                {
+                    storyboard.Begin();
+                }
+            }
+            else
+            {
+                // Flip to edit mode
+                if (Resources.TryGetValue("FlipToEditMode", out var flipToEditStoryboard) && flipToEditStoryboard is Storyboard storyboard)
+                {
+                    storyboard.Begin();
+                }
+            }
+        }
+
+        _previousIsInDemoMode = isInDemoMode;
     }
 
     private void ViewModel_DemoMediaChanged(object? sender, GameViewModel e)
@@ -232,13 +385,12 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
             {
                 ImageViewModel image = ViewModel.MediaContext.CreateIcon(new Models.Image()
                 {
-                    Bytes = await File.ReadAllBytesAsync(file),
                     Extension = Path.GetExtension(file),
-                    Url = file,
-                    Source = Models.SourceFlag.Local
+                    LocalPath = file,
+                    Source = SourceFlag.Local
                 });
 
-                await ViewModel.MediaContext.AddIcon(image);
+                await ViewModel.MediaContext.AddIcon(image, true);
             }
         }
     }
@@ -256,13 +408,12 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
             {
                 ImageViewModel image = ViewModel.MediaContext.CreateLogo(new Models.Image()
                 {
-                    Bytes = await File.ReadAllBytesAsync(file),
                     Extension = Path.GetExtension(file),
-                    Url = file,
-                    Source = Models.SourceFlag.Local
+                    LocalPath = file,
+                    Source = SourceFlag.Local
                 });
 
-                await ViewModel.MediaContext.AddLogo(image);
+                await ViewModel.MediaContext.AddLogo(image, true);
             }
         }
     }
@@ -280,13 +431,12 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
             {
                 ImageViewModel image = ViewModel.MediaContext.CreateTitle(new Models.Image()
                 {
-                    Bytes = await File.ReadAllBytesAsync(file),
                     Extension = Path.GetExtension(file),
-                    Url = file,
-                    Source = Models.SourceFlag.Local
+                    LocalPath = file,
+                    Source = SourceFlag.Local
                 });
 
-                await ViewModel.MediaContext.AddTitle(image);
+                await ViewModel.MediaContext.AddTitle(image, true);
             }
         }
     }
@@ -302,15 +452,14 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
         {
             foreach (string file in files)
             {
-                MediaViewModel image = ViewModel.MediaContext.CreateHero(new Models.Image()
+                ImageViewModel image = ViewModel.MediaContext.CreateHero(new Models.Image()
                 {
-                    Bytes = await File.ReadAllBytesAsync(file),
                     Extension = Path.GetExtension(file),
-                    Url = file,
-                    Source = Models.SourceFlag.Local
+                    LocalPath = file,
+                    Source = SourceFlag.Local
                 });
 
-                await ViewModel.MediaContext.AddHero(image);
+                await ViewModel.MediaContext.AddHero(image, true);
             }
         }
     }
@@ -326,15 +475,64 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
         {
             foreach (string file in files)
             {
-                MediaViewModel image = ViewModel.MediaContext.CreateSlide(new Models.Image()
+                ImageViewModel image = ViewModel.MediaContext.CreateSlide(new Models.Image()
                 {
-                    Bytes = await File.ReadAllBytesAsync(file),
                     Extension = Path.GetExtension(file),
-                    Url = file,
-                    Source = Models.SourceFlag.Local
+                    LocalPath = file,
+                    Source = SourceFlag.Local
                 });
 
-                await ViewModel.MediaContext.AddSlide(image);
+                await ViewModel.MediaContext.AddSlide(image, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds local files as music media to the game's media context.
+    /// Reads file bytes and creates music view models.
+    /// </summary>
+    /// <param name="files">File paths to add as musics.</param>
+    private async Task AddMusic(IEnumerable<string> files)
+    {
+        if (ViewModel != null && ViewModel.MediaContext != null)
+        {
+            foreach (string file in files)
+            {
+                MusicViewModel music = ViewModel.MediaContext.CreateMusic(new Models.Music()
+                {
+                    Extension = Path.GetExtension(file),
+                    LocalPath = file,
+                    Url = file,
+                    Title = Path.GetFileNameWithoutExtension(file),
+                    Source = SourceFlag.Local
+                });
+
+                await ViewModel.MediaContext.AddMusic(music, true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds local files as video media to the game's media context.
+    /// Reads file bytes and creates video view models.
+    /// </summary>
+    /// <param name="files">File paths to add as videos.</param>
+    private async Task AddVideos(IEnumerable<string> files)
+    {
+        if (ViewModel != null && ViewModel.MediaContext != null)
+        {
+            foreach (string file in files)
+            {
+                VideoViewModel video = ViewModel.MediaContext.CreateVideo(new Models.Video()
+                {
+                    Extension = Path.GetExtension(file),
+                    LocalPath = file,
+                    Url = file,
+                    Title = Path.GetFileNameWithoutExtension(file),
+                    Source = SourceFlag.Local,
+                    ApplyMediaType = MediaType.Slide
+                });
+                await ViewModel.MediaContext.AddVideo(video, true);
             }
         }
     }
@@ -346,7 +544,7 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// <returns>Collection of selected file paths.</returns>
     private async Task<IEnumerable<string>> PickFiles(FrameworkElement sender)
     {
-        FileOpenPicker picker = new FileOpenPicker(sender.XamlRoot.ContentIslandEnvironment.AppWindowId)
+        var picker = new FileOpenPicker(sender.XamlRoot.ContentIslandEnvironment.AppWindowId)
         {
             SuggestedStartLocation = PickerLocationId.DocumentsLibrary,
 
@@ -374,15 +572,11 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
         {
             if (ViewModel != null)
             {
-                CurrentHero = null;
-
                 if (ViewModel.DemoModeHeros.Count > 0)
                 {
                     _currentHeroIndex = (_currentHeroIndex + 1) % ViewModel.DemoModeHeros.Count;
                     CurrentHero = ViewModel.DemoModeHeros[_currentHeroIndex];
                 }
-
-                CurrentSlide = null;
 
                 if (ViewModel.DemoModeSlides.Count > 0)
                 {
@@ -420,7 +614,7 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// <returns>Visibility.Visible if image has data and is not loading, otherwise Collapsed.</returns>
     public Visibility CheckImageVisibility(bool isLoading, Models.Image image)
     {
-        if (isLoading || image == null || (image != null && image.Bytes.Length == 0))
+        if (isLoading || image == null || (image != null && string.IsNullOrWhiteSpace(image.LocalPath)))
         {
             return Visibility.Collapsed;
         }
@@ -441,6 +635,8 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
             {
                 if (_viewModel != null)
                 {
+                    StopAllMedia();
+
                     _viewModel.DemoModeHeros.CollectionChanged -= DemoModeHeros_CollectionChanged;
                     _viewModel.DemoModeSlides.CollectionChanged -= DemoModeSlides_CollectionChanged;
                     _viewModel.PropertyChanged -= ViewModel_PropertyChanged;
@@ -461,6 +657,26 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
                     _currentHeroIndex = -1; // Start at -1 so first update goes to index 0
                     _currentSlideIndex = -1;
 
+                    CurrentHero = null;
+                    CurrentSlide = null;
+
+                    // Initialize the flip state without animation
+                    _previousIsInDemoMode = _viewModel.IsInDemoMode;
+                    if (_viewModel.IsInDemoMode)
+                    {
+                        DemoModeGrid.Visibility = Visibility.Visible;
+                        EditModeGrid.Visibility = Visibility.Collapsed;
+                        DemoModeProjection.RotationY = 0;
+                        EditModeProjection.RotationY = -90;
+                    }
+                    else
+                    {
+                        DemoModeGrid.Visibility = Visibility.Collapsed;
+                        EditModeGrid.Visibility = Visibility.Visible;
+                        DemoModeProjection.RotationY = 90;
+                        EditModeProjection.RotationY = 0;
+                    }
+
                     UpdateHeroAndSlide();
                 }
                 else
@@ -477,7 +693,7 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// <summary>
     /// Gets or sets the currently displayed hero image in demo mode.
     /// </summary>
-    public Models.Image? CurrentHero
+    public MediaViewModel? CurrentHero
     {
         get => _currentHero;
         set
@@ -493,7 +709,7 @@ public sealed partial class GameView : UserControl, INotifyPropertyChanged
     /// <summary>
     /// Gets or sets the currently displayed slide image in demo mode.
     /// </summary>
-    public Models.Image? CurrentSlide
+    public MediaViewModel? CurrentSlide
     {
         get => _currentSlide;
         set

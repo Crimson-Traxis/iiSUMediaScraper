@@ -129,6 +129,42 @@ public class ObservableScraperConfiguration : BaseObservableModel<ScraperConfigu
         set => SetProperty(_baseModel.SlidePriority, value, _baseModel, (o, v) => o.SlidePriority = v);
     }
 
+    public int? IconFetchLimit
+    {
+        get => _baseModel.IconFetchLimit;
+        set => SetProperty(_baseModel.IconFetchLimit, value, _baseModel, (o, v) => o.IconFetchLimit = v);
+    }
+
+    public int? LogoFetchLimit
+    {
+        get => _baseModel.LogoFetchLimit;
+        set => SetProperty(_baseModel.LogoFetchLimit, value, _baseModel, (o, v) => o.LogoFetchLimit = v);
+    }
+
+    public int? TitleFetchLimit
+    {
+        get => _baseModel.TitleFetchLimit;
+        set => SetProperty(_baseModel.TitleFetchLimit, value, _baseModel, (o, v) => o.TitleFetchLimit = v);
+    }
+
+    public int? HeroFetchLimit
+    {
+        get => _baseModel.HeroFetchLimit;
+        set => SetProperty(_baseModel.HeroFetchLimit, value, _baseModel, (o, v) => o.HeroFetchLimit = v);
+    }
+
+    public int? SlideFetchLimit
+    {
+        get => _baseModel.SlideFetchLimit;
+        set => SetProperty(_baseModel.SlideFetchLimit, value, _baseModel, (o, v) => o.SlideFetchLimit = v);
+    }
+
+    public bool IsFetchMusic
+    {
+        get => _baseModel.IsFetchMusic;
+        set => SetProperty(_baseModel.IsFetchMusic, value, _baseModel, (o, v) => o.IsFetchMusic = v);
+    }
+
     public List<string> IconStyles
     {
         get => _baseModel.IconStyles;

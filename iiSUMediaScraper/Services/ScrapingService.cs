@@ -6,7 +6,9 @@ using iiSUMediaScraper.Scrapers;
 using iiSUMediaScraper.Scrapers.Igdb;
 using iiSUMediaScraper.Scrapers.Ign;
 using iiSUMediaScraper.Scrapers.SteamGridDb;
+using iiSUMediaScraper.Scrapers.Youtube;
 using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
 
 namespace iiSUMediaScraper.Services;
 
@@ -24,10 +26,11 @@ public class ScrapingService : IScrapingService
     /// <param name="httpClientFactory">Factory for creating HTTP clients.</param>
     /// <param name="configurationService">Service for accessing application configuration.</param>
     /// <param name="logger">Logger instance for diagnostic output.</param>
-    public ScrapingService(IHttpClientFactory httpClientFactory, IConfigurationService configurationService, ILogger<ScrapingService> logger)
+    public ScrapingService(IHttpClientFactory httpClientFactory, IConfigurationService configurationService, IDownloader downloader, ILogger<ScrapingService> logger)
     {
         HttpClientFactory = httpClientFactory;
         ConfigurationService = configurationService;
+        Downloader = downloader;
         Logger = logger;
     }
 
@@ -48,38 +51,51 @@ public class ScrapingService : IScrapingService
             {
                 return await Task.Run(async () =>
                 {
-                    var ignScraper = new IgnScraper(HttpClientFactory, configuration, Logger);
-                    var steamGridDbScraper = new SteamGridDbScraper(HttpClientFactory, configuration, Logger);
-                    var igdbScraper = new IgdbScraper(HttpClientFactory, configuration, Logger);
+                    // Initialize all scrapers for different media sources
+                    var ignScraper = new IgnScraper(HttpClientFactory, Downloader, configuration, Logger);
+                    var steamGridDbScraper = new SteamGridDbScraper(HttpClientFactory, Downloader, configuration, Logger);
+                    var igdbScraper = new IgdbScraper(HttpClientFactory, Downloader, configuration, Logger);
+                    var youtubeScraper = new YoutubeScraper(HttpClientFactory, Downloader, configuration, Logger);
 
-                    Task<MediaContext?> ignScraperTask = ignScraper.ScrapeMedia(platform, game);
-                    Task<MediaContext?> steamGridDbScraperTask = steamGridDbScraper.ScrapeMedia(platform, game);
-                    Task<MediaContext?> igdbScraperTask = igdbScraper.ScrapeMedia(platform, game);
+                    // Phase 1: Run all scrapers in parallel for initial media fetch
+                    var ignScraperTask = ignScraper.ScrapeMedia(platform, game);
+                    var steamGridDbScraperTask = steamGridDbScraper.ScrapeMedia(platform, game);
+                    var igdbScraperTask = igdbScraper.ScrapeMedia(platform, game);
+                    var youtubeScraperTask = youtubeScraper.ScrapeMedia(platform, game);
 
-                    await Task.WhenAll([ignScraperTask, steamGridDbScraperTask, igdbScraperTask]).ConfigureAwait(false);
+                    await Task.WhenAll([ignScraperTask, steamGridDbScraperTask, igdbScraperTask, youtubeScraperTask]).ConfigureAwait(false);
 
-                    IEnumerable<MediaContext> mediaContexts = new List<MediaContext?>
+                    // Collect results from first pass, filtering out nulls
+                    var mediaContexts = new List<MediaContext?>
                                                     {
                                                         await ignScraperTask,
                                                         await steamGridDbScraperTask,
-                                                        await igdbScraperTask
+                                                        await igdbScraperTask,
+                                                        await youtubeScraperTask,
                                                     }.OfType<MediaContext>();
 
+                    // Phase 2: Re-scrape with knowledge of what media was found
+                    // This allows scrapers to fill in missing media types
                     ignScraperTask = ignScraper.ScrapeMedia(platform, game, mediaContexts.Flatten());
                     steamGridDbScraperTask = steamGridDbScraper.ScrapeMedia(platform, game, mediaContexts.Flatten());
                     igdbScraperTask = igdbScraper.ScrapeMedia(platform, game, mediaContexts.Flatten());
 
+                    // YouTube only needs one pass since it doesn't have fallback logic for images
+
                     await Task.WhenAll([ignScraperTask, steamGridDbScraperTask, igdbScraperTask]).ConfigureAwait(false);
 
-                    IEnumerable<MediaContext> mediaContextsReScrape = new List<MediaContext?>
+                    var mediaContextsReScrape = new List<MediaContext?>
                                                     {
                                                         await ignScraperTask,
                                                         await steamGridDbScraperTask,
                                                         await igdbScraperTask
                                                     }.OfType<MediaContext>();
 
+                    // Combine results from both passes
                     mediaContexts = [.. mediaContexts, .. mediaContextsReScrape];
 
+                    // Aggregate and prioritize media from all sources
+                    // Deduplicate by URL and sort by configured priority (lower = higher priority)
                     IOrderedEnumerable<Image> icons = mediaContexts.Select(m => m.Icons)
                         .SelectMany(i => i)
                         .DistinctBy(i => i.Url)
@@ -97,15 +113,28 @@ public class ScrapingService : IScrapingService
                         .DistinctBy(l => l.Url)
                         .OrderBy(l => l.GetLogoPriority(configuration));
 
-                    IOrderedEnumerable<Media> heros = mediaContexts.Select(m => m.Heros)
+                    IOrderedEnumerable<Image> heros = mediaContexts.Select(m => m.Heros)
                         .SelectMany(h => h)
                         .DistinctBy(h => h.Url)
                         .OrderBy(h => h.GetHeroPriority(configuration));
 
-                    IOrderedEnumerable<Media> slides = mediaContexts.Select(m => m.Slides)
+                    IOrderedEnumerable<Image> slides = mediaContexts.Select(m => m.Slides)
                         .SelectMany(s => s)
                         .DistinctBy(s => s.Url)
                         .OrderBy(s => s.GetSlidePriority(configuration));
+
+                    // Music is sorted by search term priority first, then by like count
+                    IEnumerable<Music> music = mediaContexts.Select(m => m.Music)
+                        .SelectMany(s => s)
+                        .DistinctBy(s => s.Url)
+                        .OrderBy(s => s.GetMusicPriority(configuration).TermPriority)
+                        .ThenByDescending(s => s.GetMusicPriority(configuration).LikeCount);
+
+                    // Videos are sorted by popularity (like count)
+                    IEnumerable<Video> videos = mediaContexts.Select(m => m.Videos)
+                        .SelectMany(s => s)
+                        .DistinctBy(s => s.Url)
+                        .OrderByDescending(s => s.LikeCount);
 
                     return new MediaContext()
                     {
@@ -113,7 +142,9 @@ public class ScrapingService : IScrapingService
                         Titles = [.. titles],
                         Logos = [.. logos],
                         Heros = [.. heros],
-                        Slides = [.. slides]
+                        Slides = [.. slides],
+                        Music = [.. music],
+                        Videos = [.. videos],
                     };
                 });
             }
@@ -137,33 +168,30 @@ public class ScrapingService : IScrapingService
         {
             try
             {
-                var downloader = new Downloader(HttpClientFactory, Logger);
+                // Create per-request cache that gets disposed after downloading
+                var mediaCache = new ConcurrentDictionary<string, Media>();
 
-                List<Task> downloadTasks = new List<Task>();
+                var downloadTasks = new List<Task>();
 
                 foreach (Image media in mediaContext.Icons)
                 {
-                    downloadTasks.Add(downloader.DownloadMedia(media));
+                    downloadTasks.Add(Downloader.DownloadImage(media));
                 }
-
                 foreach (Image media in mediaContext.Logos)
                 {
-                    downloadTasks.Add(downloader.DownloadMedia(media));
+                    downloadTasks.Add(Downloader.DownloadImage(media));
                 }
-
                 foreach (Image media in mediaContext.Titles)
                 {
-                    downloadTasks.Add(downloader.DownloadMedia(media));
+                    downloadTasks.Add(Downloader.DownloadImage(media));
                 }
-
-                foreach (Media media in mediaContext.Heros)
+                foreach (Image media in mediaContext.Heros)
                 {
-                    downloadTasks.Add(downloader.DownloadMedia(media));
+                    downloadTasks.Add(Downloader.DownloadImage(media));
                 }
-
-                foreach (Media media in mediaContext.Slides)
+                foreach (Image media in mediaContext.Slides)
                 {
-                    downloadTasks.Add(downloader.DownloadMedia(media));
+                    downloadTasks.Add(Downloader.DownloadImage(media));
                 }
 
                 await Task.WhenAll(downloadTasks);
@@ -175,12 +203,20 @@ public class ScrapingService : IScrapingService
         });
     }
 
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 
     /// <summary>
     /// Gets the HTTP client factory for creating HTTP clients.
     /// </summary>
     protected IHttpClientFactory HttpClientFactory { get; private set; }
+
+    /// <summary>
+    /// Gets the downloader.
+    /// </summary>
+    protected IDownloader Downloader { get; private set; }
 
     /// <summary>
     /// Gets the configuration service for accessing scraper settings and API keys.

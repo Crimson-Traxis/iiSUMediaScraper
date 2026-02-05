@@ -100,7 +100,8 @@
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ListView x:Name="ConfigurationNavigationListView">
+        <ListView x:Name="ConfigurationNavigationListView"
+                  SelectionChanged="ConfigurationNavigationListView_SelectionChanged">
             <ListViewItem Tag="Main"
                           MinWidth="200"
                           IsSelected="True">
@@ -116,7 +117,7 @@
 
                 </Grid>
             </ListViewItem>
-            <ListViewItem Tag="ImageFormating"
+            <ListViewItem Tag="Formating"
                           MinWidth="200">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -125,8 +126,36 @@
                     </Grid.ColumnDefinitions>
                     <SymbolIcon Symbol="Edit" />
                     <TextBlock Grid.Column="1"
-                               Text="Image Formating"
+                               Text="Formating"
                                Margin="8,0,16,0" />
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Music"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Audio" />
+                    <TextBlock Grid.Column="1"
+                               Text="Music"
+                               Margin="8,0,16,0" />
+
+                </Grid>
+            </ListViewItem>
+            <ListViewItem Tag="Video"
+                          MinWidth="200">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="22" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <SymbolIcon Symbol="Video" />
+                    <TextBlock Grid.Column="1"
+                               Text="Video"
+                               Margin="8,0,16,0" />
+
                 </Grid>
             </ListViewItem>
             <ListViewItem Tag="Applying"
@@ -289,8 +318,8 @@
               Grid.Column="1"
               Margin="16,0,0,16">
 
-            <controls:SwitchPresenter Value="{Binding SelectedItem.Tag, ElementName=ConfigurationNavigationListView}">
-                <!--  And then only dynamically displays the Case with the matching Value  -->
+            <controls:SwitchPresenter x:Name="ConfigurationSwitchPresenter"
+                                       Value="{Binding SelectedItem.Tag, ElementName=ConfigurationNavigationListView}">
                 <controls:Case Value="Main">
                     <ScrollView>
                         <Grid>
@@ -347,17 +376,23 @@
                                        ToolTipService.ToolTip="Maximum number of games to concurrently scrape at one. Only applies at the begining of the process. Higher values will increase ram usage. Max 100"
                                        Width="160"
                                        HorizontalAlignment="Left"/>
+                            <ToggleSwitch OffContent="Show Previewer"
+                                          OnContent="Show Previewer"
+                                          IsOn="{x:Bind ViewModel.IsPreviewerEnabled, Mode=TwoWay}"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="5"
+                                          Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan games folder"
                                           OnContent="Scan games folder"
                                           IsOn="{x:Bind ViewModel.IsScanGames, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="5"
+                                          Grid.Row="6"
                                           Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan unfound games folder"
                                           OnContent="Scan unfound games folder"
                                           IsOn="{x:Bind ViewModel.IsScanUnfoundGames, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="6"
+                                          Grid.Row="7"
                                           Grid.ColumnSpan="2" />
                             <StackPanel Grid.Row="8"
                                         Grid.ColumnSpan="2"
@@ -386,12 +421,20 @@
                                               Margin="0,0,0,8" />
                                 <ToggleSwitch OffContent="No slides found"
                                               OnContent="No slides found"
-                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoSlides, Mode=TwoWay}" />
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoSlides, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No music found"
+                                              OnContent="No music found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoMusic, Mode=TwoWay}"
+                                              Margin="0,0,0,8" />
+                                <ToggleSwitch OffContent="No videos found"
+                                              OnContent="No videos found"
+                                              IsOn="{x:Bind ViewModel.IsUnfoundMediaIfNoVideos, Mode=TwoWay}" />
                             </StackPanel>
                         </Grid>
                     </ScrollView>
                 </controls:Case>
-                <controls:Case Value="ImageFormating">
+                <controls:Case Value="Formating">
                     <ScrollView>
                         <StackPanel>
                             <ToggleSwitch OffContent="Logos as titles"
@@ -533,6 +576,43 @@
                         </StackPanel>
                     </ScrollView>
                 </controls:Case>
+                <controls:Case Value="Music">
+                    <ScrollView>
+                        <StackPanel>
+                            <TextBox Header="Search Term Priority"
+                                     Text="{x:Bind ViewModel.MusicSearchTermPriority, Mode=TwoWay}"
+                                     Margin="0,0,0,16" />
+                            <ToggleSwitch OffContent="Sort by likes"
+                                          OnContent="Sort by likes"
+                                          IsOn="{x:Bind ViewModel.IsSortMusicByLikes, Mode=TwoWay}"
+                                          Margin="0,0,0,8" />
+                            <NumberBox Header="Max Duration (seconds)"
+                                       SpinButtonPlacementMode="Compact"
+                                       MinWidth="120"
+                                       Margin="0,0,0,16"
+                                       Width="200"
+                                       HorizontalAlignment="Left"
+                                       Value="{x:Bind ViewModel.MaxMusicDuration, Mode=TwoWay}" />
+                        </StackPanel>
+                    </ScrollView>
+                </controls:Case>
+                <controls:Case Value="Video">
+                    <ScrollView>
+                        <StackPanel>
+                            <controls1:CustomComboBox Header="Quality"
+                                                      Margin="0,0,0,16"
+                                                      ItemsSource="{x:Bind ViewModel.VideoQualities, Mode=OneWay}"
+                                                      SelectedItem="{x:Bind ViewModel.VideoQuality, Mode=TwoWay}" />
+                            <NumberBox Header="Max Duration (seconds)"
+                                       SpinButtonPlacementMode="Compact"
+                                       MinWidth="120"
+                                       Margin="0,0,0,16"
+                                       Width="200"
+                                       HorizontalAlignment="Left"
+                                       Value="{x:Bind ViewModel.MaxVideoDuration, Mode=TwoWay}" />
+                        </StackPanel>
+                    </ScrollView>
+                </controls:Case>
                 <controls:Case Value="Applying">
                     <ScrollView>
                         <StackPanel>
@@ -568,6 +648,7 @@
                                     <ColumnDefinition Width="auto" />
                                 </Grid.ColumnDefinitions>
                                 <Grid.RowDefinitions>
+                                    <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
                                     <RowDefinition Height="auto" />
@@ -616,6 +697,18 @@
                                               Grid.Row="3"
                                               Grid.Column="1"
                                               IsOn="{x:Bind ViewModel.IsApplySlides, Mode=TwoWay}" />
+                                <TextBox Text="{x:Bind ViewModel.MusicNameFormat, Mode=TwoWay}"
+                                         Header="Music Name Format"
+                                         Margin="0,0,32,16"
+                                         Grid.Row="4"
+                                         MinWidth="200"
+                                         ToolTipService.ToolTip="A blank name will use the music title"/>
+                                <ToggleSwitch OffContent="Apply Music"
+                                              OnContent="Apply Music"
+                                              Margin="0,16,0,8"
+                                              Grid.Row="4"
+                                              Grid.Column="1"
+                                              IsOn="{x:Bind ViewModel.IsApplyMusic, Mode=TwoWay}" />
                             </Grid>
                         </StackPanel>
                     </ScrollView>

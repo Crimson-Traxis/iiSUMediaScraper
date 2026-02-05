@@ -72,5 +72,8 @@ public class PageService : IPageService
         return pageType;
     }
 
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 }

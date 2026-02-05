@@ -12,7 +12,6 @@ public class NotEqualsStringToVisibilityConverter : IValueConverter
             return Visibility.Collapsed;
         }
 
-
         if (value?.ToString()?.Trim() != NotEqualsValue?.Trim())
         {
             return Visibility.Visible;

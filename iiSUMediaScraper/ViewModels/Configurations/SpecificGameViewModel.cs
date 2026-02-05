@@ -1,7 +1,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using iiSUMediaScraper.Models.Configurations;
 using iiSUMediaScraper.ObservableModels.Configurations;
+using iiSUMediaScraper.Services;
 using iiSUMediaScraper.ViewModels.Configurations;
+using System.Text.RegularExpressions;
 
 namespace iiSUMediaScraper.ViewModels.Configurations;
 
@@ -46,4 +48,24 @@ public partial class SpecificGameViewModel : ObservableSpecificGame
     {
 
     }
+
+    /// <summary>
+    /// Removes parenthetical region/version info from a game name.
+    /// Example: "Super Mario Bros (USA)" becomes "Super Mario Bros"
+    /// </summary>
+    /// <param name="name">The game name to clean.</param>
+    /// <returns>Cleaned game name.</returns>
+    protected string CleanName(string name)
+    {
+        // Remove only trailing parenthetical groups (region info, version, etc.)
+        string pattern = @"(\s*\([^)]*\))+$";
+        name = Regex.Replace(name, pattern, string.Empty).Trim();
+
+        return name;
+    }
+
+    /// <summary>
+    /// Gets the formatted name of the game without file extension.
+    /// </summary>
+    public string FormattedName => CleanName(Name);
 }

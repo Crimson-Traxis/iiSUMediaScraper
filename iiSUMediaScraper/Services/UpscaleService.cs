@@ -264,7 +264,7 @@ public class UpscalerService : IUpscalerService
     {
         try
         {
-            Process process = new Process
+            var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
@@ -299,6 +299,9 @@ public class UpscalerService : IUpscalerService
         }
     }
 
+    /// <summary>
+    /// Starts the Python SeedVR2 upscaler server process.
+    /// </summary>
     private void StartServer()
     {
         try
@@ -328,6 +331,11 @@ public class UpscalerService : IUpscalerService
         }
     }
 
+    /// <summary>
+    /// Waits for the server to become ready and respond to health checks.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the server became ready within the timeout period, false otherwise.</returns>
     private async Task<bool> WaitForServerReadyAsync(CancellationToken cancellationToken)
     {
         DateTime deadline = DateTime.UtcNow.AddSeconds(_serverStartupTimeoutSeconds);
@@ -350,6 +358,11 @@ public class UpscalerService : IUpscalerService
         return false;
     }
 
+    /// <summary>
+    /// Ensures the upscaler server is running, starting it if necessary.
+    /// </summary>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>True if the server is running and healthy, false otherwise.</returns>
     private async Task<bool> EnsureServerRunningAsync(CancellationToken cancellationToken)
     {
         // Check if server is already responding
@@ -368,6 +381,9 @@ public class UpscalerService : IUpscalerService
         return await WaitForServerReadyAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Stops the upscaler server process if it is running.
+    /// </summary>
     private void StopServer()
     {
         if (_serverProcess == null || _serverProcess.HasExited)
@@ -446,7 +462,7 @@ public class UpscalerService : IUpscalerService
             // SeedVR2 uses the shortest edge as resolution, so pick the smaller of target dimensions
             int resolution = Math.Min(targetWidth, targetHeight);
 
-            UpscaleRequest request = new UpscaleRequest
+            var request = new UpscaleRequest
             {
                 Name = configuration.Name,
                 Resolution = resolution,
@@ -526,6 +542,9 @@ public class UpscalerService : IUpscalerService
         }
     }
 
+    /// <summary>
+    /// Disposes of the upscaler service, stopping the server and releasing resources.
+    /// </summary>
     public void Dispose()
     {
         if (_disposed)
@@ -541,9 +560,18 @@ public class UpscalerService : IUpscalerService
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Gets the logger instance for diagnostic output.
+    /// </summary>
     protected ILogger Logger { get; private set; }
 
+    /// <summary>
+    /// Gets the URL of the upscaler server.
+    /// </summary>
     private string ServerUrl => $"http://{_host}:{_port}";
 
+    /// <summary>
+    /// Gets a value indicating whether the server process is currently running.
+    /// </summary>
     private bool IsServerProcessRunning => _serverProcess != null && !_serverProcess.HasExited;
 }

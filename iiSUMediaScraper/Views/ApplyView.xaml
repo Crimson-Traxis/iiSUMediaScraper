@@ -7,11 +7,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:customconverters="using:iiSUMediaScraper.Converters"
              xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+             xmlns:imageex="using:ImageEx"
              mc:Ignorable="d">
 
     <UserControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
-        
+
         <customconverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
         <customconverters:PathToValidImagePathConverter x:Key="PathToValidImagePathConverter" />
@@ -61,6 +62,7 @@
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
                         <RowDefinition Height="auto" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
                     <TextBox Text="{x:Bind ViewModel.Configuration.IconNameFormat, Mode=TwoWay}"
                              Header="Icon Name Format"
@@ -105,6 +107,17 @@
                                   Grid.Row="3"
                                   Grid.Column="1"
                                   IsOn="{x:Bind ViewModel.Configuration.IsApplySlides, Mode=TwoWay}" />
+                    <TextBox Text="{x:Bind ViewModel.Configuration.MusicNameFormat, Mode=TwoWay}"
+                             Header="Music Name Format"
+                             Margin="0,0,32,16"
+                             Grid.Row="4"
+                             MinWidth="200" />
+                    <ToggleSwitch OffContent="Apply Music"
+                                  OnContent="Apply Music"
+                                  Margin="0,16,0,8"
+                                  Grid.Row="4"
+                                  Grid.Column="1"
+                                  IsOn="{x:Bind ViewModel.Configuration.IsApplyMusic, Mode=TwoWay}" />
                 </Grid>
             </StackPanel>
             <InfoBar Severity="Success"
@@ -134,12 +147,12 @@
                                   Width="400"
                                   IsIndeterminate="False"
                                   Value="{x:Bind ViewModel.ApplyingProgress, Mode=OneWay}" />
-                    <Image Source="{x:Bind ViewModel.ApplyingGame.DemoModeIcon.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
-                           Height="180"
-                           Width="180"
-                           Stretch="Fill"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Center" />
+                    <imageex:ImageEx Source="{x:Bind ViewModel.ApplyingGame.DemoModeIcon.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                                     Height="180"
+                                     Width="180"
+                                     Stretch="Fill"
+                                     VerticalAlignment="Center"
+                                     HorizontalAlignment="Center" />
                 </Grid>
                 <TextBlock HorizontalAlignment="Center"
                            FontSize="20">

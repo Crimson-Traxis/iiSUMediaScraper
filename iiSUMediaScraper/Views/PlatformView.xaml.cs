@@ -1,5 +1,6 @@
 using iiSUMediaScraper.Models;
 using iiSUMediaScraper.ViewModels;
+using iiSUMediaScraper.ViewModels.Configurations;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Input;
@@ -9,6 +10,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Graphics.Imaging;
+using Windows.Storage;
 using Windows.Storage.Streams;
 
 // To learn more about WinUI, the WinUI project structure,
@@ -25,8 +27,6 @@ public sealed partial class PlatformView : UserControl, INotifyPropertyChanged
 {
     private PlatformViewModel? _viewModel;
 
-    private Rect _lastKnownCroppedRegion;
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     /// <summary>
@@ -37,57 +37,20 @@ public sealed partial class PlatformView : UserControl, INotifyPropertyChanged
     {
         InitializeComponent();
 
+        ResizeControls(new Size(ActualWidth, ActualHeight));
+
         GridContent.SizeChanged += GridContent_SizeChanged;
 
-        ImageCropperBottom.ManipulationCompleted += ImageCropperBottom_ManipulationCompleted;
-
-        ImageCropperBottom.Loaded += ImageCropperBottom_Loaded;
-
-        ImageCropperRight.ManipulationCompleted += ImageCropperRight_ManipulationCompleted;
-
-        ImageCropperRight.Loaded += ImageCropperRight_Loaded;
+        Loaded += PlatformView_Loaded;
     }
 
     /// <summary>
-    /// Synchronizes the right cropper with the bottom cropper on load.
+    /// Handles when the control is loaded.
+    /// Switches between side-by-side and stacked layouts at 1200px width threshold.
     /// </summary>
-    private void ImageCropperRight_Loaded(object sender, RoutedEventArgs e)
+    private void PlatformView_Loaded(object sender, RoutedEventArgs e)
     {
-        ImageCropperRight.TrySetCroppedRegion(ImageCropperBottom.CroppedRegion);
-    }
-
-    /// <summary>
-    /// Synchronizes the bottom cropper with the right cropper on load.
-    /// </summary>
-    private void ImageCropperBottom_Loaded(object sender, RoutedEventArgs e)
-    {
-        ImageCropperBottom.TrySetCroppedRegion(ImageCropperRight.CroppedRegion);
-    }
-
-    /// <summary>
-    /// Handles right cropper manipulation completion.
-    /// Updates the last known crop region and synchronizes with the bottom cropper.
-    /// </summary>
-    private void ImageCropperRight_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
-    {
-        ImageCropperRight.UpdateLayout();
-
-        _lastKnownCroppedRegion = ImageCropperRight.CroppedRegion;
-
-        ImageCropperBottom.TrySetCroppedRegion(ImageCropperRight.CroppedRegion);
-    }
-
-    /// <summary>
-    /// Handles bottom cropper manipulation completion.
-    /// Updates the last known crop region and synchronizes with the right cropper.
-    /// </summary>
-    private void ImageCropperBottom_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
-    {
-        ImageCropperBottom.UpdateLayout();
-
-        _lastKnownCroppedRegion = ImageCropperBottom.CroppedRegion;
-
-        ImageCropperRight.TrySetCroppedRegion(ImageCropperBottom.CroppedRegion);
+        ResizeControls(new Size(ActualWidth, ActualHeight));
     }
 
     /// <summary>
@@ -96,146 +59,64 @@ public sealed partial class PlatformView : UserControl, INotifyPropertyChanged
     /// </summary>
     private void GridContent_SizeChanged(object sender, SizeChangedEventArgs e)
     {
-        if (e.NewSize.Width > 1200)
+        ResizeControls(e.NewSize);
+    }
+
+    /// <summary>
+    /// Handles when showing/hiding previewer to implement responsive layout.
+    /// Switches between side-by-side and stacked layouts at 1200px width threshold if previewer is shown.
+    /// </summary>
+    private void Configuration_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if(e.PropertyName == nameof(ConfigurationViewModel.IsPreviewerEnabled))
         {
-            ImageViewSide.Width = new GridLength(1, GridUnitType.Star);
+            ResizeControls(new Size(ActualWidth, ActualHeight));
+        }
+    }
 
-            CardViewSide.Width = new GridLength(700, GridUnitType.Pixel);
+    /// <summary>
+    /// Handles grid content size changes to implement responsive layout.
+    /// Switches between side-by-side and stacked layouts at 1200px width threshold.
+    /// </summary>
+    private void ResizeControls(Size size)
+    {
+        if (ViewModel?.Configuration?.IsPreviewerEnabled ?? false)
+        {
+            if (size.Width > 1200)
+            {
+                ImageViewSide.Width = new GridLength(1, GridUnitType.Star);
 
-            CardViewTop.Height = new GridLength(1, GridUnitType.Star);
+                ImageViewSide.MaxWidth = 800;
 
-            BotomViewSide.Height = new GridLength(0, GridUnitType.Pixel);
+                CardViewSide.Width = new GridLength(1, GridUnitType.Star);
+
+                CardViewTop.Height = new GridLength(1, GridUnitType.Star);
+
+                BotomViewSide.Height = new GridLength(0, GridUnitType.Pixel);
+            }
+            else
+            {
+                ImageViewSide.Width = new GridLength(0, GridUnitType.Pixel);
+
+                CardViewSide.Width = new GridLength(1, GridUnitType.Star);
+
+                CardViewTop.Height = new GridLength(1, GridUnitType.Star);
+
+                BotomViewSide.Height = new GridLength(400, GridUnitType.Pixel);
+            }
         }
         else
         {
             ImageViewSide.Width = new GridLength(0, GridUnitType.Pixel);
 
+            ImageViewSide.MaxWidth = 0;
+
             CardViewSide.Width = new GridLength(1, GridUnitType.Star);
 
             CardViewTop.Height = new GridLength(1, GridUnitType.Star);
 
-            BotomViewSide.Height = new GridLength(400, GridUnitType.Pixel);
+            BotomViewSide.Height = new GridLength(0, GridUnitType.Pixel);
         }
-    }
-
-    /// <summary>
-    /// Handles edit requests from the view model.
-    /// Loads the image into both croppers and sets the initial crop region.
-    /// </summary>
-    private async void ViewModel_EditRequested(object? sender, ImageViewModel e)
-    {
-        if (ViewModel != null && ViewModel.EditImage != null)
-        {
-            WriteableBitmap editableBitmap = await ByteArrayToWriteableBitmapAsync(ViewModel.EditImage.Bytes);
-
-            ImageCropperBottom.Source = editableBitmap;
-
-            ImageCropperRight.Source = editableBitmap;
-
-            if (e.Crop == null)
-            {
-                _lastKnownCroppedRegion = new Rect(0, 0, e.Width, e.Height);
-            }
-            else
-            {
-                _lastKnownCroppedRegion = new Rect(e.Crop.Left, e.Crop.Top, e.Crop.Width, e.Crop.Height);
-            }
-
-            var aspectRatio = new AspectRatio((int)_lastKnownCroppedRegion.Width, (int)_lastKnownCroppedRegion.Height).Value;
-
-            ImageCropperBottom.AspectRatio = aspectRatio;
-
-            ImageCropperRight.AspectRatio = aspectRatio;
-
-            await Task.Delay(50); // Wait for image to render
-
-            bool isBottomValid = ImageCropperBottom.TrySetCroppedRegion(_lastKnownCroppedRegion);
-
-            bool isRightValid = ImageCropperRight.TrySetCroppedRegion(_lastKnownCroppedRegion);
-        }
-    }
-
-    /// <summary>
-    /// Handles save button click from the right cropper view.
-    /// Saves the current crop region to the image and updates demo mode media.
-    /// </summary>
-    private async void ButtonSaveRight_Click(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel != null && ViewModel.EditImage != null)
-        {
-            CropViewModel? crop = ViewModel.EditImage.Crop;
-
-            crop ??= new CropViewModel(new Crop());
-
-            crop.Top = (int)Math.Round(_lastKnownCroppedRegion.Top);
-            crop.Left = (int)Math.Round(_lastKnownCroppedRegion.Left);
-            crop.Width = (int)Math.Round(_lastKnownCroppedRegion.Width);
-            crop.Height = (int)Math.Round(_lastKnownCroppedRegion.Height);
-
-            ViewModel.EditImage.Crop = crop;
-        }
-
-        if (ViewModel != null)
-        {
-            await ViewModel.Save();
-        }
-
-        ViewModel?.EditImageGame?.UpdateDemoModeMedia();
-
-        ViewModel?.StopEdit();
-    }
-
-    /// <summary>
-    /// Handles save button click from the bottom cropper view.
-    /// Saves the current crop region to the image and updates demo mode media.
-    /// </summary>
-    private async void ButtonSaveBottom_Click(object sender, RoutedEventArgs e)
-    {
-        if (ViewModel != null && ViewModel.EditImage != null)
-        {
-            CropViewModel? crop = ViewModel.EditImage.Crop;
-
-            crop ??= new CropViewModel(new Crop());
-
-            crop.Top = (int)Math.Round(_lastKnownCroppedRegion.Top);
-            crop.Left = (int)Math.Round(_lastKnownCroppedRegion.Left);
-            crop.Width = (int)Math.Round(_lastKnownCroppedRegion.Width);
-            crop.Height = (int)Math.Round(_lastKnownCroppedRegion.Height);
-
-            ViewModel.EditImage.Crop = crop;
-        }
-
-        if (ViewModel != null)
-        {
-            await ViewModel.Save();
-        }
-
-        ViewModel?.EditImageGame?.UpdateDemoModeMedia();
-
-        ViewModel?.StopEdit();
-    }
-
-    /// <summary>
-    /// Converts a byte array to a WriteableBitmap for use in the image cropper.
-    /// </summary>
-    /// <param name="bytes">The image bytes to convert.</param>
-    /// <returns>A WriteableBitmap containing the image data.</returns>
-    private static async Task<WriteableBitmap> ByteArrayToWriteableBitmapAsync(byte[] bytes)
-    {
-        using InMemoryRandomAccessStream stream = new InMemoryRandomAccessStream();
-        await stream.WriteAsync(bytes.AsBuffer());
-        stream.Seek(0);
-
-        BitmapDecoder decoder = await BitmapDecoder.CreateAsync(stream);
-
-        WriteableBitmap writeableBitmap = new WriteableBitmap(
-            (int)decoder.PixelWidth,
-            (int)decoder.PixelHeight);
-
-        stream.Seek(0);
-        await writeableBitmap.SetSourceAsync(stream);
-
-        return writeableBitmap;
     }
 
     /// <summary>
@@ -257,19 +138,21 @@ public sealed partial class PlatformView : UserControl, INotifyPropertyChanged
         {
             if (_viewModel != value)
             {
-                if (ViewModel != null)
+                if (_viewModel != null && _viewModel.Configuration != null)
                 {
-                    ViewModel.EditRequested -= ViewModel_EditRequested;
+                    _viewModel.Configuration.PropertyChanged -= Configuration_PropertyChanged;
                 }
 
                 _viewModel = value;
 
-                if (ViewModel != null)
+                OnPropertyChanged(nameof(ViewModel));
+
+                if(_viewModel != null && _viewModel.Configuration != null)
                 {
-                    ViewModel.EditRequested += ViewModel_EditRequested;
+                    _viewModel.Configuration.PropertyChanged += Configuration_PropertyChanged;
                 }
 
-                OnPropertyChanged(nameof(ViewModel));
+                ResizeControls(new Size(ActualWidth, ActualHeight));
             }
         }
     }

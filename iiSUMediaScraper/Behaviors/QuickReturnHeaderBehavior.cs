@@ -36,6 +36,13 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         DependencyProperty.Register(nameof(AnimationDuration), typeof(double), typeof(QuickReturnHeaderBehavior),
             new PropertyMetadata(250.0));
 
+    /// <summary>
+    /// Identifies the HeaderSpacing dependency property.
+    /// </summary>
+    public static readonly DependencyProperty HeaderSpacingProperty =
+        DependencyProperty.Register(nameof(HeaderSpacing), typeof(double), typeof(QuickReturnHeaderBehavior),
+            new PropertyMetadata(0.0));
+
     #endregion
 
     #region Properties
@@ -57,6 +64,16 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
     {
         get => (double)GetValue(AnimationDurationProperty);
         set => SetValue(AnimationDurationProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the additional spacing between the header and the content.
+    /// Default is 0.
+    /// </summary>
+    public double HeaderSpacing
+    {
+        get => (double)GetValue(HeaderSpacingProperty);
+        set => SetValue(HeaderSpacingProperty, value);
     }
 
     #endregion
@@ -109,6 +126,7 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
 
         HeaderElement.SizeChanged += OnHeaderSizeChanged;
         AssociatedObject.ViewChanged += OnViewChanged;
+        AssociatedObject.SizeChanged += OnScrollViewSizeChanged;
 
         _headerHeight = HeaderElement.ActualHeight;
         _previousVerticalOffset = 0;
@@ -118,19 +136,22 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         _headerTransform = new TranslateTransform();
         HeaderElement.RenderTransform = _headerTransform;
 
-        // Add padding to content for header space
+        // Add padding to content for header space plus additional spacing
         if (AssociatedObject.Content is FrameworkElement content)
         {
             _originalPadding = content.Margin;
             content.Margin = new Thickness(
                 _originalPadding.Left,
-                _originalPadding.Top + _headerHeight,
+                _originalPadding.Top + _headerHeight + HeaderSpacing,
                 _originalPadding.Right,
                 _originalPadding.Bottom);
         }
 
         // Create animations
         CreateAnimations();
+
+        // Check if content is scrollable - if not, always show header
+        CheckScrollableAndShowIfNeeded();
     }
 
     /// <summary>
@@ -145,7 +166,7 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         _hideStoryboard?.Stop();
 
         // Show animation - slide down from -headerHeight to 0
-        DoubleAnimation showAnimation = new DoubleAnimation
+        var showAnimation = new DoubleAnimation
         {
             From = -_headerHeight,
             To = 0,
@@ -160,7 +181,7 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         _showStoryboard.Children.Add(showAnimation);
 
         // Hide animation - slide up from 0 to -headerHeight
-        DoubleAnimation hideAnimation = new DoubleAnimation
+        var hideAnimation = new DoubleAnimation
         {
             From = 0,
             To = -_headerHeight,
@@ -188,6 +209,7 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         if (AssociatedObject != null)
         {
             AssociatedObject.ViewChanged -= OnViewChanged;
+            AssociatedObject.SizeChanged -= OnScrollViewSizeChanged;
 
             // Restore original padding
             if (AssociatedObject.Content is FrameworkElement content)
@@ -215,7 +237,7 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         {
             content.Margin = new Thickness(
                 _originalPadding.Left,
-                _originalPadding.Top + _headerHeight,
+                _originalPadding.Top + _headerHeight + HeaderSpacing,
                 _originalPadding.Right,
                 _originalPadding.Bottom);
         }
@@ -228,15 +250,59 @@ public class QuickReturnHeaderBehavior : Behavior<ScrollView>
         {
             _headerTransform.Y = -_headerHeight;
         }
+
+        // Check if content is still scrollable after header size change
+        CheckScrollableAndShowIfNeeded();
+    }
+
+    /// <summary>
+    /// Handles changes to the ScrollView's size (e.g., window resize, nav pane collapse).
+    /// Always shows the header on size change to ensure it's visible after layout changes.
+    /// </summary>
+    private void OnScrollViewSizeChanged(object sender, SizeChangedEventArgs e)
+    {
+        // On any size change, always show the header to be safe
+        // The user can scroll down again to hide it if needed
+        if (!_isHeaderVisible)
+        {
+            ShowHeader();
+        }
+    }
+
+    /// <summary>
+    /// Checks if the ScrollView has scrollable content or is at the top.
+    /// If there's no scrollable area or we're at the top, the header should always be visible.
+    /// </summary>
+    private void CheckScrollableAndShowIfNeeded()
+    {
+        if (AssociatedObject == null || HeaderElement == null) return;
+
+        // If ScrollableHeight is 0 or less, content fits in the viewport - always show header
+        // Also show if we're at the top (VerticalOffset <= 0)
+        if (!_isHeaderVisible && (AssociatedObject.ScrollableHeight <= 0 || AssociatedObject.VerticalOffset <= 0))
+        {
+            ShowHeader();
+        }
     }
 
     /// <summary>
     /// Handles scroll position changes to determine whether to show or hide the header.
     /// Shows the header when scrolling up or at the top, hides it when scrolling down.
+    /// Always shows the header if there's no scrollable content.
     /// </summary>
     private void OnViewChanged(ScrollView sender, object args)
     {
         if (HeaderElement == null || _headerHeight <= 0) return;
+
+        // If content is not scrollable, always show header
+        if (sender.ScrollableHeight <= 0)
+        {
+            if (!_isHeaderVisible)
+            {
+                ShowHeader();
+            }
+            return;
+        }
 
         double currentOffset = sender.VerticalOffset;
         double delta = currentOffset - _previousVerticalOffset;

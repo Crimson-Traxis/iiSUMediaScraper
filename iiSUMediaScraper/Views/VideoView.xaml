@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl x:Class="iiSUMediaScraper.Views.VideoView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="using:iiSUMediaScraper.Views"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:media="using:CommunityToolkit.WinUI.Media"
+             xmlns:ui="using:CommunityToolkit.WinUI"
+             xmlns:controls="using:CommunityToolkit.WinUI.Controls"
+             xmlns:configurationmodels="using:iiSUMediaScraper.Models.Configurations"
+             xmlns:configurationviewmodels="using:iiSUMediaScraper.ViewModels.Configurations"
+             xmlns:controls1="using:iiSUMediaScraper.Controls"
+             xmlns:converters="using:CommunityToolkit.WinUI.Converters"
+             xmlns:customconverters="using:iiSUMediaScraper.Converters"
+             xmlns:datatemplateselectors="using:iiSUMediaScraper.DataTemplateSelectors"
+             xmlns:viewmodels="using:iiSUMediaScraper.ViewModels"
+             mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <customconverters:BoolToIntegerConverter x:Key="BoolToIntegerConverter"
+                                                 FalseValue="0"
+                                                 TrueValue="2" />
+
+        <customconverters:BoolToThicknessConverter x:Key="BoolToThicknessConverter"
+                                                   FalseValue="0"
+                                                   TrueValue="2" />
+
+        <customconverters:BoolToThicknessConverter x:Key="InverseBoolToThicknessConverter"
+                                                   FalseValue="1"
+                                                   TrueValue="0" />
+    </UserControl.Resources>
+
+    <Grid Background="Transparent"
+          Tapped="Grid_Tapped">
+        <Grid BorderBrush="{ThemeResource SystemFillColorAttentionBrush}"
+              CornerRadius="4"
+              BorderThickness="{x:Bind ViewModel.IsSelected, Mode=OneWay, Converter={StaticResource BoolToThicknessConverter}}" />
+        <Grid Background="{ThemeResource LayerFillColorAltBrush}"
+              BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+              BorderThickness="{x:Bind ViewModel.IsSelected, Mode=OneWay, Converter={StaticResource InverseBoolToThicknessConverter}}"
+              CornerRadius="4"
+              Padding="16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="auto" />
+            </Grid.ColumnDefinitions>
+
+            <Button Background="Transparent"
+                    BorderThickness="0"
+                    Padding="4"
+                    Margin="0,0,16,0"
+                    Tapped="Button_Tapped"
+                    Command="{x:Bind ViewModel.RequestPlayCommand, Mode=OneWay}">
+                <Viewbox Height="16">
+                    <FontIcon x:Name="PlayPauseSymbolLeft"
+                              Glyph="&#xF5B0;" />
+                </Viewbox>
+            </Button>
+            <TextBlock Text="{x:Bind ViewModel.Title, Mode=OneWay}"
+                       VerticalAlignment="Center"
+                       Grid.Column="1" />
+            <ComboBox Grid.Column="2" 
+                      ItemsSource="{x:Bind ViewModel.MediaTypes, Mode=OneWay}"
+                      SelectedItem="{x:Bind ViewModel.ApplyMediaType, Mode=TwoWay}"/>
+        </Grid>
+    </Grid>
+</UserControl>

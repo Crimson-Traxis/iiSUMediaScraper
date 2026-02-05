@@ -16,6 +16,7 @@
       xmlns:triggers="using:CommunityToolkit.WinUI"
       xmlns:datatemplateselectors="using:iiSUMediaScraper.DataTemplateSelectors"
       xmlns:configurationviews="using:iiSUMediaScraper.Views.Configurations"
+      xmlns:animations="using:CommunityToolkit.WinUI.Animations"
       Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
       mc:Ignorable="d">
 
@@ -28,6 +29,10 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
         <customconverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+
+        <customconverters:BoolToThicknessConverter x:Key="BoolToThicknessConverter"
+                                                   TrueValue="12,12,12,6"
+                                                   FalseValue="6,0" />
 
         <DataTemplate x:Key="PlatformMenuItemViewTemplate"
                       x:DataType="viewmodels:PlatformViewModel">
@@ -56,13 +61,13 @@
             <NavigationView.PaneFooter>
                 <Grid>
                     <Button Padding="6"
-                            Margin="6"
-                            Command="{x:Bind ViewModel.ShowConfigurationCommand, Mode=OneWay}">
+                            Command="{x:Bind ViewModel.ShowConfigurationCommand, Mode=OneWay}"
+                            Margin="{Binding ElementName=NavigationViewRoot, Path=IsPaneOpen, Converter={StaticResource BoolToThicknessConverter}}">
                         <SymbolIcon Symbol="Setting" />
                     </Button>
                     <Border Visibility="{Binding ElementName=NavigationViewRoot, Path=IsPaneOpen, Converter={StaticResource BoolToVisibilityConverter}}">
                         <Button Padding="6"
-                                Margin="6"
+                                Margin="{Binding ElementName=NavigationViewRoot, Path=IsPaneOpen, Converter={StaticResource BoolToThicknessConverter}}"
                                 HorizontalAlignment="Right"
                                 Command="{x:Bind ViewModel.StageApplyCommand, Mode=OneWay}"
                                 Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
@@ -79,8 +84,17 @@
             </Border.Background>
             <Border Background="{ThemeResource SmokeFillColorDefaultBrush}">
                 <Border ui:Effects.Shadow="{StaticResource CommonShadow}"
+                        ui:VisualExtensions.NormalizedCenterPoint="0.5"
                         MaxWidth="1200"
                         Margin="64">
+                    <animations:Implicit.ShowAnimations>
+                        <animations:OpacityAnimation Duration="0:0:0.1" From="0" To="1"/>
+                        <animations:ScaleAnimation Duration="0:0:0.15" Delay="0:0:0.3" From="1.05" To="1"/>
+                    </animations:Implicit.ShowAnimations>
+                    <animations:Implicit.HideAnimations>
+                        <animations:ScaleAnimation Duration="0:0:0.1" From="1" To="1.05"/>
+                        <animations:OpacityAnimation Duration="0:0:0.1" Delay="0:0:0.3" From="1" To="0"/>
+                    </animations:Implicit.HideAnimations>
                     <Grid Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
                           CornerRadius="16"
                           Padding="16">
@@ -127,14 +141,119 @@
             </Border.Background>
             <Border Background="{ThemeResource SmokeFillColorDefaultBrush}">
                 <Border ui:Effects.Shadow="{StaticResource CommonShadow}"
-                        MaxWidth="630"
-                        MaxHeight="630"
-                        Margin="64">
-                    <views:ApplyView ViewModel="{x:Bind ViewModel, Mode=OneWay}"
-                                     Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
-                                     CornerRadius="16"
-                                     Padding="16" />
+                        ui:VisualExtensions.NormalizedCenterPoint="0.5"
+                        Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+                        CornerRadius="16"
+                        MaxWidth="720"
+                        MaxHeight="720"
+                        Margin="64"
+                        Padding="16">
+                    <animations:Implicit.ShowAnimations>
+                        <animations:OpacityAnimation Duration="0:0:0.1" From="0" To="1"/>
+                        <animations:ScaleAnimation Duration="0:0:0.15" Delay="0:0:0.3" From="1.05" To="1"/>
+                    </animations:Implicit.ShowAnimations>
+                    <animations:Implicit.HideAnimations>
+                        <animations:ScaleAnimation Duration="0:0:0.1" From="1" To="1.05"/>
+                        <animations:OpacityAnimation Duration="0:0:0.1" Delay="0:0:0.3" From="1" To="0"/>
+                    </animations:Implicit.HideAnimations>
+                    <views:ApplyView ViewModel="{x:Bind ViewModel, Mode=OneWay}" />
                 </Border>
+            </Border>
+        </Border>
+        <Border Visibility="{x:Bind ViewModel.SelectedPlatform.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+            <Border.Background>
+                <media:BackdropBlurBrush Amount="5.0" />
+            </Border.Background>
+            <Border ui:Effects.Shadow="{StaticResource CommonShadow}"
+                    ui:VisualExtensions.NormalizedCenterPoint="0.5"
+                    Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultSolid}"
+                    BorderThickness="1"
+                    CornerRadius="16"
+                    MaxWidth="1200"
+                    MaxHeight="800"
+                    Margin="64">
+                <animations:Implicit.ShowAnimations>
+                    <animations:OpacityAnimation Duration="0:0:0.1" From="0" To="1"/>
+                    <animations:ScaleAnimation Duration="0:0:0.15" Delay="0:0:0.3" From="1.05" To="1"/>
+                </animations:Implicit.ShowAnimations>
+                <animations:Implicit.HideAnimations>
+                    <animations:ScaleAnimation Duration="0:0:0.1" From="1" To="1.05"/>
+                    <animations:OpacityAnimation Duration="0:0:0.1" Delay="0:0:0.3" From="1" To="0"/>
+                </animations:Implicit.HideAnimations>
+                <Grid Background="{ThemeResource LayerFillColorAltBrush}"
+                      Padding="16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
+                    </Grid.RowDefinitions>
+                    <controls:ImageCropper x:Name="ImageCropper"
+                                           Margin="0,0,0,16"
+                                           CornerRadius="8"
+                                           AspectRatio="{x:Bind ViewModel.SelectedPlatform.EditImage.AspectRatio, Mode=OneWay}"
+                                           Visibility="{x:Bind ViewModel.SelectedPlatform.IsEditingImage, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    <InfoBar Severity="Error"
+                             Message="Error during upscaling"
+                             IsOpen="{x:Bind ViewModel.SelectedPlatform.EditImage.HasUpscaleError}"
+                             IsClosable="False"
+                             VerticalAlignment="Bottom"
+                             HorizontalAlignment="Center"
+                             Margin="0,0,0,16"
+                             Grid.Row="1" />
+                    <Border Visibility="{x:Bind ViewModel.SelectedPlatform.EditImage.IsUpscaling, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
+                            Grid.Row="1">
+                        <Border.Background>
+                            <media:BackdropBlurBrush Amount="5.0" />
+                        </Border.Background>
+                        <StackPanel VerticalAlignment="Center"
+                                    HorizontalAlignment="Center">
+                            <ProgressRing IsIndeterminate="True"
+                                          Height="60"
+                                          Width="60"
+                                          Margin="0,0,0,16" />
+                            <TextBlock Text="Upscaling" />
+                        </StackPanel>
+                    </Border>
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Height="38"
+                                Command="{x:Bind ViewModel.SelectedPlatform.StopEditCommand, Mode=OneWay}" 
+                                Content="Cancel"/>
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Column="1">
+                            <SplitButton Margin="0,0,16,0"
+                                         Height="38"
+                                         Padding="6"
+                                         ToolTipService.ToolTip="Upscale with default configuration"
+                                         Command="{x:Bind ViewModel.SelectedPlatform.EditImage.UpscaleCommand, Mode=OneWay}"
+                                         CommandParameter="{x:Bind ViewModel.Configuration.SelectedUpscalerConfiguration, Mode=OneWay}">
+                                <SymbolIcon Symbol="Upload" />
+                                <SplitButton.Flyout>
+                                    <Flyout Placement="Bottom">
+                                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.SelectedPlatform.ImageUpscaleConfigurations, Mode=OneWay}">
+                                            <ItemsRepeater.ItemTemplate>
+                                                <DataTemplate x:DataType="viewmodels:ImageUpscaleConfigurationViewModel">
+                                                    <MenuFlyoutItem Text="{x:Bind UpscalerConfigurationViewModel.Name, Mode=OneWay}"
+                                                                    Command="{x:Bind UpscaleCommand, Mode=OneWay}" />
+                                                </DataTemplate>
+                                            </ItemsRepeater.ItemTemplate>
+                                        </ItemsRepeater>
+                                    </Flyout>
+                                </SplitButton.Flyout>
+                            </SplitButton>
+                            <Button Height="38"
+                                    Width="38"
+                                    Padding="6"
+                                    Grid.Column="1"
+                                    Click="ButtonSave_Click">
+                                <SymbolIcon Symbol="Save" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Grid>
             </Border>
         </Border>
     </Grid>

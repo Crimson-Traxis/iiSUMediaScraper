@@ -15,198 +15,273 @@
              xmlns:customconverters="using:iiSUMediaScraper.Converters"
              xmlns:datatemplateselectors="using:iiSUMediaScraper.DataTemplateSelectors"
              xmlns:viewmodels="using:iiSUMediaScraper.ViewModels"
+             xmlns:tk="using:CommunityToolkit.WinUI"
+             xmlns:animations="using:CommunityToolkit.WinUI.Animations"
+             xmlns:imageex="using:ImageEx"
              mc:Ignorable="d">
 
     <UserControl.Resources>
-        <media:AttachedCardShadow x:Key="CommonShadow"
-                                  Offset="0,2"
-                                  BlurRadius="12"
-                                  Opacity=".3"
-                                  CornerRadius="8" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="ms-appx:///CommunityToolkit.WinUI.Controls.Segmented/Segmented/Segmented.xaml" />
+            </ResourceDictionary.MergedDictionaries>
 
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
+            <media:AttachedCardShadow x:Key="CommonShadow"
+                                      Offset="0,2"
+                                      BlurRadius="12"
+                                      Opacity=".3"
+                                      CornerRadius="8" />
 
-        <customconverters:PathToValidImagePathConverter x:Key="PathToValidImagePathConverter" />
+            <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" />
 
-        <customconverters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
-        <customconverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
+            <customconverters:PathToValidImagePathConverter x:Key="PathToValidImagePathConverter" />
 
-        <customconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
+            <customconverters:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
 
-        <customconverters:BoolToIntegerConverter x:Key="BoolToIntegerConverter"
-                                                 FalseValue="0"
-                                                 TrueValue="2" />
+            <customconverters:NullToBoolConverter x:Key="NullToBoolConverter" />
 
-        <customconverters:BoolToThicknessConverter x:Key="BoolToThicknessConverter"
-                                                   FalseValue="0"
-                                                   TrueValue="2" />
+            <customconverters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" />
 
-        <customconverters:GreaterThanIntegerToVisibilityConverter x:Key="GreaterThanOneToVisibilityConverter"
-                                                                  GreaterThan="1" />
+            <customconverters:BoolNegationConverter x:Key="BoolNegationConverter" />
 
-        <DataTemplate x:Key="ImageViewModelTemplate"
-                      x:DataType="viewmodels:ImageViewModel">
-            <local:ImageView ViewModel="{x:Bind Mode=OneWay}" />
-        </DataTemplate>
+            <customconverters:BoolToIntegerConverter x:Key="BoolToIntegerConverter"
+                                                     FalseValue="0"
+                                                     TrueValue="2" />
 
-        <DataTemplate x:Key="VideoViewModelTemplate"
-                      x:DataType="viewmodels:VideoViewModel">
-            <Grid>
+            <customconverters:BoolToThicknessConverter x:Key="BoolToThicknessConverter"
+                                                       FalseValue="0"
+                                                       TrueValue="2" />
 
-            </Grid>
-        </DataTemplate>
+            <customconverters:BoolToThicknessConverter x:Key="InverseBoolToThicknessConverter"
+                                                       FalseValue="1"
+                                                       TrueValue="0" />
 
-        <DataTemplate x:Key="MediaViewModelTemplate"
-                      x:DataType="viewmodels:VideoViewModel">
-            <Grid>
+            <customconverters:GreaterThanIntegerToVisibilityConverter x:Key="GreaterThanOneToVisibilityConverter"
+                                                                      GreaterThan="1" />
 
-            </Grid>
-        </DataTemplate>
+            <customconverters:GreaterThanIntegerToVisibilityConverter x:Key="GreaterThanZeroToVisibilityConverter"
+                                                                      GreaterThan="0" />
 
-        <datatemplateselectors:MeadiaTemplateSelector x:Key="MeadiaTemplateSelector"
-                                                      ImageTemplate="{StaticResource ImageViewModelTemplate}"
-                                                      VideoTemplate="{StaticResource VideoViewModelTemplate}"
-                                                      MediaTemplate="{StaticResource MediaViewModelTemplate}" />
+            <customconverters:GreaterThanIntegerToVisibilityConverter x:Key="GreaterThanNinetyNineToVisibilityConverter"
+                                                                      GreaterThan="98" />
+
+            <customconverters:LessThanIntegerToVisibilityConverter x:Key="LessThanTwoToVisibilityConverter"
+                                                                   LessThan="2" />
+
+            <customconverters:EqualsIntegerToVisibilityConverter x:Key="EqualsZeroToVisibilityConverter"
+                                                                 EqualsValue="0" />
+
+            <customconverters:EqualsIntegerToVisibilityConverter x:Key="EqualsOneToVisibilityConverter"
+                                                                 EqualsValue="1" />
+
+            <customconverters:EqualsIntegerToVisibilityConverter x:Key="EqualsTwoToVisibilityConverter"
+                                                                 EqualsValue="2" />
+
+            <customconverters:PathToValidMediaPathConverter x:Key="PathToValidMediaPathConverter" />
+
+            <customconverters:ValueToStringConverter x:Key="ValueToStringConverter" />
+
+            <customconverters:PathToFileUriConverter x:Key="PathToFileUriConverter" />
+
+            <datatemplateselectors:MeadiaTemplateSelector x:Key="PreivewMeadiaTemplateSelector"
+                                                          ImageTemplate="{StaticResource PreviewImageViewModelTemplate}"
+                                                          AnimatedImageTemplate="{StaticResource PreviewAnimatedImageViewModelTemplate}"
+                                                          VideoTemplate="{StaticResource PreviewVideoViewModelTemplate}" />
+
+            <DataTemplate x:Key="ImageViewModelTemplate"
+                          x:DataType="viewmodels:ImageViewModel">
+                <local:ImageView ViewModel="{x:Bind Mode=OneWay}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="PreviewImageViewModelTemplate"
+                          x:DataType="viewmodels:ImageViewModel">
+                <imageex:ImageEx Stretch="UniformToFill"
+                                 Visibility="{x:Bind Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
+                                 Source="{x:Bind LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="PreviewAnimatedImageViewModelTemplate"
+                          x:DataType="viewmodels:ImageViewModel">
+                <controls1:AnimatedImageWebView ImagePath="{x:Bind LocalPath, Mode=OneWay}"
+                                                HorizontalAlignment="Stretch"
+                                                VerticalAlignment="Stretch"
+                                                Height="320" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="PreviewVideoViewModelTemplate"
+                          x:DataType="viewmodels:VideoViewModel">
+                <MediaPlayerElement Source="{x:Bind LocalPath, Mode=OneWay, Converter={StaticResource PathToValidMediaPathConverter}}"
+                                    AutoPlay="True" />
+            </DataTemplate>
+
+            <datatemplateselectors:MeadiaTemplateSelector x:Key="MeadiaTemplateSelector"
+                                                          ImageTemplate="{StaticResource ImageViewModelTemplate}"
+                                                          MediaTemplate="{StaticResource MediaViewModelTemplate}" />
+
+            <DataTemplate x:Key="MusicViewModelTemplate"
+                          x:DataType="viewmodels:MusicViewModel">
+                <local:MusicView ViewModel="{x:Bind Mode=OneWay}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="VideoViewModelTemplate"
+                          x:DataType="viewmodels:VideoViewModel">
+                <local:VideoView ViewModel="{x:Bind Mode=OneWay}" />
+            </DataTemplate>
+
+            <DataTemplate x:Key="MediaViewModelTemplate"
+                          x:DataType="viewmodels:MediaViewModel">
+                <Grid />
+            </DataTemplate>
+
+            <!-- Card flip animations -->
+            <Storyboard x:Key="FlipToEditMode">
+                <DoubleAnimation Storyboard.TargetName="DemoModeProjection"
+                                 Storyboard.TargetProperty="RotationY"
+                                 To="90"
+                                 Duration="0:0:0.15">
+                    <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="EditModeProjection"
+                                 Storyboard.TargetProperty="RotationY"
+                                 To="0"
+                                 BeginTime="0:0:0.15"
+                                 Duration="0:0:0.15">
+                    <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DemoModeGrid"
+                                               Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.15" Value="Collapsed"/>
+                </ObjectAnimationUsingKeyFrames>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="EditModeGrid"
+                                               Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.15" Value="Visible"/>
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+
+            <Storyboard x:Key="FlipToDemoMode">
+                <DoubleAnimation Storyboard.TargetName="EditModeProjection"
+                                 Storyboard.TargetProperty="RotationY"
+                                 To="-90"
+                                 Duration="0:0:0.15">
+                    <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseIn"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <DoubleAnimation Storyboard.TargetName="DemoModeProjection"
+                                 Storyboard.TargetProperty="RotationY"
+                                 To="0"
+                                 BeginTime="0:0:0.15"
+                                 Duration="0:0:0.15">
+                    <DoubleAnimation.EasingFunction>
+                        <CubicEase EasingMode="EaseOut"/>
+                    </DoubleAnimation.EasingFunction>
+                </DoubleAnimation>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="EditModeGrid"
+                                               Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.15" Value="Collapsed"/>
+                </ObjectAnimationUsingKeyFrames>
+                <ObjectAnimationUsingKeyFrames Storyboard.TargetName="DemoModeGrid"
+                                               Storyboard.TargetProperty="Visibility">
+                    <DiscreteObjectKeyFrame KeyTime="0:0:0.15" Value="Visible"/>
+                </ObjectAnimationUsingKeyFrames>
+            </Storyboard>
+        </ResourceDictionary>
     </UserControl.Resources>
 
     <Border ui:Effects.Shadow="{StaticResource CommonShadow}">
-        <Grid BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-              BorderThickness="1"
-              Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-              CornerRadius="8"
-              Padding="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="auto" />
-            </Grid.RowDefinitions>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Margin="0,0,0,16">
-                    <TextBlock Text="{x:Bind ViewModel.Name, Mode=OneWay}"
-                               FontSize="16"
-                               VerticalAlignment="Center"
-                               Grid.Column="1"
-                               Margin="0,0,16,0" />
-                    <TextBlock Text="{x:Bind ViewModel.Path, Mode=OneWay}"
-                               FontSize="13"
-                               Foreground="{ThemeResource TextFillColorSecondary}"
-                               VerticalAlignment="Center"
-                               Grid.Column="1"
-                               Margin="0,0,16,0" />
-                </StackPanel>
-                <StackPanel Orientation="Horizontal"
-                            Grid.Column="1">
-                    <InfoBar Severity="Error"
-                             Message="Missing Media"
-                             IsOpen="True"
-                             IsClosable="False"
-                             Margin="0,0,16,0"
-                             Visibility="{x:Bind ViewModel.IsFound, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
-                    <Button Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
-                            Padding="6"
-                            Height="36"
-                            Margin="0,0,16,0"
-                            VerticalAlignment="Top">
-                        <SymbolIcon Symbol="Add" />
-                        <Button.Flyout>
-                            <Flyout>
-                                <StackPanel>
-                                    <MenuFlyoutItem Text="Icons"
-                                                    Click="MenuFlyoutItem_AddIconsClick"
-                                                    MinWidth="160" />
-                                    <MenuFlyoutItem Text="Titles"
-                                                    Click="MenuFlyoutItem_AddTitlesClick"
-                                                    MinWidth="160" />
-                                    <MenuFlyoutItem Text="Logos"
-                                                    Click="MenuFlyoutItem_AddSlidesClick"
-                                                    MinWidth="160" />
-                                    <MenuFlyoutItem Text="Slides"
-                                                    Click="MenuFlyoutItem_AddLogosClick"
-                                                    MinWidth="160" />
-                                    <MenuFlyoutItem Text="Heros"
-                                                    Click="MenuFlyoutItem_AddHerosClick"
-                                                    MinWidth="160" />
-                                </StackPanel>
-                            </Flyout>
-                        </Button.Flyout>
-                    </Button>
-                    <ToggleButton IsChecked="{x:Bind ViewModel.IsInDemoMode, Mode=TwoWay}"
-                                  Padding="6"
-                                  Height="36"
-                                  VerticalAlignment="Top"
-                                  ToolTipService.ToolTip="Toggle Demo Mode">
-                        <SymbolIcon Symbol="DockBottom" />
-                    </ToggleButton>
-                </StackPanel>
-            </Grid>
-            <Grid Grid.Row="1"
-                  Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                  MinHeight="462"
-                  MaxWidth="600"
-                  Margin="32,16">
+        <Grid x:Name="CardContainer"
+              CornerRadius="8">
+            <Grid x:Name="DemoModeGrid"
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                  BorderThickness="1"
+                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                  CornerRadius="8">
+                <Grid.Projection>
+                    <PlaneProjection x:Name="DemoModeProjection" CenterOfRotationX="0.5"/>
+                </Grid.Projection>
+                <controls:Shimmer Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                  CornerRadius="8" />
                 <Grid Background="{ThemeResource LayerFillColorAltBrush}"
                       BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                      BorderThickness="1"
-                      CornerRadius="8">
+                      CornerRadius="8"
+                      BorderThickness="1">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*" />
                         <RowDefinition Height="6" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="auto" />
                     </Grid.RowDefinitions>
-                    <Border Margin="16,0"
-                            VerticalAlignment="Center"
-                            HorizontalAlignment="Stretch"
+                    <Grid Margin="16,0"
+                          VerticalAlignment="Center"
+                          HorizontalAlignment="Stretch"
+                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                        <ContentControl x:Name="HeroPreviewContentControl"
+                                        Content="{x:Bind CurrentHero, Mode=OneWay}"
+                                        VerticalAlignment="Stretch"
+                                        HorizontalAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch"
+                                        HorizontalContentAlignment="Stretch"
+                                        ContentTemplateSelector="{StaticResource PreivewMeadiaTemplateSelector}" />
+                    </Grid>
+                    <Border CornerRadius="8,8,0,0"
                             Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
-                        <Image Stretch="UniformToFill"
-                               Visibility="{x:Bind CurrentHero, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
-                               Source="{x:Bind CurrentHero.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+                        <controls:Shimmer Visibility="{x:Bind ViewModel.IsFormattingHeros, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}" />
                     </Border>
                     <Border Background="{ThemeResource SmokeFillColorDefaultBrush}"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
-                            MinHeight="320" />
-                    <InfoBadge Value="{x:Bind ViewModel.DemoModeHeros.Count, Mode=OneWay}"
-                               VerticalAlignment="Top"
-                               HorizontalAlignment="Left"
-                               Visibility="{x:Bind HeroCount, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}"
-                               ToolTipService.ToolTip="There are multiple heros. They will cycle every 5 seconds"
-                               Margin="8" />
-                    <Border VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            Width="240"
+                            MinHeight="320"
+                            CornerRadius="8,8,0,0" />
+                    <Border VerticalAlignment="Top"
+                            HorizontalAlignment="Left"
+                            Margin="8"
                             Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
-                        <Image Stretch="Uniform"
-                               Visibility="{x:Bind ViewModel.DemoModeTitle, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
-                               Source="{x:Bind ViewModel.DemoModeTitle.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+                        <InfoBadge Value="{x:Bind ViewModel.DemoModeHeros.Count, Mode=OneWay}"
+                                   Visibility="{x:Bind HeroCount, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}"
+                                   ToolTipService.ToolTip="There are multiple heros. They will cycle every 5 seconds" />
                     </Border>
-                    <Border Margin="32,16"
-                            Width="140"
-                            Height="100"
+                    <Grid VerticalAlignment="Center"
+                          HorizontalAlignment="Center"
+                          Width="240"
+                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                        <imageex:ImageEx Stretch="Uniform"
+                                         Visibility="{x:Bind ViewModel.DemoModeTitle, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
+                                         Source="{x:Bind ViewModel.DemoModeTitle.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+                        <controls:Shimmer Visibility="{x:Bind ViewModel.IsFormattingTitle, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                          CornerRadius="8" />
+                    </Grid>
+                    <Grid Margin="32,16"
+                          Width="140"
+                          Height="100"
+                          VerticalAlignment="Bottom"
+                          HorizontalAlignment="Left"
+                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                        <ContentControl x:Name="SlidePreviewContentControl"
+                                        Content="{x:Bind CurrentSlide, Mode=OneWay}"
+                                        ContentTemplateSelector="{StaticResource PreivewMeadiaTemplateSelector}" />
+                        <controls:Shimmer Visibility="{x:Bind ViewModel.IsFormattingSlides, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                          CornerRadius="8" />
+                    </Grid>
+                    <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}"
                             VerticalAlignment="Bottom"
                             HorizontalAlignment="Left"
-                            Visibility="{x:Bind CurrentSlide, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}">
-                        <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
-                            <Image Stretch="Uniform"
-                                   Visibility="{x:Bind CurrentSlide, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
-                                   Source="{x:Bind CurrentSlide.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
-                        </Border>
+                            Margin="168,0,0, 110">
+                        <InfoBadge Value="{x:Bind SlideCount, Mode=OneWay}"
+                                   Visibility="{x:Bind ViewModel.DemoModeSlides.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}"
+                                   ToolTipService.ToolTip="There are multiple slides. They will cycle every 5 seconds" />
                     </Border>
-                    <InfoBadge Value="{x:Bind SlideCount, Mode=OneWay}"
-                               VerticalAlignment="Bottom"
-                               HorizontalAlignment="Left"
-                               Visibility="{x:Bind ViewModel.DemoModeSlides.Count, Mode=OneWay, Converter={StaticResource GreaterThanOneToVisibilityConverter}}"
-                               Margin="168,0,0, 110"
-                               ToolTipService.ToolTip="There are multiple slides. They will cycle every 5 seconds" />
                     <Border BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                             BorderThickness="0,6,0,0"
                             VerticalAlignment="Center"
                             Grid.Row="1" />
-                    <Grid Grid.Row="2">
+                    <Grid Grid.Row="2"
+                          MaxHeight="280"
+                          VerticalAlignment="Bottom">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="140" />
                             <ColumnDefinition Width="*" />
@@ -218,46 +293,94 @@
                                     Width="80"
                                     CornerRadius="40"
                                     VerticalAlignment="Top"
-                                    Margin="0,32,0,0" />
+                                    Margin="0,32,0,32" />
                             <Grid VerticalAlignment="Bottom">
                                 <Border Background="{ThemeResource AccentAAFillColorDefaultBrush}"
                                         Height="30"
                                         Width="80"
                                         CornerRadius="8"
                                         VerticalAlignment="Center"
-                                        Margin="0,0,0,32" />
+                                        Margin="0,0,0,64" />
                                 <Border Background="{ThemeResource AccentAAFillColorDefaultBrush}"
                                         Height="80"
                                         Width="30"
                                         CornerRadius="8"
                                         VerticalAlignment="Center"
-                                        Margin="0,0,0,32" />
+                                        Margin="0,0,0,64" />
                             </Grid>
                         </Grid>
-                        <Border Background="{ThemeResource LayerFillColorAltBrush}"
-                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-                                BorderThickness="1"
-                                Grid.Column="1"
-                                CornerRadius="8"
-                                Margin="16"
-                                Height="240"
-                                HorizontalAlignment="Stretch">
-                            <Border Height="200"
-                                    Width="200"
-                                    Margin="16"
-                                    Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
-                                <Image Stretch="Uniform"
-                                       Visibility="{x:Bind ViewModel.DemoModeIcon, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
-                                       Source="{x:Bind ViewModel.DemoModeIcon.Bytes, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
-                            </Border>
-                        </Border>
+                        <StackPanel Grid.Column="1"
+                                    VerticalAlignment="Bottom">
+                            <Grid x:Name="GridIcon" 
+                                  Background="{ThemeResource LayerFillColorAltBrush}"
+                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                  BorderThickness="1"
+                                  CornerRadius="8"
+                                  Margin="16"
+                                  Height="200"
+                                  HorizontalAlignment="Stretch">
+                                <Border Margin="16">
+                                    <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                                        <imageex:ImageEx Stretch="Uniform"
+                                                         Visibility="{x:Bind ViewModel.DemoModeIcon, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}, FallbackValue='Collapsed'}"
+                                                         Source="{x:Bind ViewModel.DemoModeIcon.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}" />
+                                    </Border>
+                                </Border>
+                                <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                                    <controls:Shimmer Visibility="{x:Bind ViewModel.IsFormattingIcon, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                </Border>
+                            </Grid>
+                            <Grid Width="{Binding ElementName=GridIcon, Path=ActualWidth}"
+                                  Grid.Column="1"
+                                  Margin="0,-16,0,0"
+                                  Visibility="{x:Bind ViewModel.IsFetchMusicOrHasMusic, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <Grid Grid.Column="1"
+                                      HorizontalAlignment="Center"
+                                      Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Viewbox Height="60">
+                                        <Grid>
+                                            <ProgressBar Value="{x:Bind ViewModel.SelectedDemoModeMusic.Progress, Mode=OneWay}"
+                                                         Visibility="{x:Bind ViewModel.SelectedDemoModeMusic.IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
+                                                         VerticalAlignment="Bottom"
+                                                         Margin="18,10" />
+                                            <MediaPlayerElement x:Name="DemoModeMusicPlayer"
+                                                                AutoPlay="False"
+                                                                Width="400"
+                                                                ToolTipService.ToolTip="{x:Bind ViewModel.SelectedDemoModeMusic.Title, Mode=OneWay}"
+                                                                AreTransportControlsEnabled="True"
+                                                                IsEnabled="{x:Bind ViewModel.SelectedDemoModeMusic, Mode=OneWay, Converter={StaticResource NullToBoolConverter}}"
+                                                                Source="{x:Bind ViewModel.SelectedDemoModeMusic.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidMediaPathConverter}}">
+                                                <MediaPlayerElement.TransportControls>
+                                                    <MediaTransportControls IsZoomButtonVisible="False"
+                                                                            IsVolumeEnabled="True"
+                                                                            IsCompact="True" />
+                                                </MediaPlayerElement.TransportControls>
+                                            </MediaPlayerElement>
+                                        </Grid>
+                                    </Viewbox>
+                                </Grid>
+                                <Grid Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                      Grid.ColumnSpan="2"
+                                      Background="{ThemeResource LayerFillColorAltBrush}"
+                                      BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                      BorderThickness="1"
+                                      CornerRadius="8"
+                                      Margin="0,8,0,8"
+                                      MinHeight="40">
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
                         <Grid Grid.Column="2">
                             <Border VerticalAlignment="Bottom"
                                     Background="{ThemeResource AccentAAFillColorDefaultBrush}"
                                     Height="80"
                                     Width="80"
                                     CornerRadius="40"
-                                    Margin="0,0,0,32" />
+                                    Margin="0,0,0,64" />
                             <Grid VerticalAlignment="Top"
                                   Margin="0,32,0,0"
                                   Height="80"
@@ -289,164 +412,629 @@
                             </Grid>
                         </Grid>
                     </Grid>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,0,16"
+                                    HorizontalAlignment="Left"
+                                    Background="{ThemeResource SmokeFillColorDefault}"
+                                    VerticalAlignment="Top"
+                                    Padding="8"
+                                    CornerRadius="8"
+                                    ToolTipService.ToolTip="{x:Bind ViewModel.Path, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.NotIsFoundOrIsHover, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                            <animations:Implicit.ShowAnimations>
+                                <animations:TranslationAnimation Duration="0:0:0.2" From="0,-20,0" To="0,0,0"/>
+                                <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1"/>
+                            </animations:Implicit.ShowAnimations>
+                            <animations:Implicit.HideAnimations>
+                                <animations:TranslationAnimation Duration="0:0:0.15" To="0,-20,0"/>
+                                <animations:OpacityAnimation Duration="0:0:0.15" To="0"/>
+                            </animations:Implicit.HideAnimations>
+                            <TextBlock Text="{x:Bind ViewModel.FormattedName, Mode=OneWay}"
+                                       IsTextSelectionEnabled="True"
+                                       FontSize="16"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="0,0,16,0" />
+                            <TextBlock Text="{x:Bind ViewModel.Path, Mode=OneWay}"
+                                       FontSize="13"
+                                       Foreground="{ThemeResource TextFillColorSecondary}"
+                                       IsTextSelectionEnabled="True"
+                                       VerticalAlignment="Center"
+                                       Grid.Column="1"
+                                       Margin="0,0,16,0" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal"
+                                    Grid.Column="1"
+                                    Padding="8"
+                                    VerticalAlignment="Top"
+                                    Visibility="{x:Bind ViewModel.IsHover, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}">
+                            <animations:Implicit.ShowAnimations>
+                                <animations:TranslationAnimation Duration="0:0:0.2" From="20,0,0" To="0,0,0"/>
+                                <animations:OpacityAnimation Duration="0:0:0.2" From="0" To="1"/>
+                            </animations:Implicit.ShowAnimations>
+                            <animations:Implicit.HideAnimations>
+                                <animations:TranslationAnimation Duration="0:0:0.15" To="20,0,0"/>
+                                <animations:OpacityAnimation Duration="0:0:0.15" To="0"/>
+                            </animations:Implicit.HideAnimations>
+                            <Button Height="38"
+                                    Padding="6"
+                                    Margin="0,0,16,0"
+                                    ToolTipService.ToolTip="Apply Game"
+                                    Command="{x:Bind ViewModel.StageApplyCommand, Mode=OneWay}"
+                                    Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                <animations:Implicit.ShowAnimations>
+                                    <animations:TranslationAnimation Duration="0:0:0.2"
+                                                                     From="20,0,0"
+                                                                     To="0,0,0" />
+                                    <animations:OpacityAnimation Duration="0:0:0.2"
+                                                                 From="0"
+                                                                 To="1" />
+                                </animations:Implicit.ShowAnimations>
+                                <animations:Implicit.HideAnimations>
+                                    <animations:TranslationAnimation Duration="0:0:0.15"
+                                                                     To="20,0,0" />
+                                    <animations:OpacityAnimation Duration="0:0:0.15"
+                                                                 To="0" />
+                                </animations:Implicit.HideAnimations>
+                                <SymbolIcon Symbol="Save" />
+                            </Button>
+                            <ToggleButton IsChecked="{x:Bind ViewModel.IsInDemoMode, Mode=TwoWay}"
+                                          Padding="6"
+                                          Height="36"
+                                          VerticalAlignment="Top"
+                                          ToolTipService.ToolTip="Toggle Demo Mode"
+                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                <animations:Implicit.ShowAnimations>
+                                    <animations:TranslationAnimation Duration="0:0:0.2"
+                                                                     From="20,0,0"
+                                                                     To="0,0,0" />
+                                    <animations:OpacityAnimation Duration="0:0:0.2"
+                                                                 From="0"
+                                                                 To="1" />
+                                </animations:Implicit.ShowAnimations>
+                                <animations:Implicit.HideAnimations>
+                                    <animations:TranslationAnimation Duration="0:0:0.15"
+                                                                     To="20,0,0" />
+                                    <animations:OpacityAnimation Duration="0:0:0.15"
+                                                                 To="0" />
+                                </animations:Implicit.HideAnimations>
+                                <SymbolIcon Symbol="DockBottom" />
+                            </ToggleButton>
+                        </StackPanel>
+                    </Grid>
+                    <Border Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                        <StackPanel Background="{ThemeResource InfoBarErrorSeverityBackgroundBrush}"
+                                    HorizontalAlignment="Right"
+                                    VerticalAlignment="Bottom"
+                                    Orientation="Horizontal"
+                                    Padding="8"
+                                    Margin="8"
+                                    CornerRadius="4"
+                                    Visibility="{x:Bind ViewModel.IsFound, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                            <Grid Margin="0,0,8,0"
+                                  VerticalAlignment="Center">
+                                <TextBlock VerticalAlignment="Top"
+                                           FontSize="{StaticResource InfoBarIconFontSize}"
+                                           Text="{StaticResource InfoBarIconBackgroundGlyph}"
+                                           Foreground="{ThemeResource InfoBarErrorSeverityIconBackground}"
+                                           FontFamily="{ThemeResource SymbolThemeFontFamily}"
+                                           AutomationProperties.AccessibilityView="Raw" />
+                                <TextBlock VerticalAlignment="Top"
+                                           FontSize="{StaticResource InfoBarIconFontSize}"
+                                           Text="{StaticResource InfoBarErrorIconGlyph}"
+                                           Foreground="{ThemeResource InfoBarErrorSeverityIconForeground}"
+                                           FontFamily="{ThemeResource SymbolThemeFontFamily}" />
+                            </Grid>
+                            <TextBlock Text="Missing Media"
+                                       VerticalAlignment="Center"
+                                       Foreground="{ThemeResource InfoBarMessageForeground}" />
+                        </StackPanel>
+                    </Border>
                 </Grid>
-                <controls:Shimmer Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                                  CornerRadius="8" />
             </Grid>
-            <StackPanel Grid.Row="1"
-                        Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+            <Grid x:Name="EditModeGrid"
+                  Padding="16"
+                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                  BorderThickness="1"
+                  Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                  CornerRadius="8"
+                  Visibility="Collapsed">
+                <Grid.Projection>
+                    <PlaneProjection x:Name="EditModeProjection" CenterOfRotationX="0.5" RotationY="-90"/>
+                </Grid.Projection>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="auto" />
+                    <RowDefinition Height="auto" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="0,0,0,16"
+                                ToolTipService.ToolTip="{x:Bind ViewModel.Path, Mode=OneWay}">
+                        <TextBlock Text="{x:Bind ViewModel.FormattedName, Mode=OneWay}"
+                                   FontSize="16"
+                                   VerticalAlignment="Center"
+                                   Grid.Column="1"
+                                   Margin="0,0,16,0" />
+                        <TextBlock Text="{x:Bind ViewModel.Path, Mode=OneWay}"
+                                   FontSize="13"
+                                   Foreground="{ThemeResource TextFillColorSecondary}"
+                                   IsTextSelectionEnabled="True"
+                                   VerticalAlignment="Center"
+                                   Grid.Column="1"
+                                   Margin="0,0,16,0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Grid.Column="1">
+                        <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                            <controls:Segmented x:Name="DisplaySelector"
+                                                SelectedIndex="{x:Bind ViewModel.ViewIndex, Mode=TwoWay}"
+                                                Style="{StaticResource ButtonSegmentedStyle}"
+                                                Background="{ThemeResource LayerFillColorAltBrush}"
+                                                VerticalAlignment="Top"
+                                                Margin="0,0,16,0"
+                                                Height="36"
+                                                Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                <controls:SegmentedItem ToolTipService.ToolTip="Images">
+                                    <Viewbox>
+                                        <SymbolIcon Symbol="Pictures" />
+                                    </Viewbox>
+                                </controls:SegmentedItem>
+                                <controls:SegmentedItem ToolTipService.ToolTip="Music">
+                                    <Viewbox>
+                                        <SymbolIcon Symbol="Audio" />
+                                    </Viewbox>
+                                </controls:SegmentedItem>
+                                <controls:SegmentedItem ToolTipService.ToolTip="Videos">
+                                    <Viewbox>
+                                        <SymbolIcon Symbol="Video" />
+                                    </Viewbox>
+                                </controls:SegmentedItem>
+                            </controls:Segmented>
+                        </Border>
+                        <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                            <Button x:Name="AddButton"
+                                    Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                    Padding="6"
+                                    Height="36"
+                                    Margin="0,0,16,0"
+                                    VerticalAlignment="Top">
+                                <SymbolIcon Symbol="Add" />
+                                <Button.Flyout>
+                                    <Flyout>
+                                        <StackPanel>
+                                            <StackPanel Visibility="{x:Bind ViewModel.ViewIndex, Mode=OneWay, Converter={StaticResource EqualsZeroToVisibilityConverter}, FallbackValue='Collapsed'}">
+                                                <TextBlock Text="Files"
+                                                           Margin="0,0,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Icons"
+                                                                Click="MenuFlyoutItem_AddIconsClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Titles"
+                                                                Click="MenuFlyoutItem_AddTitlesClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Logos"
+                                                                Click="MenuFlyoutItem_AddSlidesClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Slides"
+                                                                Click="MenuFlyoutItem_AddLogosClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Heros"
+                                                                Click="MenuFlyoutItem_AddHerosClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <TextBlock Text="Url"
+                                                           Margin="0,8,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Icon"
+                                                                Command="{x:Bind ViewModel.EnterIconUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Title"
+                                                                Command="{x:Bind ViewModel.EnterTitleUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Logo"
+                                                                Command="{x:Bind ViewModel.EnterLogoUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Slide"
+                                                                Command="{x:Bind ViewModel.EnterSlideUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Hero"
+                                                                Command="{x:Bind ViewModel.EnterHeroUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                            </StackPanel>
+                                            <StackPanel Visibility="{x:Bind ViewModel.ViewIndex, Mode=OneWay, Converter={StaticResource EqualsOneToVisibilityConverter}, FallbackValue='Collapsed'}">
+                                                <TextBlock Text="Files"
+                                                           Margin="0,0,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Music"
+                                                                Click="MenuFlyoutItem_AddMusicClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <TextBlock Text="Url"
+                                                           Margin="0,8,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Music"
+                                                                Command="{x:Bind ViewModel.EnterMusicUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <MenuFlyoutItem Text="Playlist"
+                                                                Command="{x:Bind ViewModel.EnterMusicPlaylistUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                            </StackPanel>
+                                            <StackPanel Visibility="{x:Bind ViewModel.ViewIndex, Mode=OneWay, Converter={StaticResource EqualsTwoToVisibilityConverter}, FallbackValue='Collapsed'}">
+                                                <TextBlock Text="Files"
+                                                           Margin="0,0,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Video"
+                                                                Click="MenuFlyoutItem_AddVideosClick"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                                <TextBlock Text="Url"
+                                                           Margin="0,8,0,8"
+                                                           Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <MenuFlyoutItem Text="Video"
+                                                                Command="{x:Bind ViewModel.EnterVideoUrlCommand, Mode=OneWay}"
+                                                                Tapped="MenuFlyoutItem_Tapped"
+                                                                MinWidth="160" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Flyout>
+                                </Button.Flyout>
+                            </Button>
+                        </Border>
+                        <ToggleButton IsChecked="{x:Bind ViewModel.IsInDemoMode, Mode=TwoWay}"
+                                      Padding="6"
+                                      Height="36"
+                                      VerticalAlignment="Top"
+                                      ToolTipService.ToolTip="Toggle Demo Mode">
+                            <SymbolIcon Symbol="DockBottom" />
+                        </ToggleButton>
+                    </StackPanel>
+                </Grid>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="Icons"
-                                   Margin="0,0,0,8" />
-                        <Grid Margin="0,0,0,8">
-                            <controls:Shimmer MinHeight="168"
-                                              Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <controls1:DropZone Padding="16"
-                                                MinHeight="168"
-                                                DropMessage="Drop Images"
-                                                AcceptedExtensions="png, jpg, jpeg, gif, webp"
-                                                FilesDropped="DropZone_IconFilesDropped"
-                                                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                <ScrollView>
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Icons, Mode=OneWay}"
-                                                   ItemTemplate="{StaticResource MeadiaTemplateSelector}">
-                                        <ItemsRepeater.Layout>
-                                            <StackLayout Spacing="16"
-                                                         Orientation="Horizontal" />
-                                        </ItemsRepeater.Layout>
-                                    </ItemsRepeater>
-                                </ScrollView>
-                            </controls1:DropZone>
+                <controls:SwitchPresenter Value="{x:Bind ViewModel.ViewIndex, Mode=OneWay, Converter={StaticResource ValueToStringConverter}}"
+                                          Grid.Row="1"
+                                          Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                    <controls:Case Value="0">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Icons"
+                                               Margin="0,0,0,8" />
+                                    <Grid Margin="0,0,0,8">
+                                        <controls:Shimmer MinHeight="168"
+                                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <controls1:DropZone Padding="8"
+                                                            MinHeight="168"
+                                                            DropMessage="Drop Images"
+                                                            AcceptedExtensions="png, jpg, jpeg, gif, webp"
+                                                            FilesDropped="DropZone_IconFilesDropped"
+                                                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            <ScrollView HorizontalScrollBarVisibility="Auto"
+                                                        VerticalScrollBarVisibility="Hidden"
+                                                        HorizontalScrollMode="Enabled"
+                                                        VerticalScrollMode="Disabled"
+                                                        ContentOrientation="Horizontal">
+                                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Icons, Mode=OneWay}"
+                                                               ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                                                    <ItemsRepeater.Layout>
+                                                        <StackLayout Spacing="16"
+                                                                     Orientation="Horizontal" />
+                                                    </ItemsRepeater.Layout>
+                                                </ItemsRepeater>
+                                            </ScrollView>
+                                        </controls1:DropZone>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Titles"
+                                               Margin="0,0,0,8" />
+                                    <Grid Margin="0,0,0,8">
+                                        <controls:Shimmer MinHeight="168"
+                                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <controls1:DropZone Padding="8"
+                                                            MinHeight="168"
+                                                            DropMessage="Drop Images"
+                                                            AcceptedExtensions="png, jpg, jpeg, gif, webp"
+                                                            FilesDropped="DropZone_TitleFilesDropped"
+                                                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            <ScrollView HorizontalScrollBarVisibility="Auto"
+                                                        VerticalScrollBarVisibility="Hidden"
+                                                        HorizontalScrollMode="Enabled"
+                                                        VerticalScrollMode="Disabled"
+                                                        ContentOrientation="Horizontal">
+                                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Titles, Mode=OneWay}"
+                                                               ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                                                    <ItemsRepeater.Layout>
+                                                        <StackLayout Spacing="16"
+                                                                     Orientation="Horizontal" />
+                                                    </ItemsRepeater.Layout>
+                                                </ItemsRepeater>
+                                            </ScrollView>
+                                        </controls1:DropZone>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="16" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="Slides"
+                                               Margin="0,0,0,8" />
+                                    <Grid Margin="0,0,0,8">
+                                        <controls:Shimmer MinHeight="168"
+                                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <controls1:DropZone Padding="8"
+                                                            MinHeight="168"
+                                                            DropMessage="Drop Images"
+                                                            AcceptedExtensions="png, jpg, jpeg, gif, webp"
+                                                            FilesDropped="DropZone_SlideFilesDropped"
+                                                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            <ScrollView HorizontalScrollBarVisibility="Auto"
+                                                        VerticalScrollBarVisibility="Hidden"
+                                                        HorizontalScrollMode="Enabled"
+                                                        VerticalScrollMode="Disabled"
+                                                        ContentOrientation="Horizontal">
+                                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Slides, Mode=OneWay}"
+                                                               ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                                                    <ItemsRepeater.Layout>
+                                                        <StackLayout Spacing="16"
+                                                                     Orientation="Horizontal" />
+                                                    </ItemsRepeater.Layout>
+                                                </ItemsRepeater>
+                                            </ScrollView>
+                                        </controls1:DropZone>
+                                    </Grid>
+                                </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="Logos"
+                                               Margin="0,0,0,8" />
+                                    <Grid Margin="0,0,0,8">
+                                        <controls:Shimmer MinHeight="168"
+                                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                        <controls1:DropZone Padding="8"
+                                                            MinHeight="168"
+                                                            DropMessage="Drop Images"
+                                                            AcceptedExtensions="png, jpg, jpeg, gif, webp"
+                                                            FilesDropped="DropZone_LogoFilesDropped"
+                                                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                            <ScrollView HorizontalScrollBarVisibility="Auto"
+                                                        VerticalScrollBarVisibility="Hidden"
+                                                        HorizontalScrollMode="Enabled"
+                                                        VerticalScrollMode="Disabled"
+                                                        ContentOrientation="Horizontal">
+                                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Logos, Mode=OneWay}"
+                                                               ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                                                    <ItemsRepeater.Layout>
+                                                        <StackLayout Spacing="16"
+                                                                     Orientation="Horizontal" />
+                                                    </ItemsRepeater.Layout>
+                                                </ItemsRepeater>
+                                            </ScrollView>
+                                        </controls1:DropZone>
+                                    </Grid>
+                                </StackPanel>
+                            </Grid>
+                            <StackPanel>
+                                <TextBlock Text="Heros"
+                                           Margin="0,0,0,8" />
+                                <Grid>
+                                    <controls:Shimmer MinHeight="168"
+                                                      Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                                    <controls1:DropZone Padding="8"
+                                                        MinHeight="168"
+                                                        DropMessage="Drop Images"
+                                                        AcceptedExtensions="png, jpg, jpeg, gif, webp"
+                                                        FilesDropped="DropZone_HeroFilesDropped"
+                                                        Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                        <ScrollView HorizontalScrollBarVisibility="Auto"
+                                                    VerticalScrollBarVisibility="Hidden"
+                                                    HorizontalScrollMode="Enabled"
+                                                    VerticalScrollMode="Disabled"
+                                                    ContentOrientation="Horizontal">
+                                            <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Heros, Mode=OneWay}"
+                                                           ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                                                <ItemsRepeater.Layout>
+                                                    <StackLayout Spacing="16"
+                                                                 Orientation="Horizontal" />
+                                                </ItemsRepeater.Layout>
+                                            </ItemsRepeater>
+                                        </ScrollView>
+                                    </controls1:DropZone>
+                                </Grid>
+                            </StackPanel>
+                        </StackPanel>
+                    </controls:Case>
+                    <controls:Case Value="1">
+                        <Grid Height="660">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Grid MinHeight="120"
+                                  Background="{ThemeResource LayerFillColorAltBrush}"
+                                  BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                  BorderThickness="1"
+                                  CornerRadius="8"
+                                  Margin="0,0,0,16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Background="{ThemeResource LayerFillColorAltBrush}"
+                                        Margin="16,16,0,16"
+                                        CornerRadius="4">
+                                    <imageex:ImageEx Source="{x:Bind ViewModel.PlayingMusic.Thumbnail.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidImagePathConverter}}"
+                                                     Height="80" />
+                                </Border>
+                                <Grid Grid.Column="1">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid>
+                                        <TextBlock Text="{x:Bind ViewModel.PlayingMusic.Title, Mode=OneWay}"
+                                                   Margin="16,16,16,0"
+                                                   FontSize="16"
+                                                   Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}" />
+                                    </Grid>
+                                    <Grid Grid.Row="2"
+                                          Margin="4">
+                                        <ProgressBar Value="{x:Bind ViewModel.PlayingMusic.Progress, Mode=OneWay}"
+                                                     Visibility="{x:Bind ViewModel.PlayingMusic.IsDownloading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue='Collapsed'}"
+                                                     VerticalAlignment="Bottom"
+                                                     Margin="18,10" />
+                                        <MediaPlayerElement x:Name="EditModeMusicPlayer"
+                                                            AreTransportControlsEnabled="True"
+                                                            IsEnabled="true"
+                                                            AutoPlay="True"
+                                                            Source="{x:Bind ViewModel.PlayingMusic.LocalPath, Mode=OneWay, Converter={StaticResource PathToValidMediaPathConverter}}">
+                                            <MediaPlayerElement.TransportControls>
+                                                <MediaTransportControls IsZoomButtonVisible="False"
+                                                                        IsVolumeEnabled="True"
+                                                                        IsCompact="True" />
+                                            </MediaPlayerElement.TransportControls>
+                                        </MediaPlayerElement>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+                            <Grid Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                                <controls:Shimmer CornerRadius="8"
+                                                  Margin="0,0,0,16" />
+                            </Grid>
+                            <Border Grid.Row="1"
+                                    MaxHeight="640"
+                                    Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                    Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    CornerRadius="8"
+                                    Padding="16"
+                                    Margin="0,0,0,16">
+                                <controls1:DropZone DropMessage="Drop Music"
+                                                    Padding="0"
+                                                    Background="Transparent"
+                                                    BorderBrush="Transparent"
+                                                    BorderThickness="0"
+                                                    CornerRadius="0"
+                                                    FilesDropped="DropZone_MusicFilesDropped"
+                                                    AcceptedExtensions="mp3, aac, wav, flac">
+                                    <ScrollView>
+                                        <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Music, Mode=OneWay}"
+                                                       ItemTemplate="{StaticResource MusicViewModelTemplate}">
+                                            <ItemsRepeater.Layout>
+                                                <StackLayout Spacing="16" />
+                                            </ItemsRepeater.Layout>
+                                        </ItemsRepeater>
+                                    </ScrollView>
+                                </controls1:DropZone>
+                            </Border>
                         </Grid>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Titles"
-                                   Margin="0,0,0,8" />
-                        <Grid Margin="0,0,0,8">
-                            <controls:Shimmer MinHeight="168"
-                                              Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <controls1:DropZone Padding="16"
-                                                MinHeight="168"
-                                                DropMessage="Drop Images"
-                                                AcceptedExtensions="png, jpg, jpeg, gif, webp"
-                                                FilesDropped="DropZone_TitleFilesDropped"
-                                                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                <ScrollView>
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Titles, Mode=OneWay}"
-                                                   ItemTemplate="{StaticResource MeadiaTemplateSelector}">
-                                        <ItemsRepeater.Layout>
-                                            <StackLayout Spacing="16"
-                                                         Orientation="Horizontal" />
-                                        </ItemsRepeater.Layout>
-                                    </ItemsRepeater>
-                                </ScrollView>
-                            </controls1:DropZone>
-                        </Grid>
-                    </StackPanel>
-                </Grid>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="16" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel>
-                        <TextBlock Text="Slides"
-                                   Margin="0,0,0,8" />
-                        <Grid Margin="0,0,0,8">
-                            <controls:Shimmer MinHeight="168"
-                                              Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <controls1:DropZone Padding="16"
-                                                MinHeight="168"
-                                                DropMessage="Drop Images"
-                                                AcceptedExtensions="png, jpg, jpeg, gif, webp"
-                                                FilesDropped="DropZone_SlideFilesDropped"
-                                                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                <ScrollView>
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Slides, Mode=OneWay}"
-                                                   ItemTemplate="{StaticResource MeadiaTemplateSelector}">
-                                        <ItemsRepeater.Layout>
-                                            <StackLayout Spacing="16"
-                                                         Orientation="Horizontal" />
-                                        </ItemsRepeater.Layout>
-                                    </ItemsRepeater>
-                                </ScrollView>
-                            </controls1:DropZone>
-                        </Grid>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Logos"
-                                   Margin="0,0,0,8" />
-                        <Grid Margin="0,0,0,8">
-                            <controls:Shimmer MinHeight="168"
-                                              Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                            <controls1:DropZone Padding="16"
-                                                MinHeight="168"
-                                                DropMessage="Drop Images"
-                                                AcceptedExtensions="png, jpg, jpeg, gif, webp"
-                                                FilesDropped="DropZone_LogoFilesDropped"
-                                                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                <ScrollView>
-                                    <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Logos, Mode=OneWay}"
-                                                   ItemTemplate="{StaticResource MeadiaTemplateSelector}">
-                                        <ItemsRepeater.Layout>
-                                            <StackLayout Spacing="16"
-                                                         Orientation="Horizontal" />
-                                        </ItemsRepeater.Layout>
-                                    </ItemsRepeater>
-                                </ScrollView>
-                            </controls1:DropZone>
-                        </Grid>
-                    </StackPanel>
-                </Grid>
-                <StackPanel>
-                    <TextBlock Text="Heros"
-                               Margin="0,0,0,8" />
-                    <Grid Margin="0,0,0,8">
-                        <controls:Shimmer MinHeight="168"
-                                          Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                        <controls1:DropZone Padding="16"
-                                            MinHeight="168"
-                                            DropMessage="Drop Images"
-                                            AcceptedExtensions="png, jpg, jpeg, gif, webp"
-                                            FilesDropped="DropZone_HeroFilesDropped"
-                                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                            <ScrollView>
-                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Heros, Mode=OneWay}"
-                                               ItemTemplate="{StaticResource MeadiaTemplateSelector}">
+                    </controls:Case>
+                    <controls:Case Value="2">
+                        <Grid Height="660">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="auto" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
+                            <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                    Margin="0,0,0,16"
+                                    Height="300">
+                                <WebView2 x:Name="PlayingVideoWebView"
+                                                  Source="{x:Bind ViewModel.PlayingVideo.Url, Mode=OneWay}" />
+                            </Border>
+                            <controls1:DropZone DropMessage="Drop Videos"
+                                                Padding="0"
+                                                Background="Transparent"
+                                                BorderBrush="Transparent"
+                                                BorderThickness="0"
+                                                CornerRadius="0"
+                                                Grid.Row="1"
+                                                FilesDropped="DropZone_VideoFilesDropped"
+                                                AcceptedExtensions="mp4, mov, mkv, avi, webm">
+                                <ItemsRepeater ItemsSource="{x:Bind ViewModel.MediaContext.Videos, Mode=OneWay}"
+                                               ItemTemplate="{StaticResource VideoViewModelTemplate}">
                                     <ItemsRepeater.Layout>
-                                        <StackLayout Spacing="16"
-                                                     Orientation="Horizontal" />
+                                        <StackLayout Spacing="16" />
                                     </ItemsRepeater.Layout>
                                 </ItemsRepeater>
-                            </ScrollView>
-                        </controls1:DropZone>
+                            </controls1:DropZone>
+                        </Grid>
+                    </controls:Case>
+                </controls:SwitchPresenter>
+            </Grid>
+            <Grid Background="{ThemeResource SmokeFillColorDefaultBrush}"
+                  CornerRadius="8"
+                  Visibility="{x:Bind ViewModel.IsEnteringUrl, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Border>
+                    <Border.Background>
+                        <media:BackdropBlurBrush Amount="5.0" />
+                    </Border.Background>
+                </Border>
+                <Border ui:Effects.Shadow="{StaticResource CommonShadow}">
+                    <Grid Background="{ThemeResource SolidBackgroundFillColorQuarternaryBrush}"
+                          BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                          BorderThickness="1"
+                          CornerRadius="8"
+                          Width="600"
+                          VerticalAlignment="Center">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="auto" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Margin="16">
+                            <Run Text="{x:Bind ViewModel.UrlType, Mode=OneWay}" /> <Run Text="Url" />
+                        </TextBlock>
+                        <StackPanel Grid.Row="1">
+                            <TextBox Margin="16,0"
+                                     Text="{x:Bind ViewModel.Url, Mode=TwoWay}" />
+                            <ToggleSwitch OffContent="Clear existing"
+                                          OnContent="Clear existing"
+                                          Margin="16,16,0,8"
+                                          IsOn="{x:Bind ViewModel.IsClearItems, Mode=TwoWay}"
+                                          Grid.ColumnSpan="2" />
+                        </StackPanel>
+                        <Grid Grid.Row="2"
+                              Padding="16">
+                            <Button Content="Cancel"
+                                    Command="{x:Bind ViewModel.CancleUrlCommand, Mode=OneWay}" />
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right">
+                                <ProgressRing Visibility="{x:Bind ViewModel.IsImportingUrl, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                                              IsIndeterminate="True"
+                                              Margin="0,0,16,0" />
+                                <Button Content="Confirm"
+                                        Style="{ThemeResource AccentButtonStyle}"
+                                        Command="{x:Bind ViewModel.ConfirmUrlCommand, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
                     </Grid>
-                </StackPanel>
-            </StackPanel>
-            <Grid Grid.Row="2"
-                  MinHeight="32">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="1"
-                            Orientation="Horizontal"
-                            Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                    <Button Height="38"
-                            Padding="6"
-                            ToolTipService.ToolTip="Apply Game"
-                            Command="{x:Bind ViewModel.StageApplyCommand, Mode=OneWay}">
-                        <SymbolIcon Symbol="Save" />
-                    </Button>
-                </StackPanel>
+                </Border>
             </Grid>
         </Grid>
     </Border>
