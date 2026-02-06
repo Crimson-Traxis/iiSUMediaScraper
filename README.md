@@ -4,7 +4,17 @@ A powerful WinUI 3 application for scraping, managing, and formatting game media
 
 https://github.com/user-attachments/assets/50972a7b-6cd6-47bc-9c0b-e29c42bcc303
 
-## Game folder location example
+## MTP (Android over usb) example
+
+<img width="1226" height="273" alt="image" src="https://github.com/user-attachments/assets/750fa9de-fb7d-49a6-bc2d-f300f84d3ceb" />
+<br><br>
+Games Folder<br>
+mtp:\AYN Thor\Internal shared storage\Emulation\Roms
+<br><br>
+Asset Folder<br>
+mtp:\AYN Thor\Internal shared storage\Android\media\com.iisulauncher\iiSULauncher\assets\media\roms\consoles
+
+## PC Game folder location example
 
 <img width="927" height="624" alt="Folder" src="https://github.com/user-attachments/assets/6a79170c-9dc7-40c4-ac73-afc7847e36e7" />
 
