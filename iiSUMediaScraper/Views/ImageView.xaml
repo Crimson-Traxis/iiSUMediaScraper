@@ -37,6 +37,9 @@
         <customconverters:BoolToThicknessConverter x:Key="BoolToThicknessConverter"
                                                    FalseValue="0"
                                                    TrueValue="2" />
+
+        <customconverters:NotEqualsStringToVisibilityConverter x:Key="NotPreviousToVisibilityConverter"
+                                                                NotEqualsValue="Previous" />
     </UserControl.Resources>
 
     <Grid Background="{ThemeResource LayerFillColorAltBrush}"
@@ -65,17 +68,19 @@
                           Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"/>
         <Border HorizontalAlignment="Right"
                 VerticalAlignment="Top"
-                Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-            <Button Padding="6"
-                    Height="32"
-                    Width="32"
-                    Tapped="ButtonEdit_Tapped"
-                    Visibility="{x:Bind ViewModel.IsHovering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                    Command="{x:Bind ViewModel.RequestEditCommand, Mode=OneWay}">
-                <Viewbox>
-                    <SymbolIcon Symbol="Edit" />
-                </Viewbox>
-            </Button>
+                Visibility="{x:Bind ViewModel.Source, Mode=OneWay, Converter={StaticResource NotPreviousToVisibilityConverter}}">
+            <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                <Button Padding="6"
+                        Height="32"
+                        Width="32"
+                        Tapped="ButtonEdit_Tapped"
+                        Visibility="{x:Bind ViewModel.IsHovering, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Command="{x:Bind ViewModel.RequestEditCommand, Mode=OneWay}">
+                    <Viewbox>
+                        <SymbolIcon Symbol="Edit" />
+                    </Viewbox>
+                </Button>
+            </Border>
         </Border>
         <Border Background="{ThemeResource SolidBackgroundFillColorBaseBrush}"
                 BorderBrush="{ThemeResource SystemFillColorAttentionBrush}"
