@@ -21,6 +21,8 @@ public class Downloader : IDownloader
     /// </summary>
     private const int MaxRetries = 5;
 
+    private long _lastProgressTicks;
+
     /// <summary>
     /// Raised when download progress is updated.
     /// </summary>
@@ -49,6 +51,11 @@ public class Downloader : IDownloader
     /// <param name="progress">Progress value (0-100).</param>
     private void RaiseProgressUpdated(double progress)
     {
+        var now = Environment.TickCount64;
+        if (progress < 100 && now - _lastProgressTicks < 1000)
+            return;
+
+        _lastProgressTicks = now;
         UIThreadService.DispachToUIThread(() =>
         {
             ProgressUpdated?.Invoke(this, progress);
@@ -213,6 +220,7 @@ public class Downloader : IDownloader
             // Music: best audio, extract and convert to mp3
             var videoQuality = ConfigurationService.Configuration?.VideoQuality ?? "best";
             var maxVideoDuration = ConfigurationService.Configuration?.MaxVideoDuration;
+            var maxMusicDuration = ConfigurationService.Configuration?.MaxMusicDuration;
             var ffmpegPath = System.IO.Path.Combine(ConfigurationService.ToolsFolder, "ffmpeg.exe");
             var ffmpegExists = System.IO.File.Exists(ffmpegPath);
 
@@ -238,8 +246,9 @@ public class Downloader : IDownloader
                 conversionArg = ffmpegExists ? "--extract-audio --audio-format mp3" : "";
             }
 
-            var durationLimit = isVideo && maxVideoDuration.HasValue
-                ? $"--download-sections \"*0-{(int)maxVideoDuration.Value.TotalSeconds}\""
+            var maxDuration = isVideo ? maxVideoDuration : maxMusicDuration;
+            var durationLimit = maxDuration.HasValue
+                ? $"--download-sections \"*0-{(int)maxDuration.Value.TotalSeconds}\""
                 : "";
             // --no-warnings: suppress informational warnings (like JS runtime)
             // --no-playlist: ensure we only download the single video, not a playlist

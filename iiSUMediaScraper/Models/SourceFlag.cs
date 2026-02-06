@@ -91,5 +91,10 @@ public enum SourceFlag
     /// <summary>
     /// Local file source.
     /// </summary>
-    Local
+    Local,
+
+    /// <summary>
+    /// Previous media file.
+    /// </summary>
+    Previous
 }

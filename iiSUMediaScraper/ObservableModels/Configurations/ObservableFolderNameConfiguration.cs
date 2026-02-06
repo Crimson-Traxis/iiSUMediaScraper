@@ -19,4 +19,10 @@ public class ObservableFolderNameConfiguration : BaseObservableModel<FolderNameC
         get => _baseModel.Name;
         set => SetProperty(_baseModel.Name, value, _baseModel, (o, v) => o.Name = v);
     }
+
+    public bool IsAssetFolder
+    {
+        get => _baseModel.IsAssetFolder;
+        set => SetProperty(_baseModel.IsAssetFolder, value, _baseModel, (o, v) => o.IsAssetFolder = v);
+    }
 }

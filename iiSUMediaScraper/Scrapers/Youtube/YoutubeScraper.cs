@@ -150,7 +150,10 @@ public class YoutubeScraper : Scraper
         // Use --flat-playlist for faster results when video details aren't needed
         // Without --flat-playlist, we get full metadata including like_count
         var flatPlaylistArg = GlobalConfiguration.IsSortMusicByLikes ? "" : "--flat-playlist ";
-        var output = await RunYtDlp($"--dump-json --no-warnings --skip-download {flatPlaylistArg}\"{playlistUrl}\"", cancellationToken);
+        var matchFilter = GlobalConfiguration.SearchMusicMaxDuration.HasValue
+            ? $"--match-filter \"duration<={(int)GlobalConfiguration.SearchMusicMaxDuration.Value.TotalSeconds}\" "
+            : "";
+        var output = await RunYtDlp($"--dump-json --no-warnings --skip-download {matchFilter}{flatPlaylistArg}\"{playlistUrl}\"", cancellationToken);
 
         if (string.IsNullOrWhiteSpace(output))
             return results;
@@ -211,8 +214,11 @@ public class YoutubeScraper : Scraper
 
                 // Sort by like count descending (most liked first)
                 // Construct small thumbnail URL from video ID (default.jpg = 120x90)
+                var maxSearchDuration = GlobalConfiguration.SearchMusicMaxDuration;
+
                 return videos
                     .Where(v => !string.IsNullOrEmpty(v.Id))
+                    .Where(v => !maxSearchDuration.HasValue || v.Duration <= maxSearchDuration.Value)
                     .Select(v => new Music()
                     {
                         Source = SourceFlag.Youtube,

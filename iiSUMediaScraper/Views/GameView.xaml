@@ -260,6 +260,7 @@
                           Height="100"
                           VerticalAlignment="Bottom"
                           HorizontalAlignment="Left"
+                          CornerRadius="8"
                           Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}, FallbackValue='Collapsed'}">
                         <ContentControl x:Name="SlidePreviewContentControl"
                                         Content="{x:Bind CurrentSlide, Mode=OneWay}"
@@ -280,8 +281,7 @@
                             VerticalAlignment="Center"
                             Grid.Row="1" />
                     <Grid Grid.Row="2"
-                          MaxHeight="280"
-                          VerticalAlignment="Bottom">
+                          MaxHeight="280">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="140" />
                             <ColumnDefinition Width="*" />
@@ -310,7 +310,7 @@
                             </Grid>
                         </Grid>
                         <StackPanel Grid.Column="1"
-                                    VerticalAlignment="Bottom">
+                                    Margin="0,16,0,0">
                             <Grid x:Name="GridIcon" 
                                   Background="{ThemeResource LayerFillColorAltBrush}"
                                   BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"

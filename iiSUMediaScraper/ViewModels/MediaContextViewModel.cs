@@ -219,7 +219,33 @@ public partial class MediaContextViewModel : ObservableMediaContext
             CreateVideo,
             InitializeVideo);
 
-        if ((Configuration.IsPrioritizeLogoAsTitle || Configuration.IsUseLogoAsTitle) && logos.Any())
+        // Select previous media if available, otherwise use default selection logic
+        var previousIcon = icons.FirstOrDefault(i => i.Source == SourceFlag.Previous);
+        var previousTitle = titles.FirstOrDefault(t => t.Source == SourceFlag.Previous);
+        var previousLogo = logos.FirstOrDefault(l => l.Source == SourceFlag.Previous);
+        var previousHero = heros.FirstOrDefault(h => h.Source == SourceFlag.Previous);
+        var previousMusic = music.FirstOrDefault(m => m.Source == SourceFlag.Previous);
+        var previousSlides = slides.Where(s => s.Source == SourceFlag.Previous).ToList();
+        var previousVideos = videos.Where(v => v.Source == SourceFlag.Previous).ToList();
+
+        if (previousIcon != null)
+        {
+            previousIcon.IsSelected = true;
+        }
+        else if (icons.Any())
+        {
+            icons.First().IsSelected = true;
+        }
+
+        if (previousTitle != null)
+        {
+            previousTitle.IsSelected = true;
+        }
+        else if (previousLogo != null && (Configuration.IsPrioritizeLogoAsTitle || Configuration.IsUseLogoAsTitle))
+        {
+            previousLogo.IsSelected = true;
+        }
+        else if ((Configuration.IsPrioritizeLogoAsTitle || Configuration.IsUseLogoAsTitle) && logos.Any())
         {
             logos.First().IsSelected = true;
         }
@@ -228,24 +254,44 @@ public partial class MediaContextViewModel : ObservableMediaContext
             titles.First().IsSelected = true;
         }
 
-        if (icons.Any())
+        if (previousHero != null)
         {
-            icons.First().IsSelected = true;
+            previousHero.IsSelected = true;
         }
-
-        if (heros.Any())
+        else if (heros.Any())
         {
             heros.First().IsSelected = true;
         }
 
-        if (music.Any())
+        if (previousMusic != null)
+        {
+            previousMusic.IsSelected = true;
+        }
+        else if (music.Any())
         {
             music.First().IsSelected = true;
         }
 
-        foreach (MediaViewModel slide in slides)
+        // For slides, select all previous slides if any exist, otherwise select all slides
+        if (previousSlides.Any())
         {
-            slide.IsSelected = true;
+            foreach (var slide in previousSlides)
+            {
+                slide.IsSelected = true;
+            }
+        }
+        else
+        {
+            foreach (MediaViewModel slide in slides)
+            {
+                slide.IsSelected = true;
+            }
+        }
+
+        // Select previous videos
+        foreach (var video in previousVideos)
+        {
+            video.IsSelected = true;
         }
     }
 

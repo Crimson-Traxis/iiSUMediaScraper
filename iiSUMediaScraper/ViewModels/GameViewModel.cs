@@ -282,6 +282,180 @@ public partial class GameViewModel : ObservableObject
         }
     }
 
+    private static readonly HashSet<string> VideoExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".webm", ".flv", ".m4v",
+        ".mpg", ".mpeg", ".m2ts", ".mts", ".ts", ".vob",
+        ".3gp", ".3g2", ".ogv", ".f4v", ".rm", ".rmvb", ".divx", ".asf"
+    };
+
+    /// <summary>
+    /// Copies a file from the source path to the temp folder.
+    /// </summary>
+    /// <param name="filePath">The source file path.</param>
+    /// <returns>The temporary file path.</returns>
+    private async Task<string> CopyToTemp(string filePath)
+    {
+        var extension = FileService.GetExtension(filePath);
+        var tempPath = FileService.GetTemporaryFilePath(extension.TrimStart('.'));
+
+        await FileService.CopyFile(filePath, tempPath);
+
+        return tempPath;
+    }
+
+    /// <summary>
+    /// Loads previous assets from all configured asset folders for this game.
+    /// </summary>
+    /// <param name="mediaContext">The media context to add items to.</param>
+    private async Task LoadPrevious(MediaContext mediaContext)
+    {
+        var folders = Configuration.FolderConfigurations.Where(f => f.Platform == Platform && f.IsAssetFolder).Select(f => f.Name);
+
+        if (!folders.Any())
+        {
+            folders = [Folder];
+        }
+
+        foreach (var folder in folders)
+        {
+            if (!string.IsNullOrEmpty(folder) && !string.IsNullOrEmpty(Configuration.ApplyAssetPath))
+            {
+                var path = FileService.CombinePath(Configuration.ApplyAssetPath, folder, FileService.CleanFileName(Name));
+
+                // Load previous icon assets
+                foreach (var filePath in await FileService.GetFiles(path, $"{Configuration.IconNameFormat}.*"))
+                {
+                    var localPath = await CopyToTemp(filePath);
+
+                    var media = new Image()
+                    {
+                        LocalPath = localPath,
+                        Extension = FileService.GetExtension(filePath),
+                        Source = SourceFlag.Previous
+                    };
+
+                    await MediaFormatterService.UpdateImageSize(media);
+
+                    mediaContext.Icons.Insert(0, media);
+                }
+
+                // Load previous title assets
+                foreach (var filePath in await FileService.GetFiles(path, $"{Configuration.TitleNameFormat}.*"))
+                {
+                    var localPath = await CopyToTemp(filePath);
+
+                    var media = new Image()
+                    {
+                        LocalPath = localPath,
+                        Extension = FileService.GetExtension(filePath),
+                        Source = SourceFlag.Previous,
+                    };
+
+                    await MediaFormatterService.UpdateImageSize(media);
+
+                    mediaContext.Titles.Insert(0, media);
+                }
+
+                // Load previous hero assets (images or videos)
+                await LoadPreviousType(mediaContext, path, Configuration.HeroNameFormat, MediaType.Hero);
+
+                // Load previous slide assets (images or videos)
+                await LoadPreviousType(mediaContext, path, Configuration.SlideNameFormat, MediaType.Slide);
+
+                // Load previous music assets
+                await LoadPreviousMusic(mediaContext, path);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads previous assets from the asset folder for the specified media type.
+    /// Creates Image or Video models depending on the file extension.
+    /// </summary>
+    /// <param name="mediaContext">The media context to add items to.</param>
+    /// <param name="assetPath">The asset folder path.</param>
+    /// <param name="nameFormat">The name format pattern to search for.</param>
+    /// <param name="mediaType">The media type (Hero or Slide).</param>
+    private async Task LoadPreviousType(MediaContext mediaContext, string assetPath, string? nameFormat, MediaType mediaType)
+    {
+        if (string.IsNullOrWhiteSpace(nameFormat))
+            return;
+
+        foreach (var filePath in await FileService.GetFiles(assetPath, $"{nameFormat}*.*"))
+        {
+            var extension = FileService.GetExtension(filePath);
+            var localPath = await CopyToTemp(filePath);
+
+            if (VideoExtensions.Contains(extension))
+            {
+                var video = new Video()
+                {
+                    LocalPath = localPath,
+                    Extension = extension,
+                    Source = SourceFlag.Previous,
+                    ApplyMediaType = mediaType
+                };
+
+                mediaContext.Videos.Insert(0, video);
+            }
+            else
+            {
+                var image = new Image()
+                {
+                    LocalPath = localPath,
+                    Extension = extension,
+                    Source = SourceFlag.Previous
+                };
+
+                await MediaFormatterService.UpdateImageSize(image);
+
+                if (mediaType == MediaType.Hero)
+                {
+                    mediaContext.Heros.Insert(0, image);
+                }
+                else if (mediaType == MediaType.Slide)
+                {
+                    mediaContext.Slides.Insert(0, image);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Loads previous music assets from the asset folder.
+    /// </summary>
+    /// <param name="mediaContext">The media context to add items to.</param>
+    /// <param name="assetPath">The asset folder path.</param>
+    private async Task LoadPreviousMusic(MediaContext mediaContext, string assetPath)
+    {
+        var nameFormat = Configuration.MusicNameFormat;
+
+        // If no name format, music files may have their original titles
+        var searchPattern = string.IsNullOrWhiteSpace(nameFormat) ? "*.mp3" : $"{nameFormat}*.*";
+
+        foreach (var filePath in await FileService.GetFiles(assetPath, searchPattern))
+        {
+            var extension = FileService.GetExtension(filePath);
+
+            // Only load audio files
+            if (!extension.Equals(".mp3", StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            var localPath = await CopyToTemp(filePath);
+
+            var music = new Music()
+            {
+                LocalPath = localPath,
+                Extension = extension,
+                Source = SourceFlag.Previous,
+                Title = FileService.GetFileNameWithoutExtension(filePath)
+            };
+
+            mediaContext.Music.Insert(0, music);
+        }
+    }
+
     /// <summary>
     /// Handles the selection changed event from the media context.
     /// </summary>
@@ -472,7 +646,7 @@ public partial class GameViewModel : ObservableObject
 
     private async Task OnCropMedia(ImageViewModel imageViewModel, MediaType mediaType)
     {
-        if(imageViewModel.Crop == null)
+        if (imageViewModel.Crop == null)
         {
             Crop? crop = null;
 
@@ -769,7 +943,7 @@ public partial class GameViewModel : ObservableObject
             {
                 var newMusic = MediaContext.CreateMusic(music.BaseModel);
 
-                await newMusic.Download();
+                _ = newMusic.Download();
 
                 DemoModeMusic.Add(newMusic);
             }
@@ -1345,72 +1519,85 @@ public partial class GameViewModel : ObservableObject
         {
             if (IsFound || Configuration.IsApplyUnfoundGames)
             {
-                // Create the game's asset folder
-                var path = FileService.CombinePath(Configuration.ApplyAssetPath, Folder, FileService.CleanFileName(Name));
+                var folders = Configuration.FolderConfigurations.Where(f => f.Platform == Platform && f.IsAssetFolder).Select(f => f.Name);
 
-                await FileService.CreateDirectory(path);
-
-                // Apply icon image
-                if (Configuration.IsApplyIcon && !string.IsNullOrWhiteSpace(Configuration.IconNameFormat) && DemoModeIcon != null && !string.IsNullOrWhiteSpace(DemoModeIcon.LocalPath))
+                if (!folders.Any())
                 {
-                    await FileService.CopyFile(DemoModeIcon.LocalPath, FileService.CombinePath(path, $"{Configuration.IconNameFormat}.png"));
+                    folders = [Folder];
                 }
 
-                // Apply title image
-                if (Configuration.IsApplyTitle && !string.IsNullOrWhiteSpace(Configuration.TitleNameFormat) && DemoModeTitle != null && !string.IsNullOrWhiteSpace(DemoModeTitle.LocalPath))
+                foreach (var folder in folders)
                 {
-                    await FileService.CopyFile(DemoModeTitle.LocalPath, FileService.CombinePath(path, $"{Configuration.TitleNameFormat}.png"));
-                }
-
-                // Apply hero images (multiple, numbered)
-                if (Configuration.IsApplyHeros && !string.IsNullOrWhiteSpace(Configuration.HeroNameFormat))
-                {
-                    // Delete existing hero files before applying new ones
-                    await FileService.DeleteFiles(path, $"{Configuration.HeroNameFormat}.*");
-
-                    for (int i = 0; i < DemoModeHeros.Count; i++)
+                    if (!string.IsNullOrEmpty(folder))
                     {
-                        var localPath = DemoModeHeros[i].LocalPath;
+                        // Create the game's asset folder
+                        var path = FileService.CombinePath(Configuration.ApplyAssetPath, folder, FileService.CleanFileName(Name));
 
-                        if (!string.IsNullOrWhiteSpace(localPath))
+                        await FileService.CreateDirectory(path);
+
+                        // Apply icon image
+                        if (Configuration.IsApplyIcon && !string.IsNullOrWhiteSpace(Configuration.IconNameFormat) && DemoModeIcon != null && !string.IsNullOrWhiteSpace(DemoModeIcon.LocalPath))
                         {
-                            await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.HeroNameFormat}{i + 1}.{(DemoModeHeros[i] is ImageViewModel ? "png" : "mp4")}"));
+                            await FileService.CopyFile(DemoModeIcon.LocalPath, FileService.CombinePath(path, $"{Configuration.IconNameFormat}.png"));
                         }
-                    }
-                }
 
-                // Apply slide images (multiple, numbered)
-                if (Configuration.IsApplySlides && !string.IsNullOrWhiteSpace(Configuration.SlideNameFormat))
-                {
-                    // Delete existing slide files before applying new ones
-                    await FileService.DeleteFiles(path, $"{Configuration.SlideNameFormat}.*");
-
-                    for (int i = 0; i < DemoModeSlides.Count; i++)
-                    {
-                        var localPath = DemoModeSlides[i].LocalPath;
-
-                        if (!string.IsNullOrWhiteSpace(localPath))
+                        // Apply title image
+                        if (Configuration.IsApplyTitle && !string.IsNullOrWhiteSpace(Configuration.TitleNameFormat) && DemoModeTitle != null && !string.IsNullOrWhiteSpace(DemoModeTitle.LocalPath))
                         {
-                            await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.SlideNameFormat}{i + 1}.{(DemoModeSlides[i] is ImageViewModel ? "png" : "mp4")}"));
+                            await FileService.CopyFile(DemoModeTitle.LocalPath, FileService.CombinePath(path, $"{Configuration.TitleNameFormat}.png"));
                         }
-                    }
-                }
 
-                // Apply music files (multiple, numbered)
-                if (Configuration.IsApplyMusic)
-                {
-                    // Delete existing music files before applying new ones
-                    await FileService.DeleteFiles(path, $"{Configuration.MusicNameFormat}.*");
-
-                    for (int i = 0; i < DemoModeMusic.Count; i++)
-                    {
-                        var localPath = DemoModeMusic[i].LocalPath;
-
-                        var name = string.IsNullOrWhiteSpace(Configuration.MusicNameFormat) ? DemoModeMusic[i].Title : $"{Configuration.MusicNameFormat}{i + 1}";
-
-                        if (!string.IsNullOrWhiteSpace(localPath))
+                        // Apply hero images (multiple, numbered)
+                        if (Configuration.IsApplyHeros && !string.IsNullOrWhiteSpace(Configuration.HeroNameFormat))
                         {
-                            await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{name}.mp3"));
+                            // Delete existing hero files before applying new ones
+                            await FileService.DeleteFiles(path, $"{Configuration.HeroNameFormat}.*");
+
+                            for (int i = 0; i < DemoModeHeros.Count; i++)
+                            {
+                                var localPath = DemoModeHeros[i].LocalPath;
+
+                                if (!string.IsNullOrWhiteSpace(localPath))
+                                {
+                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.HeroNameFormat}{i + 1}.{(DemoModeHeros[i] is ImageViewModel ? "png" : "mp4")}"));
+                                }
+                            }
+                        }
+
+                        // Apply slide images (multiple, numbered)
+                        if (Configuration.IsApplySlides && !string.IsNullOrWhiteSpace(Configuration.SlideNameFormat))
+                        {
+                            // Delete existing slide files before applying new ones
+                            await FileService.DeleteFiles(path, $"{Configuration.SlideNameFormat}.*");
+
+                            for (int i = 0; i < DemoModeSlides.Count; i++)
+                            {
+                                var localPath = DemoModeSlides[i].LocalPath;
+
+                                if (!string.IsNullOrWhiteSpace(localPath))
+                                {
+                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.SlideNameFormat}{i + 1}.{(DemoModeSlides[i] is ImageViewModel ? "png" : "mp4")}"));
+                                }
+                            }
+                        }
+
+                        // Apply music files (multiple, numbered)
+                        if (Configuration.IsApplyMusic)
+                        {
+                            // Delete existing music files before applying new ones
+                            await FileService.DeleteFiles(path, $"{Configuration.MusicNameFormat}.*");
+
+                            for (int i = 0; i < DemoModeMusic.Count; i++)
+                            {
+                                var localPath = DemoModeMusic[i].LocalPath;
+
+                                var name = string.IsNullOrWhiteSpace(Configuration.MusicNameFormat) ? DemoModeMusic[i].Title : $"{Configuration.MusicNameFormat}{i + 1}";
+
+                                if (!string.IsNullOrWhiteSpace(localPath))
+                                {
+                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{name}.mp3"));
+                                }
+                            }
                         }
                     }
                 }
@@ -1423,9 +1610,6 @@ public partial class GameViewModel : ObservableObject
     /// </summary>
     public async Task Scrape()
     {
-        // Reset task completion source for new scrape operation
-        _scrapTaskCompletionSource = new TaskCompletionSource();
-
         IsLoading = true;
 
         if (!string.IsNullOrWhiteSpace(Path) && !string.IsNullOrWhiteSpace(Platform))
@@ -1441,51 +1625,45 @@ public partial class GameViewModel : ObservableObject
 
             if (mediaContext != null)
             {
+                // Load previously saved assets from asset folders
+                if (Configuration.IsLoadPrevious)
+                {
+                    await LoadPrevious(mediaContext);
+                }
+
                 // Create view model wrapper and wire up event handlers
                 MediaContext = new MediaContextViewModel(mediaContext, ScrapingService, MediaFormatterService, UpscalerService, FileService, Downloader, Configuration);
 
                 InitializeMediaContext(MediaContext);
+
+                DemoModeHeros.Clear();
+                DemoModeSlides.Clear();
+
+                if (MediaContext != null)
+                {
+                    // Calculate smart crop regions for each image type in parallel
+                    // This determines optimal crop areas based on content analysis
+                    var smartCropTasks = new List<Task>();
+
+                    smartCropTasks.AddRange(MediaContext.Icons.Where(i => i.IsSelected).Select(i => OnCropMedia(i, MediaType.Icon)));
+
+                    smartCropTasks.AddRange(MediaContext.Logos.Where(l => l.IsSelected).Select(l => OnCropMedia(l, MediaType.Logo)));
+
+                    smartCropTasks.AddRange(MediaContext.Titles.Where(t => t.IsSelected).Select(t => OnCropMedia(t, MediaType.Title)));
+
+                    smartCropTasks.AddRange(MediaContext.Heros.Where(h => h.IsSelected).OfType<ImageViewModel>().Select(h => OnCropMedia(h, MediaType.Hero)));
+
+                    smartCropTasks.AddRange(MediaContext.Slides.Where(s => s.IsSelected).OfType<ImageViewModel>().Select(s => OnCropMedia(s, MediaType.Hero)));
+
+                    await Task.WhenAll(smartCropTasks);
+
+                    // Generate demo mode preview with formatted media
+                    await UpdateDemoModeMedia();
+                }
             }
         }
 
-        // Signal that scraping is complete (Format() waits on this)
         _scrapTaskCompletionSource.SetResult();
-    }
-
-    /// <summary>
-    /// Formats media for the game by calculating smart crop regions.
-    /// Waits for scraping to complete before formatting.
-    /// </summary>
-    public async Task Format()
-    {
-        // Wait for scraping to complete before formatting
-        await _scrapTaskCompletionSource.Task;
-
-        // Clear existing demo mode media before formatting
-        DemoModeHeros.Clear();
-        DemoModeSlides.Clear();
-
-        if (MediaContext != null)
-        {
-            // Calculate smart crop regions for each image type in parallel
-            // This determines optimal crop areas based on content analysis
-            var smartCropTasks = new List<Task>();
-
-            smartCropTasks.AddRange(MediaContext.Icons.Where(i => i.IsSelected).Select(i => OnCropMedia(i, MediaType.Icon)));
-
-            smartCropTasks.AddRange(MediaContext.Logos.Where(l => l.IsSelected).Select(l => OnCropMedia(l, MediaType.Logo)));
-
-            smartCropTasks.AddRange(MediaContext.Titles.Where(t => t.IsSelected).Select(t => OnCropMedia(t, MediaType.Title)));
-
-            smartCropTasks.AddRange(MediaContext.Heros.Where(h => h.IsSelected).OfType<ImageViewModel>().Select(h => OnCropMedia(h, MediaType.Hero)));
-
-            smartCropTasks.AddRange(MediaContext.Slides.Where(s => s.IsSelected).OfType<ImageViewModel>().Select(s => OnCropMedia(s, MediaType.Hero)));
-
-            await Task.WhenAll(smartCropTasks);
-
-            // Generate demo mode preview with formatted media
-            await UpdateDemoModeMedia();
-        }
 
         IsLoading = false;
     }

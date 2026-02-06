@@ -18,17 +18,23 @@
             <ColumnDefinition Width="*" />
             <ColumnDefinition Width="auto" />
             <ColumnDefinition Width="auto" />
+            <ColumnDefinition Width="auto" />
         </Grid.ColumnDefinitions>
         <TextBox PlaceholderText="Folder"
                  Text="{x:Bind ViewModel.Name, Mode=TwoWay}"
                  Margin="0,0,16,0" />
+        <controls1:CustomComboBox Grid.Column="1"
+                                  Width="100"
+                                  SelectedItem="{x:Bind ViewModel.SelectedIsAssetFolder, Mode=TwoWay}"
+                                  ItemsSource="{x:Bind ViewModel.IsAssetFolderOptions, Mode=OneWay}"
+                                  Margin="0,0,16,0" />
         <controls1:CustomComboBox Width="300"
-                                  Grid.Column="1"
+                                  Grid.Column="2"
                                   SelectedItem="{x:Bind ViewModel.SelectedPlatform, Mode=TwoWay}"
                                   ItemsSource="{x:Bind ViewModel.PlatformConfigurations, Mode=OneWay}"
                                   DisplayMemberPath="Name"
                                   Margin="0,0,16,0" />
-        <Button Grid.Column="2"
+        <Button Grid.Column="3"
                 Height="32"
                 Width="32"
                 Padding="0"

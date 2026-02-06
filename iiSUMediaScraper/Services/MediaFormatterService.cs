@@ -234,9 +234,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The image to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns null if cancelled.</param>
-    /// <returns>The calculated crop region, or null if cancelled.</returns>
+    /// <returns>The calculated crop region, or null if cancelled or if image is from Previous source.</returns>
     public Task<Crop?> SmartCropHero(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Crop?>(null);
+
         var config = ConfigurationService.Configuration;
 
         return SmartCrop(image, config?.HeroWidth, config?.HeroHeight, cancellationToken);
@@ -247,9 +250,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The image to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns null if cancelled.</param>
-    /// <returns>The calculated crop region, or null if cancelled.</returns>
+    /// <returns>The calculated crop region, or null if cancelled or if image is from Previous source.</returns>
     public Task<Crop?> SmartCropIcon(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Crop?>(null);
+
         var config = ConfigurationService.Configuration;
 
         return SmartCrop(image, config?.IconWidth, config?.IconHeight, cancellationToken);
@@ -260,9 +266,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The image to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns null if cancelled.</param>
-    /// <returns>The calculated crop region, or null if cancelled.</returns>
+    /// <returns>The calculated crop region, or null if cancelled or if image is from Previous source.</returns>
     public Task<Crop?> SmartCropLogo(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Crop?>(null);
+
         var config = ConfigurationService.Configuration;
 
         return SmartCrop(image, config?.LogoWidth, config?.LogoHeight, cancellationToken);
@@ -273,9 +282,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The image to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns null if cancelled.</param>
-    /// <returns>The calculated crop region, or null if cancelled.</returns>
+    /// <returns>The calculated crop region, or null if cancelled or if image is from Previous source.</returns>
     public Task<Crop?> SmartCropSlide(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Crop?>(null);
+
         var config = ConfigurationService.Configuration;
 
         return SmartCrop(image, config?.SlideWidth, config?.SlideHeight, cancellationToken);
@@ -286,9 +298,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The image to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns null if cancelled.</param>
-    /// <returns>The calculated crop region, or null if cancelled.</returns>
+    /// <returns>The calculated crop region, or null if cancelled or if image is from Previous source.</returns>
     public Task<Crop?> SmartCropTitle(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Crop?>(null);
+
         var config = ConfigurationService.Configuration;
 
         return SmartCrop(image, config?.TitleWidth, config?.TitleHeight, cancellationToken);
@@ -583,9 +598,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The hero image to format.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns the original image if cancelled.</param>
-    /// <returns>The formatted image, or the original image if cancelled.</returns>
+    /// <returns>The formatted image, the original image if cancelled, or unchanged if from Previous source.</returns>
     public Task<Image?> FormatHero(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Image?>(image);
+
         var config = ConfigurationService.Configuration;
 
         return FormatImage(image, config?.HeroWidth, config?.HeroHeight, cancellationToken);
@@ -597,9 +615,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// <param name="image">The icon image to format.</param>
     /// <param name="platform">The gaming platform to determine which overlay to apply.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns the original image if cancelled.</param>
-    /// <returns>The formatted image, or the original image if cancelled.</returns>
+    /// <returns>The formatted image, the original image if cancelled, or unchanged if from Previous source.</returns>
     public Task<Image?> FormatIcon(Image image, string platform, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Image?>(image);
+
         var config = ConfigurationService.Configuration;
 
         return FormatImage(image, config?.IconWidth, config?.IconHeight, cancellationToken, postProcess: magickImage =>
@@ -623,9 +644,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The logo image to format.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns the original image if cancelled.</param>
-    /// <returns>The formatted image, or the original image if cancelled.</returns>
+    /// <returns>The formatted image, the original image if cancelled, or unchanged if from Previous source.</returns>
     public Task<Image?> FormatLogo(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Image?>(image);
+
         var config = ConfigurationService.Configuration;
 
         return FormatImage(image, config?.LogoWidth, config?.LogoHeight, cancellationToken);
@@ -636,9 +660,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The slide image to format.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns the original image if cancelled.</param>
-    /// <returns>The formatted image, or the original image if cancelled.</returns>
+    /// <returns>The formatted image, the original image if cancelled, or unchanged if from Previous source.</returns>
     public Task<Image?> FormatSlide(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Image?>(image);
+
         var config = ConfigurationService.Configuration;
 
         return FormatImage(image, config?.SlideWidth, config?.SlideHeight, cancellationToken);
@@ -649,9 +676,12 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="image">The title image to format.</param>
     /// <param name="cancellationToken">Token to cancel the operation. Returns the original image if cancelled.</param>
-    /// <returns>The formatted image, or the original image if cancelled.</returns>
+    /// <returns>The formatted image, the original image if cancelled, or unchanged if from Previous source.</returns>
     public Task<Image?> FormatTitle(Image image, CancellationToken cancellationToken = default)
     {
+        if (image.Source == SourceFlag.Previous)
+            return Task.FromResult<Image?>(image);
+
         var config = ConfigurationService.Configuration;
 
         return FormatImage(image, config?.TitleWidth, config?.TitleHeight, cancellationToken, applyRoundCorners: true);
@@ -996,9 +1026,14 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="video">The video to analyze.</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
-    /// <returns>The calculated crop region, or null if smart crop cannot be determined.</returns>
+    /// <returns>The calculated crop region, or null if smart crop cannot be determined or if video is from Previous source.</returns>
     public async Task<Crop?> SmartCropVideo(Video video, CancellationToken cancellationToken = default)
     {
+        if (video.Source == SourceFlag.Previous)
+        {
+            return null;
+        }
+
         if (string.IsNullOrWhiteSpace(video.LocalPath) || !File.Exists(video.LocalPath))
         {
             return null;
@@ -1132,9 +1167,14 @@ public class MediaFormatterService : IMediaFormatterService
     /// </summary>
     /// <param name="video">The video to format. Must have Crop set (use SmartCropVideo first).</param>
     /// <param name="cancellationToken">Token to cancel the operation.</param>
-    /// <returns>The formatted video with updated LocalPath, or the original video if processing failed.</returns>
+    /// <returns>The formatted video with updated LocalPath, the original video if processing failed, or unchanged if from Previous source.</returns>
     public async Task<Video?> FormatVideo(Video video, CancellationToken cancellationToken = default)
     {
+        if (video.Source == SourceFlag.Previous)
+        {
+            return video;
+        }
+
         if (string.IsNullOrWhiteSpace(video.LocalPath) || !File.Exists(video.LocalPath))
         {
             return video;

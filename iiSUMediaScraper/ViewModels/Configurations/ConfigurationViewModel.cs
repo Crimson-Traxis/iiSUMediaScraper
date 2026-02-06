@@ -86,6 +86,12 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     private double maxMusicDuration = double.NaN;
 
     /// <summary>
+    /// Max duration for music search results.
+    /// </summary>
+    [ObservableProperty]
+    private double searchMusicMaxDuration = double.NaN;
+
+    /// <summary>
     /// Max Duration of the video to download.
     /// </summary>
     [ObservableProperty]
@@ -351,12 +357,17 @@ public partial class ConfigurationViewModel : ObservableConfiguration
 
         if (base.MaxMusicDuration != null)
         {
-            MaxMusicDuration = base.MaxMusicDuration.Value.Seconds;
+            MaxMusicDuration = base.MaxMusicDuration.Value.TotalSeconds;
+        }
+
+        if (base.SearchMusicMaxDuration != null)
+        {
+            SearchMusicMaxDuration = base.SearchMusicMaxDuration.Value.TotalSeconds;
         }
 
         if (base.MaxVideoDuration != null)
         {
-            MaxVideoDuration = base.MaxVideoDuration.Value.Seconds;
+            MaxVideoDuration = base.MaxVideoDuration.Value.TotalSeconds;
         }
 
         folderConfigurations = [];
@@ -710,6 +721,22 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     }
 
     /// <summary>
+    /// Called when the search music max duration changes to update the base model.
+    /// </summary>
+    /// <param name="value">The new duration in seconds.</param>
+    partial void OnSearchMusicMaxDurationChanged(double value)
+    {
+        if (double.IsNaN(value) || value <= 0)
+        {
+            base.SearchMusicMaxDuration = null;
+        }
+        else
+        {
+            base.SearchMusicMaxDuration = TimeSpan.FromSeconds(value);
+        }
+    }
+
+    /// <summary>
     /// Called when the max video duration changes to update the base model.
     /// </summary>
     /// <param name="value">The new duration in seconds.</param>
@@ -1031,19 +1058,28 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     /// Called when a property value changes to handle dependent updates.
     /// </summary>
     /// <param name="e">The property changed event args.</param>
-    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    protected override async void OnPropertyChanged(PropertyChangedEventArgs e)
     {
+        base.OnPropertyChanged(e);
+
         switch (e.PropertyName)
         {
+            case nameof(ApplyAssetPath):
+                ApplyAssetPath = await FileService.CheckPath(ApplyAssetPath);
+                break;
             case nameof(GamesPath):
+                GamesPath = await FileService.CheckPath(GamesPath);
+                UpdateSpecificGames();
+                break;
             case nameof(UnfoundMediaMovePath):
+                UnfoundMediaMovePath = await FileService.CheckPath(UnfoundMediaMovePath);
+                UpdateSpecificGames();
+                break;
             case nameof(IsScanGames):
             case nameof(IsScanUnfoundGames):
                 UpdateSpecificGames();
                 break;
         }
-
-        base.OnPropertyChanged(e);
     }
 
     /// <summary>

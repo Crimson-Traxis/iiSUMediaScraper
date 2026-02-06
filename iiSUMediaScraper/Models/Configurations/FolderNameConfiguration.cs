@@ -5,4 +5,6 @@ public class FolderNameConfiguration
     public string Platform { get; set; }
 
     public string? Name { get; set; }
+
+    public bool IsAssetFolder { get; set; }
 }

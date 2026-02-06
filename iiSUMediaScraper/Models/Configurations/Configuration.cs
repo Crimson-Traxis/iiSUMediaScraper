@@ -126,6 +126,11 @@ public class Configuration
     public int? MaxNumberOfConcurrentGames { get; set; }
 
     /// <summary>
+    /// Gets or sets whether to load previously saved assets when scraping.
+    /// </summary>
+    public bool IsLoadPrevious { get; set; }
+
+    /// <summary>
     /// Gets or sets the name of the default upscale configuration.
     /// </summary>
     public string? DefaultUpscaleConfigurationName { get; set; }
@@ -234,6 +239,12 @@ public class Configuration
     /// Gets or sets the maximum duration for music tracks.
     /// </summary>
     public TimeSpan? MaxMusicDuration { get; set; }
+
+    /// <summary>
+    /// Gets or sets the maximum duration for music search results.
+    /// Tracks longer than this are excluded from search results.
+    /// </summary>
+    public TimeSpan? SearchMusicMaxDuration { get; set; }
 
     /// <summary>
     /// Gets or sets the comma-separated priority terms for music search.

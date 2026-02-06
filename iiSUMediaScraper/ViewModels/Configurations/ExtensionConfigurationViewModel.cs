@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using iiSUMediaScraper.Models.Configurations;
 using iiSUMediaScraper.ObservableModels.Configurations;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace iiSUMediaScraper.ViewModels.Configurations;
 

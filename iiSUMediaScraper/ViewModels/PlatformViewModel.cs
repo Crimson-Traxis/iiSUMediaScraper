@@ -428,8 +428,6 @@ public partial class PlatformViewModel : ObservableObject
         foreach (GameViewModel game in Games)
         {
             tasks.Add(OnScrapeGame(game));
-
-            tasks.Add(game.Format());
         }
 
         await Task.WhenAll(tasks);

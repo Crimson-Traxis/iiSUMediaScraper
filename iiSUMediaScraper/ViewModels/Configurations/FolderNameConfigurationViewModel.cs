@@ -23,9 +23,20 @@ public partial class FolderNameConfigurationViewModel : ObservableFolderNameConf
     private PlatformConfigurationViewModel? selectedPlatform;
 
     /// <summary>
+    /// Gets or sets the selected IsAssetFolder value as a string ("True" or "False").
+    /// </summary>
+    [ObservableProperty]
+    private string selectedIsAssetFolder = "False";
+
+    /// <summary>
     /// Gets the collection of available platform configurations.
     /// </summary>
     public ObservableCollection<PlatformConfigurationViewModel> PlatformConfigurations { get; }
+
+    /// <summary>
+    /// Gets the collection of available IsAssetFolder options.
+    /// </summary>
+    public IReadOnlyList<string> IsAssetFolderOptions { get; } = ["False", "True"];
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FolderNameConfigurationViewModel"/> class.
@@ -37,6 +48,7 @@ public partial class FolderNameConfigurationViewModel : ObservableFolderNameConf
         PlatformConfigurations = configurationViewModel.PlatformConfigurations;
 
         selectedPlatform = PlatformConfigurations.FirstOrDefault(p => p.Code == baseModel.Platform);
+        selectedIsAssetFolder = baseModel.IsAssetFolder ? "True" : "False";
     }
 
     /// <summary>
@@ -49,6 +61,15 @@ public partial class FolderNameConfigurationViewModel : ObservableFolderNameConf
         {
             Platform = value.Code;
         }
+    }
+
+    /// <summary>
+    /// Called when the selected IsAssetFolder string changes to update the bool property.
+    /// </summary>
+    /// <param name="value">The new value ("True" or "False").</param>
+    partial void OnSelectedIsAssetFolderChanged(string value)
+    {
+        IsAssetFolder = value == "True";
     }
 
     /// <summary>

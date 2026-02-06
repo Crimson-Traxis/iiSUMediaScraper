@@ -200,6 +200,12 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
         set => SetProperty(_baseModel.MaxNumberOfConcurrentGames, value, _baseModel, (o, v) => o.MaxNumberOfConcurrentGames = v);
     }
 
+    public bool IsLoadPrevious
+    {
+        get => _baseModel.IsLoadPrevious;
+        set => SetProperty(_baseModel.IsLoadPrevious, value, _baseModel, (o, v) => o.IsLoadPrevious = v);
+    }
+
     public bool IsApplyUnfoundGames
     {
         get => _baseModel.IsApplyUnfoundGames;
@@ -283,6 +289,12 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
     {
         get => _baseModel.MaxMusicDuration;
         set => SetProperty(_baseModel.MaxMusicDuration, value, _baseModel, (o, v) => o.MaxMusicDuration = v);
+    }
+
+    public TimeSpan? SearchMusicMaxDuration
+    {
+        get => _baseModel.SearchMusicMaxDuration;
+        set => SetProperty(_baseModel.SearchMusicMaxDuration, value, _baseModel, (o, v) => o.SearchMusicMaxDuration = v);
     }
 
     public string? MusicSearchTermPriority

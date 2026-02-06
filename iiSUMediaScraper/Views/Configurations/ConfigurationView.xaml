@@ -370,31 +370,37 @@
                                     Grid.Column="1"
                                     Click="PickAssetsFolderButton_Click" />
                             <NumberBox Value="{x:Bind ViewModel.MaxNumberOfConcurrentGames, Mode=TwoWay}"
-                                       Grid.Row="4" 
+                                       Grid.Row="4"
                                        Margin="0,0,0,16"
                                        Header="Max Concurrency"
                                        ToolTipService.ToolTip="Maximum number of games to concurrently scrape at one. Only applies at the begining of the process. Higher values will increase ram usage. Max 100"
                                        Width="160"
                                        HorizontalAlignment="Left"/>
+                            <ToggleSwitch OffContent="Load previous assets"
+                                          OnContent="Load previous assets"
+                                          IsOn="{x:Bind ViewModel.IsLoadPrevious, Mode=TwoWay}"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="5"
+                                          Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Show Previewer"
                                           OnContent="Show Previewer"
                                           IsOn="{x:Bind ViewModel.IsPreviewerEnabled, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="5"
+                                          Grid.Row="6"
                                           Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan games folder"
                                           OnContent="Scan games folder"
                                           IsOn="{x:Bind ViewModel.IsScanGames, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="6"
+                                          Grid.Row="7"
                                           Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan unfound games folder"
                                           OnContent="Scan unfound games folder"
                                           IsOn="{x:Bind ViewModel.IsScanUnfoundGames, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="7"
+                                          Grid.Row="8"
                                           Grid.ColumnSpan="2" />
-                            <StackPanel Grid.Row="8"
+                            <StackPanel Grid.Row="9"
                                         Grid.ColumnSpan="2"
                                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                                         HorizontalAlignment="Left"
@@ -593,6 +599,13 @@
                                        Width="200"
                                        HorizontalAlignment="Left"
                                        Value="{x:Bind ViewModel.MaxMusicDuration, Mode=TwoWay}" />
+                            <NumberBox Header="Search Max Duration (seconds)"
+                                       SpinButtonPlacementMode="Compact"
+                                       MinWidth="120"
+                                       Margin="0,0,0,16"
+                                       Width="200"
+                                       HorizontalAlignment="Left"
+                                       Value="{x:Bind ViewModel.SearchMusicMaxDuration, Mode=TwoWay}" />
                         </StackPanel>
                     </ScrollView>
                 </controls:Case>
@@ -947,12 +960,18 @@
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="auto" />
                                     <ColumnDefinition Width="350" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Folder Name"
                                            Margin="0,0,16,16"
                                            MinWidth="200" />
                                 <TextBlock Grid.Column="1"
+                                           Text="Asset Folder"
+                                           ToolTipService.ToolTip="Folder name to store the assets in. If there are none set to true for a platform the game platform folder is used"
+                                           Width="100"
+                                           Margin="0,0,16,16" />
+                                <TextBlock Grid.Column="2"
                                            Text="Platform"
                                            Margin="0,0,16,16" />
                             </Grid>
