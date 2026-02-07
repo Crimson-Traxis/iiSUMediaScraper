@@ -391,7 +391,8 @@
         ".nes",
         ".nez",
         ".unf",
-        ".unif"
+        ".unif",
+        ".zip"
       ]
     },
     {
@@ -401,7 +402,8 @@
         ".smc",
         ".swc",
         ".fig",
-        ".bs"
+        ".bs",
+        ".zip"
       ]
     },
     {
@@ -409,25 +411,29 @@
       "Extension": [
         ".z64",
         ".n64",
-        ".v64"
+        ".v64",
+        ".zip"
       ]
     },
     {
       "Platform": "GB",
       "Extension": [
-        ".gb"
+        ".gb",
+        ".zip"
       ]
     },
     {
       "Platform": "GBC",
       "Extension": [
-        ".gbc"
+        ".gbc",
+        ".zip"
       ]
     },
     {
       "Platform": "GBA",
       "Extension": [
-        ".gba"
+        ".gba",
+        ".zip"
       ]
     },
     {
@@ -444,7 +450,8 @@
     {
       "Platform": "NDS",
       "Extension": [
-        ".nds"
+        ".nds",
+        ".zip"
       ]
     },
     {
@@ -556,7 +563,8 @@
     {
       "Platform": "GameGear",
       "Extension": [
-        ".gg"
+        ".gg",
+        ".zip"
       ]
     },
     {
@@ -565,7 +573,8 @@
         ".md",
         ".smd",
         ".gen",
-        ".bin"
+        ".bin",
+        ".zip"
       ]
     },
     {
@@ -581,14 +590,16 @@
       "Platform": "Atari2600",
       "Extension": [
         ".a26",
-        ".bin"
+        ".bin",
+        ".zip"
       ]
     },
     {
       "Platform": "NeoGeoPocketColor",
       "Extension": [
         ".ngc",
-        ".ngp"
+        ".ngp",
+        ".zip"
       ]
     },
     {
