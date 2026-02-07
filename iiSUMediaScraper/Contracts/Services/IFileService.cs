@@ -119,28 +119,12 @@ public interface IFileService
 
     /// <summary>
     /// Checks if a file exists at the specified path.
-    /// Supports both local file system and MTP device paths.
     /// </summary>
     Task<bool> FileExists(string filePath);
 
     /// <summary>
-    /// Checks if the first segment of a path matches a connected MTP device
-    /// and rewrites it to include the mtp:\ prefix if so.
+    /// Gives each handler a chance to rewrite a path for its protocol if needed.
+    /// Returns the path unchanged if no handler claims it.
     /// </summary>
     Task<string?> CheckPath(string? path);
-
-    /// <summary>
-    /// Returns true if the path refers to an MTP device (uses the mtp:\ prefix).
-    /// </summary>
-    bool IsMtpPath(string path);
-
-    /// <summary>
-    /// Gets the friendly names of all connected MTP devices.
-    /// </summary>
-    Task<IEnumerable<string>> GetMtpDevices();
-
-    /// <summary>
-    /// Disconnects all cached MTP device connections.
-    /// </summary>
-    Task DisconnectMtpDevices();
 }

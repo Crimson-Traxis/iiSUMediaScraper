@@ -20,6 +20,7 @@
   "SlideNameFormat": "slide_",
   "MusicNameFormat": "track_",
   "IsApplyUnfoundGames": false,
+  "IsFetchIfPreviousFound": false,
   "IsDeleteExistingHeroAssets": false,
   "IsDeleteExistingSlideAssets": false,
   "MaxNumberOfConcurrentGames": 20,
@@ -1082,5 +1083,16 @@
     }
   ],
   "SpecificPlatforms": [],
-  "SpecificGames": []
+  "SpecificGames": [],
+  "GamesPathHistory": [
+    "C:\\Emulation\\Roms",
+    "mtp:\\AYN Thor\\Internal shared storage\\Emulation\\Roms",
+    "ftp://pc:902087@192.168.0.193:1989/device/Emulation/Roms"
+  ],
+  "ApplyAssetPathHistory": [
+    "C:\\Emulation\\Assets",
+    "mtp:\\AYN Thor\\Internal shared storage\\Android\\media\\com.iisulauncher\\iiSULauncher\\assets\\media\\roms\\consoles",
+    "ftp://pc:902087@192.168.0.193:1989/device/Android/media/com.iisulauncher/iiSULauncher/assets/media/roms/consoles"
+  ],
+  "UnfoundMediaMovePathHistory": []
 }

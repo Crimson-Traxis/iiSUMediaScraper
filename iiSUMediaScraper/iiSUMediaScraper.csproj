@@ -18,7 +18,7 @@
 		<UserSecretsId>f56c6b21-052c-4a63-a873-0055657b4875</UserSecretsId>
 		<WindowsPackageType>None</WindowsPackageType>
 		<PackageIcon>icon.png</PackageIcon>
-		<Version>1.2.0</Version>
+		<Version>1.3.0</Version>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Assets\icon.ico" />
@@ -52,6 +52,7 @@
 		<PackageReference Include="CommunityToolkit.WinUI.Extensions" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Media" Version="8.2.251219" />
 		<PackageReference Include="CommunityToolkit.WinUI.Triggers" Version="8.2.251219" />
+		<PackageReference Include="FluentFTP" Version="53.0.2" />
 		<PackageReference Include="ImageEx.WinUI" Version="4.0.0" />
 		<PackageReference Include="Magick.NET-Q8-AnyCPU" Version="14.10.2" />
 		<PackageReference Include="MediaDevices" Version="1.10.0" />

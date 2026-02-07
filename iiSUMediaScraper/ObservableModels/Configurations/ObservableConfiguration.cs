@@ -212,6 +212,12 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
         set => SetProperty(_baseModel.IsApplyUnfoundGames, value, _baseModel, (o, v) => o.IsApplyUnfoundGames = v);
     }
 
+    public bool IsFetchIfPreviousFound
+    {
+        get => _baseModel.IsFetchIfPreviousFound;
+        set => SetProperty(_baseModel.IsFetchIfPreviousFound, value, _baseModel, (o, v) => o.IsFetchIfPreviousFound = v);
+    }
+
     public bool IsDeleteExistingHeroAssets
     {
         get => _baseModel.IsDeleteExistingHeroAssets;
@@ -379,5 +385,23 @@ public class ObservableConfiguration : BaseObservableModel<Configuration>
     {
         get => _baseModel.SpecificGames;
         set => SetProperty(_baseModel.SpecificGames, value, _baseModel, (o, v) => o.SpecificGames = v);
+    }
+
+    public List<string> GamesPathHistory
+    {
+        get => _baseModel.GamesPathHistory;
+        set => SetProperty(_baseModel.GamesPathHistory, value, _baseModel, (o, v) => o.GamesPathHistory = v);
+    }
+
+    public List<string> ApplyAssetPathHistory
+    {
+        get => _baseModel.ApplyAssetPathHistory;
+        set => SetProperty(_baseModel.ApplyAssetPathHistory, value, _baseModel, (o, v) => o.ApplyAssetPathHistory = v);
+    }
+
+    public List<string> UnfoundMediaMovePathHistory
+    {
+        get => _baseModel.UnfoundMediaMovePathHistory;
+        set => SetProperty(_baseModel.UnfoundMediaMovePathHistory, value, _baseModel, (o, v) => o.UnfoundMediaMovePathHistory = v);
     }
 }

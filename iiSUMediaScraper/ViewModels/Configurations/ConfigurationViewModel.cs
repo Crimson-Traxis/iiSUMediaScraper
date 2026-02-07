@@ -230,6 +230,24 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     private ObservableCollection<SpecificGameViewModel> specificGames;
 
     /// <summary>
+    /// Gets or sets the collection of games path history entries.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<PathHistoryViewModel> gamesPathHistory;
+
+    /// <summary>
+    /// Gets or sets the collection of apply asset path history entries.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<PathHistoryViewModel> applyAssetPathHistory;
+
+    /// <summary>
+    /// Gets or sets the collection of unfound media move path history entries.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<PathHistoryViewModel> unfoundMediaMovePathHistory;
+
+    /// <summary>
     /// Gets the available video quality options for yt-dlp.
     /// </summary>
     [ObservableProperty]
@@ -290,6 +308,21 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     /// Raised when the extension configurations search text changes.
     /// </summary>
     public event EventHandler? ExtensionConfigurationsSearchChanged;
+
+    /// <summary>
+    /// Raised when a games path history entry is removed.
+    /// </summary>
+    public event EventHandler? GamesPathHistoryRemoved;
+
+    /// <summary>
+    /// Raised when an apply asset path history entry is removed.
+    /// </summary>
+    public event EventHandler? ApplyAssetPathHistoryRemoved;
+
+    /// <summary>
+    /// Raised when an unfound media move path history entry is removed.
+    /// </summary>
+    public event EventHandler? UnfoundMediaMovePathHistoryRemoved;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ConfigurationViewModel"/> class.
@@ -380,6 +413,9 @@ public partial class ConfigurationViewModel : ObservableConfiguration
         reconstructorConfigurations = [];
         specificPlatforms = [];
         specificGames = [];
+        gamesPathHistory = [];
+        applyAssetPathHistory = [];
+        unfoundMediaMovePathHistory = [];
 
         selectedSpecificPlatforms = [];
 
@@ -445,6 +481,30 @@ public partial class ConfigurationViewModel : ObservableConfiguration
             upscalerConfigurations,
             CreateUpscalerConfiguration,
             InitializeUpscalerConfiguration);
+
+        RegisterObservableCollection(
+            nameof(GamesPathHistory),
+            baseModel.GamesPathHistory,
+            gamesPathHistory,
+            path => new PathHistoryViewModel(path),
+            InitializePathHistory,
+            vm => vm.Path);
+
+        RegisterObservableCollection(
+            nameof(ApplyAssetPathHistory),
+            baseModel.ApplyAssetPathHistory,
+            applyAssetPathHistory,
+            path => new PathHistoryViewModel(path),
+            InitializePathHistory,
+            vm => vm.Path);
+
+        RegisterObservableCollection(
+            nameof(UnfoundMediaMovePathHistory),
+            baseModel.UnfoundMediaMovePathHistory,
+            unfoundMediaMovePathHistory,
+            path => new PathHistoryViewModel(path),
+            InitializePathHistory,
+            vm => vm.Path);
 
         selectedUpscalerConfiguration ??= upscalerConfigurations.FirstOrDefault();
 
@@ -888,6 +948,26 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     }
 
     /// <summary>
+    /// Handles the remove requested event for a path history entry.
+    /// </summary>
+    /// <param name="sender">The path history entry requesting removal.</param>
+    /// <param name="e">The event arguments.</param>
+    private void OnPathHistoryRemoveRequested(object? sender, EventArgs e)
+    {
+        if (sender is PathHistoryViewModel item)
+        {
+            if (GamesPathHistory.Remove(item))
+                GamesPathHistoryRemoved?.Invoke(this, EventArgs.Empty);
+
+            if (ApplyAssetPathHistory.Remove(item))
+                ApplyAssetPathHistoryRemoved?.Invoke(this, EventArgs.Empty);
+
+            if (UnfoundMediaMovePathHistory.Remove(item))
+                UnfoundMediaMovePathHistoryRemoved?.Invoke(this, EventArgs.Empty);
+        }
+    }
+
+    /// <summary>
     /// Handles the selection changed event for a specific platform.
     /// </summary>
     /// <param name="sender">The specific platform whose selection changed.</param>
@@ -1069,15 +1149,15 @@ public partial class ConfigurationViewModel : ObservableConfiguration
                 break;
             case nameof(GamesPath):
                 GamesPath = await FileService.CheckPath(GamesPath);
-                UpdateSpecificGames();
+                await UpdateSpecificGames();
                 break;
             case nameof(UnfoundMediaMovePath):
                 UnfoundMediaMovePath = await FileService.CheckPath(UnfoundMediaMovePath);
-                UpdateSpecificGames();
+                await UpdateSpecificGames();
                 break;
             case nameof(IsScanGames):
             case nameof(IsScanUnfoundGames):
-                UpdateSpecificGames();
+                await UpdateSpecificGames();
                 break;
         }
     }
@@ -1260,6 +1340,24 @@ public partial class ConfigurationViewModel : ObservableConfiguration
     protected void DeInitializeSpecificGame(SpecificGameViewModel item)
     {
         item.SelectionChanged -= SpecificGame_SelectionChanged;
+    }
+
+    /// <summary>
+    /// Initializes event handlers for a path history entry.
+    /// </summary>
+    /// <param name="item">The path history entry to initialize.</param>
+    protected void InitializePathHistory(PathHistoryViewModel item)
+    {
+        item.RemoveRequested += OnPathHistoryRemoveRequested;
+    }
+
+    /// <summary>
+    /// Removes event handlers from a path history entry.
+    /// </summary>
+    /// <param name="item">The path history entry to de-initialize.</param>
+    protected void DeInitializePathHistory(PathHistoryViewModel item)
+    {
+        item.RemoveRequested -= OnPathHistoryRemoveRequested;
     }
 
     /// <summary>
@@ -1865,6 +1963,97 @@ public partial class ConfigurationViewModel : ObservableConfiguration
         foreach (var item in SpecificGames.ToList())
         {
             RemoveSpecificGame(item);
+        }
+    }
+
+    /// <summary>
+    /// Returns games path history entries matching the query text.
+    /// </summary>
+    /// <param name="query">The search text to filter by.</param>
+    /// <returns>Matching path history entries.</returns>
+    public IEnumerable<PathHistoryViewModel> FindGamesPath(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return GamesPathHistory;
+
+        return GamesPathHistory.Where(p => p.Path.Contains(query, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Sets the games path from a chosen history entry.
+    /// </summary>
+    /// <param name="path">The path to set.</param>
+    public void ChooseGamesPath(string path)
+    {
+        GamesPath = path;
+    }
+
+    /// <summary>
+    /// Returns apply asset path history entries matching the query text.
+    /// </summary>
+    /// <param name="query">The search text to filter by.</param>
+    /// <returns>Matching path history entries.</returns>
+    public IEnumerable<PathHistoryViewModel> FindApplyAssetPath(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return ApplyAssetPathHistory;
+
+        return ApplyAssetPathHistory.Where(p => p.Path.Contains(query, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Sets the apply asset path from a chosen history entry.
+    /// </summary>
+    /// <param name="path">The path to set.</param>
+    public void ChooseApplyAssetPath(string path)
+    {
+        ApplyAssetPath = path;
+    }
+
+    /// <summary>
+    /// Returns unfound media move path history entries matching the query text.
+    /// </summary>
+    /// <param name="query">The search text to filter by.</param>
+    /// <returns>Matching path history entries.</returns>
+    public IEnumerable<PathHistoryViewModel> FindUnfoundMediaMovePath(string query)
+    {
+        if (string.IsNullOrWhiteSpace(query))
+            return UnfoundMediaMovePathHistory;
+
+        return UnfoundMediaMovePathHistory.Where(p => p.Path.Contains(query, StringComparison.OrdinalIgnoreCase));
+    }
+
+    /// <summary>
+    /// Sets the unfound media move path from a chosen history entry.
+    /// </summary>
+    /// <param name="path">The path to set.</param>
+    public void ChooseUnfoundMediaMovePath(string path)
+    {
+        UnfoundMediaMovePath = path;
+    }
+
+    /// <summary>
+    /// Adds the current path values to their respective history lists if not already present.
+    /// </summary>
+    public void AddCurrentPathsToHistory()
+    {
+        AddToHistory(GamesPathHistory, GamesPath);
+        AddToHistory(ApplyAssetPathHistory, ApplyAssetPath);
+        AddToHistory(UnfoundMediaMovePathHistory, UnfoundMediaMovePath);
+    }
+
+    /// <summary>
+    /// Adds the path value to its respective history lists if not already present.
+    /// </summary>
+    private void AddToHistory(ObservableCollection<PathHistoryViewModel> history, string? path)
+    {
+        if (!string.IsNullOrWhiteSpace(path) && !history.Any(h => h.Path.Equals(path, StringComparison.OrdinalIgnoreCase)))
+        {
+            var item = new PathHistoryViewModel(path);
+
+            InitializePathHistory(item);
+
+            history.Add(item);
         }
     }
 

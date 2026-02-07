@@ -161,6 +161,97 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
         }
     }
 
+    #region AutoSuggestBox Event Handlers
+
+    private void GamesPath_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && ViewModel != null)
+        {
+            sender.ItemsSource = ViewModel.FindGamesPath(sender.Text).ToList();
+        }
+    }
+
+    private void GamesPath_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is PathHistoryViewModel chosen && ViewModel != null)
+        {
+            ViewModel.ChooseGamesPath(chosen.Path);
+        }
+    }
+
+    private void GamesPath_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    {
+        if (args.SelectedItem is PathHistoryViewModel chosen)
+        {
+            sender.Text = chosen.Path;
+        }
+    }
+
+    private void ApplyAssetPath_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && ViewModel != null)
+        {
+            sender.ItemsSource = ViewModel.FindApplyAssetPath(sender.Text).ToList();
+        }
+    }
+
+    private void ApplyAssetPath_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is PathHistoryViewModel chosen && ViewModel != null)
+        {
+            ViewModel.ChooseApplyAssetPath(chosen.Path);
+        }
+    }
+
+    private void ApplyAssetPath_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    {
+        if (args.SelectedItem is PathHistoryViewModel chosen)
+        {
+            sender.Text = chosen.Path;
+        }
+    }
+
+    private void UnfoundMediaMovePath_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+    {
+        if (args.Reason == AutoSuggestionBoxTextChangeReason.UserInput && ViewModel != null)
+        {
+            sender.ItemsSource = ViewModel.FindUnfoundMediaMovePath(sender.Text).ToList();
+        }
+    }
+
+    private void UnfoundMediaMovePath_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+    {
+        if (args.ChosenSuggestion is PathHistoryViewModel chosen && ViewModel != null)
+        {
+            ViewModel.ChooseUnfoundMediaMovePath(chosen.Path);
+        }
+    }
+
+    private void UnfoundMediaMovePath_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+    {
+        if (args.SelectedItem is PathHistoryViewModel chosen)
+        {
+            sender.Text = chosen.Path;
+        }
+    }
+
+    private void OnGamesPathHistoryRemoved(object? sender, EventArgs e)
+    {
+        GamesPathAutoSuggestBox.ItemsSource = null;
+    }
+
+    private void OnApplyAssetPathHistoryRemoved(object? sender, EventArgs e)
+    {
+        ApplyAssetPathAutoSuggestBox.ItemsSource = null;
+    }
+
+    private void OnUnfoundMediaMovePathHistoryRemoved(object? sender, EventArgs e)
+    {
+        UnfoundMediaMovePathAutoSuggestBox.ItemsSource = null;
+    }
+
+    #endregion
+
     #region Search Filters
 
     /// <summary>
@@ -589,6 +680,11 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
             };
             viewModel.ExtensionConfigurationsSearchChanged += ExtensionConfigurationsSearchChanged;
 
+            // Path History
+            viewModel.GamesPathHistoryRemoved += OnGamesPathHistoryRemoved;
+            viewModel.ApplyAssetPathHistoryRemoved += OnApplyAssetPathHistoryRemoved;
+            viewModel.UnfoundMediaMovePathHistoryRemoved += OnUnfoundMediaMovePathHistoryRemoved;
+
             OnPropertyChanged(nameof(SpecificGamesSearch));
             OnPropertyChanged(nameof(PlatformDefinitionConfigurationsSearch));
             OnPropertyChanged(nameof(SpecificPlatformsSearch));
@@ -645,6 +741,11 @@ public sealed partial class ConfigurationView : UserControl, INotifyPropertyChan
             // ExtensionConfigurations
             ExtensionConfigurationsSearch = [];
             viewModel.ExtensionConfigurationsSearchChanged -= ExtensionConfigurationsSearchChanged;
+
+            // Path History
+            viewModel.GamesPathHistoryRemoved -= OnGamesPathHistoryRemoved;
+            viewModel.ApplyAssetPathHistoryRemoved -= OnApplyAssetPathHistoryRemoved;
+            viewModel.UnfoundMediaMovePathHistoryRemoved -= OnUnfoundMediaMovePathHistoryRemoved;
         }
     }
 

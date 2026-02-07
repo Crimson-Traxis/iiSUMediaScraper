@@ -256,5 +256,22 @@
                 </Grid>
             </Border>
         </Border>
+        <Border Visibility="{x:Bind ViewModel.IsLoadingPlatforms, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Border.Background>
+                <media:BackdropBlurBrush Amount="5.0" />
+            </Border.Background>
+            <StackPanel
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+                <ProgressRing Width="300"
+                              Height="300"
+                              IsIndeterminate="True" 
+                              Margin="0,0,0,32"/>
+                <TextBlock Text="Loading Platforms.."
+                           FontSize="22"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

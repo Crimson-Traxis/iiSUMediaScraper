@@ -2,6 +2,7 @@
 using iiSUMediaScraper.Http;
 using iiSUMediaScraper.Models;
 using iiSUMediaScraper.Services;
+using iiSUMediaScraper.Services.FileHandlers;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.RateLimiting;
 
@@ -70,6 +71,20 @@ public static class ServiceCollectionExtensions
     {
         services.Configure(configureOptions);
         services.AddSingleton<IUpscalerService, UpscalerService>();
+        return services;
+    }
+
+    /// <summary>
+    /// Registers file handler implementations and the file service orchestrator.
+    /// Handler registration order matters: protocol-specific handlers are checked
+    /// before the default Windows handler.
+    /// </summary>
+    public static IServiceCollection AddFileServices(this IServiceCollection services)
+    {
+        services.AddSingleton<IFileHandler, FtpFileHandler>();
+        services.AddSingleton<IFileHandler, MtpFileHandler>();
+        services.AddSingleton<IFileHandler, WindowsFileHandler>();
+        services.AddSingleton<IFileService, FileService>();
         return services;
     }
 

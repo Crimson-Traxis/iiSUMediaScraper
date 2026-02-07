@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using iiSUMediaScraper.Contracts.Services;
+using iiSUMediaScraper.Models;
 using iiSUMediaScraper.ViewModels.Configurations;
 using System.Collections.ObjectModel;
 
@@ -21,6 +22,13 @@ public partial class MainViewModel : ObservableRecipient
     /// </summary>
     [ObservableProperty]
     private bool isLoadingConfiguration;
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the platforms are being loaded.
+    /// </summary>
+    [ObservableProperty]
+    private bool isLoadingPlatforms;
+
 
     /// <summary>
     /// Gets or sets a value indicating whether the scraping process has begun.
@@ -196,7 +204,7 @@ public partial class MainViewModel : ObservableRecipient
 
         ApplyingGames.Clear();
 
-        foreach (GameViewModel game in games)
+        foreach (var game in games.Where(g => g.MediaContext?.AllMedia.Any(m => m.Source != SourceFlag.Previous) ?? false))
         {
             ApplyingGames.Add(game);
         }
@@ -228,6 +236,8 @@ public partial class MainViewModel : ObservableRecipient
     [RelayCommand]
     public async Task SaveConfiguration()
     {
+        Configuration?.AddCurrentPathsToHistory();
+
         ConfigurationService?.SaveConfiguration();
     }
 
@@ -318,6 +328,8 @@ public partial class MainViewModel : ObservableRecipient
 
             var semaphore = new SemaphoreSlim((int)Math.Min(MaxConcurrency, Configuration.MaxNumberOfConcurrentGames));
 
+            IsLoadingPlatforms = true;
+
             foreach (string scanLocation in scanLocations)
             {
                 IEnumerable<string> folders = await FileService.GetSubFolders(scanLocation);
@@ -367,6 +379,8 @@ public partial class MainViewModel : ObservableRecipient
 
                 if(platform.Games.Count > 0)
                 {
+                    IsLoadingPlatforms = false;
+
                     SelectedPlatform ??= platform;
                 }
 

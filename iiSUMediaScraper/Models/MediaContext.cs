@@ -1,4 +1,6 @@
-﻿namespace iiSUMediaScraper.Models;
+﻿using iiSUMediaScraper.ViewModels;
+
+namespace iiSUMediaScraper.Models;
 
 /// <summary>
 /// Contains collections of different media types associated with a game.
@@ -39,4 +41,18 @@ public class MediaContext
     /// Gets or sets the collection of music tracks.
     /// </summary>
     public List<Music> Music { get; set; } = [];
+
+    /// <summary>
+    /// Gets all media items in the context.
+    /// </summary>
+    public IEnumerable<Media> AllMedia =>
+    [
+        .. Icons,
+        .. Logos,
+        .. Titles,
+        .. Heros,
+        .. Slides,
+        .. Music,
+        .. Videos
+    ];
 }

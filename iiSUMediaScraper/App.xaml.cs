@@ -109,7 +109,7 @@ public partial class App : Application
             services.AddScrapingHttpClients();
 
             // Core Services
-            services.AddSingleton<IFileService, FileService>();
+            services.AddFileServices();
 
             // Views and ViewModels
             services.AddTransient<MainViewModel>();

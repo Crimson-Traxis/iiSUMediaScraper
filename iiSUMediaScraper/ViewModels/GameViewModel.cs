@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using iiSUMediaScraper.Contracts.Services;
+using iiSUMediaScraper.Extensions;
 using iiSUMediaScraper.Models;
 using iiSUMediaScraper.Models.Scraping.SteamGridDb;
 using iiSUMediaScraper.Services;
@@ -28,7 +29,7 @@ public partial class GameViewModel : ObservableObject
 
     private CancellationTokenSource? _cancelUrlFetchCancellationTokenSource;
 
-    private TaskCompletionSource _scrapTaskCompletionSource;
+    private TaskCompletionSource? _scrapTaskCompletionSource;
 
     private TaskCompletionSource? _formatIconTaskCompletionSource;
 
@@ -258,8 +259,6 @@ public partial class GameViewModel : ObservableObject
         demoModeHeros = [];
 
         demoModeMusic = [];
-
-        _scrapTaskCompletionSource = new TaskCompletionSource();
     }
 
     partial void OnIsInDemoModeChanged(bool value)
@@ -1455,8 +1454,11 @@ public partial class GameViewModel : ObservableObject
     /// </summary>
     public async Task Apply()
     {
-        // Wait for scraping and all formatting tasks to complete before applying
-        await _scrapTaskCompletionSource.Task;
+        if(_scrapTaskCompletionSource != null)
+        {
+            // Wait for scraping and all formatting tasks to complete before applying
+            await _scrapTaskCompletionSource.Task;
+        }
 
         if (_formatIconTaskCompletionSource != null)
         {
@@ -1608,14 +1610,45 @@ public partial class GameViewModel : ObservableObject
     /// <summary>
     /// Scrapes media for the game from configured scraping sources.
     /// </summary>
-    public async Task Scrape()
+    [RelayCommand]
+    public Task ReScrape()
     {
+        return Scrape(true);
+    }
+
+    /// <summary>
+    /// Scrapes media for the game from configured scraping sources.
+    /// </summary>
+    [RelayCommand]
+    public async Task Scrape(bool isRescrape = false)
+    {
+        _scrapTaskCompletionSource = new TaskCompletionSource();
+
         IsLoading = true;
 
         if (!string.IsNullOrWhiteSpace(Path) && !string.IsNullOrWhiteSpace(Platform))
         {
-            // Fetch media from all configured scrapers (IGN, SteamGridDB, IGDB, YouTube)
-            MediaContext mediaContext = await ScrapingService.GetMedia(Platform, Name);
+            var mediaContext = new MediaContext();
+
+            // Load previously saved assets from asset folders
+            if (Configuration.IsLoadPrevious)
+            {
+                await LoadPrevious(mediaContext);
+            }
+
+            if (!isRescrape)
+            {
+                if (!mediaContext.AllMedia.Any() || Configuration.IsFetchIfPreviousFound)
+                {
+                    // Fetch media from all configured scrapers (IGN, SteamGridDB, IGDB, YouTube)
+                    mediaContext.AddFrom(await ScrapingService.GetMedia(Platform, Name));
+                }
+            }
+            else
+            {
+                // Fetch media from all configured scrapers (IGN, SteamGridDB, IGDB, YouTube)
+                mediaContext.AddFrom(await ScrapingService.GetMedia(Platform, Name));
+            }
 
             // Clean up event handlers from previous media context
             if (MediaContext != null)
@@ -1625,12 +1658,6 @@ public partial class GameViewModel : ObservableObject
 
             if (mediaContext != null)
             {
-                // Load previously saved assets from asset folders
-                if (Configuration.IsLoadPrevious)
-                {
-                    await LoadPrevious(mediaContext);
-                }
-
                 // Create view model wrapper and wire up event handlers
                 MediaContext = new MediaContextViewModel(mediaContext, ScrapingService, MediaFormatterService, UpscalerService, FileService, Downloader, Configuration);
 
@@ -1729,7 +1756,7 @@ public partial class GameViewModel : ObservableObject
 
                 if (Configuration.IsUnfoundMediaIfNoLogos)
                 {
-                    isfound &= MediaContext.Logos.Any();
+                    isfound &= MediaContext.Logos.Any() || MediaContext.Titles.Any(t => t.Source == SourceFlag.Previous);
                 }
 
                 if (Configuration.IsUnfoundMediaIfNoTitles)

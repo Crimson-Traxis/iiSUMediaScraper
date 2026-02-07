@@ -28,6 +28,11 @@
 
         <customconverters:InverseStringToVisibilityConverter x:Key="InverseStringToVisibilityConverter" />
 
+        <DataTemplate x:Key="PathHistoryTemplate"
+                      x:DataType="configurationviewmodels:PathHistoryViewModel">
+            <local:PathHistoryView ViewModel="{x:Bind Mode=OneWay}" />
+        </DataTemplate>
+
         <DataTemplate x:Key="GameIconOverlayConfigurationTemplate"
                       x:DataType="configurationviewmodels:GameIconOverlayConfigurationViewModel">
             <local:GameIconOverlayConfigurationView ViewModel="{x:Bind Mode=OneWay}"
@@ -348,21 +353,35 @@
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="auto" />
                             </Grid.ColumnDefinitions>
-                            <TextBox Margin="0,0,0,16"
-                                     Text="{x:Bind ViewModel.GamesPath, Mode=TwoWay}"
-                                     Header="Games Folder"
-                                     ToolTipService.ToolTip="Location that contains all your game folders. Suggest browsing to folder on device connected via usb"/>
+                            <AutoSuggestBox x:Name="GamesPathAutoSuggestBox"
+                                           Margin="0,0,0,16"
+                                           Text="{x:Bind ViewModel.GamesPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                           Header="Games Folder"
+                                           PlaceholderText="Enter games folder path"
+                                           QueryIcon="Find"
+                                           ItemTemplate="{StaticResource PathHistoryTemplate}"
+                                           TextChanged="GamesPath_TextChanged"
+                                           QuerySubmitted="GamesPath_QuerySubmitted"
+                                           SuggestionChosen="GamesPath_SuggestionChosen"
+                                           ToolTipService.ToolTip="Location that contains all your game folders. Suggest browsing to folder on device connected via usb"/>
                             <Button Content="Pick Folder"
                                     Margin="16,0,0,16"
                                     VerticalAlignment="Bottom"
                                     Grid.Column="1"
                                     Click="PickGamesFolderButton_Click" />
-                            <TextBox Header="Asset Folder"
-                                     Text="{x:Bind ViewModel.ApplyAssetPath, Mode=TwoWay}"
-                                     Margin="0,0,0,16"
-                                     MinWidth="200"
-                                     Grid.Row="3"
-                                     ToolTipService.ToolTip="Location that contains all your game assets. Generates the same folder structure as your game folder and places assets in each sanitized game folder. Suggest browsing to folder on device connected via usb" />
+                            <AutoSuggestBox x:Name="ApplyAssetPathAutoSuggestBox"
+                                           Header="Asset Folder"
+                                           Text="{x:Bind ViewModel.ApplyAssetPath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                           Margin="0,0,0,16"
+                                           MinWidth="200"
+                                           Grid.Row="3"
+                                           PlaceholderText="Enter asset folder path"
+                                           QueryIcon="Find"
+                                           ItemTemplate="{StaticResource PathHistoryTemplate}"
+                                           TextChanged="ApplyAssetPath_TextChanged"
+                                           QuerySubmitted="ApplyAssetPath_QuerySubmitted"
+                                           SuggestionChosen="ApplyAssetPath_SuggestionChosen"
+                                           ToolTipService.ToolTip="Location that contains all your game assets. Generates the same folder structure as your game folder and places assets in each sanitized game folder. Suggest browsing to folder on device connected via usb" />
                             <Button Content="Pick Folder"
                                     Grid.Row="3"
                                     Margin="16,0,0,16"
@@ -382,25 +401,31 @@
                                           Margin="0,0,0,8"
                                           Grid.Row="5"
                                           Grid.ColumnSpan="2" />
+                            <ToggleSwitch OffContent="Fetch if previous assets found"
+                                          OnContent="Fetch if previous assets found"
+                                          Margin="0,0,0,8"
+                                          Grid.Row="6"
+                                          Grid.ColumnSpan="2"
+                                          IsOn="{x:Bind ViewModel.IsFetchIfPreviousFound, Mode=TwoWay}" />
                             <ToggleSwitch OffContent="Show Previewer"
                                           OnContent="Show Previewer"
                                           IsOn="{x:Bind ViewModel.IsPreviewerEnabled, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="6"
+                                          Grid.Row="7"
                                           Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan games folder"
                                           OnContent="Scan games folder"
                                           IsOn="{x:Bind ViewModel.IsScanGames, Mode=TwoWay}"
                                           Margin="0,0,0,8"
-                                          Grid.Row="7"
+                                          Grid.Row="8"
                                           Grid.ColumnSpan="2" />
                             <ToggleSwitch OffContent="Scan unfound games folder"
                                           OnContent="Scan unfound games folder"
                                           IsOn="{x:Bind ViewModel.IsScanUnfoundGames, Mode=TwoWay}"
-                                          Margin="0,0,0,8"
-                                          Grid.Row="8"
+                                          Margin="0,0,0,16"
+                                          Grid.Row="9"
                                           Grid.ColumnSpan="2" />
-                            <StackPanel Grid.Row="9"
+                            <StackPanel Grid.Row="10"
                                         Grid.ColumnSpan="2"
                                         Background="{ThemeResource LayerFillColorDefaultBrush}"
                                         HorizontalAlignment="Left"
@@ -634,11 +659,18 @@
                                     <ColumnDefinition Width="*" />
                                     <ColumnDefinition Width="auto" />
                                 </Grid.ColumnDefinitions>
-                                <TextBox Header="Unfound Game Folder"
-                                         Text="{x:Bind ViewModel.UnfoundMediaMovePath, Mode=TwoWay}"
-                                         ToolTipService.ToolTip="If there is no media found for a game then games will be moved to this folder"
-                                         Margin="0,0,0,16"
-                                         Grid.Row="2" />
+                                <AutoSuggestBox x:Name="UnfoundMediaMovePathAutoSuggestBox"
+                                               Header="Unfound Game Folder"
+                                               Text="{x:Bind ViewModel.UnfoundMediaMovePath, Mode=TwoWay, UpdateSourceTrigger=LostFocus}"
+                                               ToolTipService.ToolTip="If there is no media found for a game then games will be moved to this folder"
+                                               Margin="0,0,0,16"
+                                               Grid.Row="2"
+                                               PlaceholderText="Enter unfound games folder path"
+                                               QueryIcon="Find"
+                                               ItemTemplate="{StaticResource PathHistoryTemplate}"
+                                               TextChanged="UnfoundMediaMovePath_TextChanged"
+                                               QuerySubmitted="UnfoundMediaMovePath_QuerySubmitted"
+                                               SuggestionChosen="UnfoundMediaMovePath_SuggestionChosen" />
                                 <Button Content="Pick Folder"
                                         Grid.Row="2"
                                         Margin="16,0,0,16"

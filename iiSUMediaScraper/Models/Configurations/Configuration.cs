@@ -111,6 +111,11 @@ public class Configuration
     public bool IsApplyUnfoundGames { get; set; }
 
     /// <summary>
+    /// Gets or sets whether to fetch assets if previous assets were found.
+    /// </summary>
+    public bool IsFetchIfPreviousFound { get; set; }
+
+    /// <summary>
     /// Gets or sets whether to delete existing hero assets before applying new ones.
     /// </summary>
     public bool IsDeleteExistingHeroAssets { get; set; }
@@ -310,4 +315,19 @@ public class Configuration
     /// Gets or sets the list of specific games to process.
     /// </summary>
     public List<SpecificGame> SpecificGames { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the history of previously used games folder paths.
+    /// </summary>
+    public List<string> GamesPathHistory { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the history of previously used asset folder paths.
+    /// </summary>
+    public List<string> ApplyAssetPathHistory { get; set; } = [];
+
+    /// <summary>
+    /// Gets or sets the history of previously used unfound game folder paths.
+    /// </summary>
+    public List<string> UnfoundMediaMovePathHistory { get; set; } = [];
 }

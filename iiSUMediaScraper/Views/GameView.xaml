@@ -331,6 +331,7 @@
                                 </Border>
                             </Grid>
                             <Grid Width="{Binding ElementName=GridIcon, Path=ActualWidth}"
+                                  MinWidth="280"
                                   Grid.Column="1"
                                   Margin="0,-16,0,0"
                                   Visibility="{x:Bind ViewModel.IsFetchMusicOrHasMusic, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -581,8 +582,7 @@
                                                 Background="{ThemeResource LayerFillColorAltBrush}"
                                                 VerticalAlignment="Top"
                                                 Margin="0,0,16,0"
-                                                Height="36"
-                                                Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                Height="36">
                                 <controls:SegmentedItem ToolTipService.ToolTip="Images">
                                     <Viewbox>
                                         <SymbolIcon Symbol="Pictures" />
@@ -602,7 +602,6 @@
                         </Border>
                         <Border Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                             <Button x:Name="AddButton"
-                                    Visibility="{x:Bind ViewModel.IsInDemoMode, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
                                     Padding="6"
                                     Height="36"
                                     Margin="0,0,16,0"
@@ -611,6 +610,13 @@
                                 <Button.Flyout>
                                     <Flyout>
                                         <StackPanel>
+                                            <TextBlock Text="Scraping"
+                                                       Margin="0,0,0,8"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <MenuFlyoutItem Text="Rescrape"
+                                                            Tapped="MenuFlyoutItem_Tapped"
+                                                            Command="{x:Bind ViewModel.ReScrapeCommand, Mode=OneWay}"
+                                                            MinWidth="160" />
                                             <StackPanel Visibility="{x:Bind ViewModel.ViewIndex, Mode=OneWay, Converter={StaticResource EqualsZeroToVisibilityConverter}, FallbackValue='Collapsed'}">
                                                 <TextBlock Text="Files"
                                                            Margin="0,0,0,8"
@@ -704,7 +710,8 @@
                                       Padding="6"
                                       Height="36"
                                       VerticalAlignment="Top"
-                                      ToolTipService.ToolTip="Toggle Demo Mode">
+                                      ToolTipService.ToolTip="Toggle Demo Mode"
+                                      Visibility="{x:Bind ViewModel.IsLoading, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                             <SymbolIcon Symbol="DockBottom" />
                         </ToggleButton>
                     </StackPanel>
