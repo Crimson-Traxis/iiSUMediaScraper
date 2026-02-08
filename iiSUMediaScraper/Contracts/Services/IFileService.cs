@@ -36,6 +36,11 @@ public interface IFileService
     Task Delete(string folderPath, string fileName);
 
     /// <summary>
+    /// Deletes a file from the specified file.
+    /// </summary>
+    Task Delete(string fileName);
+
+    /// <summary>
     /// Gets all subfolders matching the search pattern.
     /// </summary>
     Task<IEnumerable<string>> GetSubFolders(string folderPath, string searchPattern = null);

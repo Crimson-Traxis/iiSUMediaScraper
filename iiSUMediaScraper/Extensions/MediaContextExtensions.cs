@@ -16,5 +16,7 @@ public static class MediaContextExtensions
         mediaContext.Titles.AddRange(mediaContext2.Titles);
         mediaContext.Heros.AddRange(mediaContext2.Heros);
         mediaContext.Slides.AddRange(mediaContext2.Slides);
+        mediaContext.Music.AddRange(mediaContext2.Music);
+        mediaContext.Videos.AddRange(mediaContext2.Videos);
     }
 }

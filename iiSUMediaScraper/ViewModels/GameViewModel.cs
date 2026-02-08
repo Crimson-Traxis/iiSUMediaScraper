@@ -1540,13 +1540,27 @@ public partial class GameViewModel : ObservableObject
                         // Apply icon image
                         if (Configuration.IsApplyIcon && !string.IsNullOrWhiteSpace(Configuration.IconNameFormat) && DemoModeIcon != null && !string.IsNullOrWhiteSpace(DemoModeIcon.LocalPath))
                         {
-                            await FileService.CopyFile(DemoModeIcon.LocalPath, FileService.CombinePath(path, $"{Configuration.IconNameFormat}.png"));
+                            var file = FileService.CombinePath(path, $"{Configuration.IconNameFormat}.png");
+
+                            if (await FileService.FileExists(file)) 
+                            {
+                                await FileService.Delete(file);
+                            }
+
+                            await FileService.CopyFile(DemoModeIcon.LocalPath, file);
                         }
 
                         // Apply title image
                         if (Configuration.IsApplyTitle && !string.IsNullOrWhiteSpace(Configuration.TitleNameFormat) && DemoModeTitle != null && !string.IsNullOrWhiteSpace(DemoModeTitle.LocalPath))
                         {
-                            await FileService.CopyFile(DemoModeTitle.LocalPath, FileService.CombinePath(path, $"{Configuration.TitleNameFormat}.png"));
+                            var file = FileService.CombinePath(path, $"{Configuration.TitleNameFormat}.png");
+
+                            if (await FileService.FileExists(file))
+                            {
+                                await FileService.Delete(file);
+                            }
+
+                            await FileService.CopyFile(DemoModeTitle.LocalPath, file);
                         }
 
                         // Apply hero images (multiple, numbered)
@@ -1561,7 +1575,14 @@ public partial class GameViewModel : ObservableObject
 
                                 if (!string.IsNullOrWhiteSpace(localPath))
                                 {
-                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.HeroNameFormat}{i + 1}.{(DemoModeHeros[i] is ImageViewModel ? "png" : "mp4")}"));
+                                    var file = FileService.CombinePath(path, $"{Configuration.HeroNameFormat}{i + 1}.{(DemoModeHeros[i] is ImageViewModel ? "png" : "mp4")}");
+
+                                    if (await FileService.FileExists(file))
+                                    {
+                                        await FileService.Delete(file);
+                                    }
+
+                                    await FileService.CopyFile(localPath, file);
                                 }
                             }
                         }
@@ -1578,7 +1599,14 @@ public partial class GameViewModel : ObservableObject
 
                                 if (!string.IsNullOrWhiteSpace(localPath))
                                 {
-                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{Configuration.SlideNameFormat}{i + 1}.{(DemoModeSlides[i] is ImageViewModel ? "png" : "mp4")}"));
+                                    var file = FileService.CombinePath(path, $"{Configuration.SlideNameFormat}{i + 1}.{(DemoModeSlides[i] is ImageViewModel ? "png" : "mp4")}");
+
+                                    if (await FileService.FileExists(file))
+                                    {
+                                        await FileService.Delete(file);
+                                    }
+
+                                    await FileService.CopyFile(localPath, file);
                                 }
                             }
                         }
@@ -1597,7 +1625,14 @@ public partial class GameViewModel : ObservableObject
 
                                 if (!string.IsNullOrWhiteSpace(localPath))
                                 {
-                                    await FileService.CopyFile(localPath, FileService.CombinePath(path, $"{name}.mp3"));
+                                    var file = FileService.CombinePath(path, $"{name}.mp3");
+
+                                    if (await FileService.FileExists(file))
+                                    {
+                                        await FileService.Delete(file);
+                                    }
+
+                                    await FileService.CopyFile(localPath, file);
                                 }
                             }
                         }

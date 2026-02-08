@@ -160,6 +160,15 @@ public class FileService : IFileService
     }
 
     /// <summary>
+    /// Deletes a file if it exists using the full file path.
+    /// </summary>
+    public async Task Delete(string fileName)
+    {
+        var handler = GetHandler(fileName);
+        await handler.DeleteFile(fileName);
+    }
+
+    /// <summary>
     /// Deletes all files in a folder matching the search pattern.
     /// </summary>
     public async Task DeleteFiles(string folderPath, string searchPattern = null)

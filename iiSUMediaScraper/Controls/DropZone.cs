@@ -1,8 +1,11 @@
 ﻿using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using System.IO;
 using Windows.ApplicationModel.DataTransfer;
+using Windows.Graphics.Imaging;
 using Windows.Storage;
+using Windows.Storage.Streams;
 
 namespace iiSUMediaScraper.Controls;
 
@@ -164,7 +167,8 @@ public sealed class DropZone : ContentControl
 
     private void OnDragEnter(object sender, DragEventArgs e)
     {
-        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        if (e.DataView.Contains(StandardDataFormats.StorageItems) ||
+            e.DataView.Contains(StandardDataFormats.Bitmap))
         {
             IsDragOver = true;
             e.AcceptedOperation = DataPackageOperation.Copy;
@@ -176,7 +180,8 @@ public sealed class DropZone : ContentControl
 
     private void OnDragOver(object sender, DragEventArgs e)
     {
-        if (e.DataView.Contains(StandardDataFormats.StorageItems))
+        if (e.DataView.Contains(StandardDataFormats.StorageItems) ||
+            e.DataView.Contains(StandardDataFormats.Bitmap))
         {
             e.AcceptedOperation = DataPackageOperation.Copy;
         }
@@ -198,15 +203,32 @@ public sealed class DropZone : ContentControl
 
             foreach (IStorageItem? item in items)
             {
-                if (item is StorageFile file && IsAcceptedFile(file))
+                if (item is StorageFile file)
                 {
-                    files.Add(file);
+                    if (string.IsNullOrEmpty(file.Path))
+                    {
+                        file = await ConvertToPng(file);
+                    }
+
+                    if (IsAcceptedFile(file))
+                    {
+                        files.Add(file);
+                    }
                 }
             }
 
             if (files.Count > 0)
             {
                 FilesDropped?.Invoke(this, new FilesDroppedEventArgs(files));
+            }
+        }
+        else if (e.DataView.Contains(StandardDataFormats.Bitmap))
+        {
+            var storageFile = await SaveBitmapToTempFile(e.DataView);
+
+            if (storageFile != null && IsAcceptedFile(storageFile))
+            {
+                FilesDropped?.Invoke(this, new FilesDroppedEventArgs([storageFile]));
             }
         }
     }
@@ -238,6 +260,44 @@ public sealed class DropZone : ContentControl
     #endregion
 
     #region Methods
+
+    private static async Task<StorageFile> EncodeToPng(IRandomAccessStream inputStream)
+    {
+        var decoder = await BitmapDecoder.CreateAsync(inputStream);
+        using var softwareBitmap = await decoder.GetSoftwareBitmapAsync();
+
+        var tempFolder = await StorageFolder.GetFolderFromPathAsync(Path.GetTempPath());
+        var outputFile = await tempFolder.CreateFileAsync($"{Guid.NewGuid()}.png", CreationCollisionOption.GenerateUniqueName);
+
+        using (var outputStream = await outputFile.OpenAsync(FileAccessMode.ReadWrite))
+        {
+            var encoder = await BitmapEncoder.CreateAsync(BitmapEncoder.PngEncoderId, outputStream);
+            encoder.SetSoftwareBitmap(softwareBitmap);
+            await encoder.FlushAsync();
+        }
+
+        return outputFile;
+    }
+
+    private static async Task<StorageFile?> SaveBitmapToTempFile(DataPackageView dataView)
+    {
+        var streamRef = await dataView.GetBitmapAsync();
+        using var stream = await streamRef.OpenReadAsync();
+
+        if (stream.Size == 0)
+        {
+            return null;
+        }
+
+        return await EncodeToPng(stream);
+    }
+
+    private static async Task<StorageFile> ConvertToPng(StorageFile sourceFile)
+    {
+        using var stream = await sourceFile.OpenReadAsync();
+
+        return await EncodeToPng(stream);
+    }
 
     protected override void OnApplyTemplate()
     {
