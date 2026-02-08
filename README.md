@@ -203,6 +203,17 @@ Define output settings:
 
 **Note**: IGN scraper does not require API keys and works without authentication.
 
+## Packages/External Libraries
+
+ComfyUI-SeedVR2_VideoUpscaler - https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git <br>
+yt-dl - https://github.com/yt-dlp/yt-dlp<br>
+Ffmpeg - https://github.com/FFmpeg/FFmpeg<br>
+FluentFTP - https://github.com/robinrodricks/FluentFTP<br>
+Magick.Net - https://github.com/dlemstra/Magick.NET<br>
+MTP - https://github.com/Bassman2/MediaDevices<br>
+SmartCrop.Net - https://github.com/softawaregmbh/smartcrop.net<br>
+WinUIEx - https://dotmorten.github.io/WinUIEx/<br>
+
 ## Support
 
 For issues, questions, or suggestions, please open an issue on GitHub.
